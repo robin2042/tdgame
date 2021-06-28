@@ -1,0 +1,25 @@
+db:
+  username: "root"
+  host: "127.0.0.1"
+  dbname: "tdgames"
+
+dapi:
+  all: "https://2ch.pm/%s/threads.json"
+  thread: "https://2ch.pm/%s/res/%s.json"
+  resource: "https://2ch.hk%s"
+
+tg:
+  admin_id: ["232469683"]
+
+disk:
+  path: "src"
+  size: 1073714824
+
+polling:
+  time: 20
+
+niuniu_start_text:
+  username: "postgres"
+
+niuniu_start_button:
+  

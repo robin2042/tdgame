@@ -1,0 +1,17 @@
+version: '2'
+services:
+  postgres:
+    image: postgres
+    environment:
+      - 'POSTGRES_PASSWORD=${DB_PASSWORD}'
+    command: '-p ${DB_PORT}'
+    ports:
+        - "${DB_PORT}:${DB_PORT}"
+    expose:
+        - "${DB_PORT}"
+  bot:
+    environment:
+      - 'DB_PASSWORD=${DB_PASSWORD}'
+      - 'DB_PORT=${DB_PORT}'
+      - 'BOT_TOKEN=${BOT_TOKEN}'
+    build: .
