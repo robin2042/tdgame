@@ -6,6 +6,18 @@ import (
 )
 
 // User interface defines methods for User Storage
+type Group interface {
+	Register(user *logic.Group) error // Adds user in databse
+	// Unregister(user *logic.Group) error                                 // Removes user from database
+	// GetUserByChatID(chatID int64) (*logic.User, error)                  // Returns user by chat id
+	// Update(user *logic.User) error                                      // Updates user
+	// GetUserByID(userID int64) (*logic.User, error)                      // Returns user by it's id
+	// GetUsersByPublication(pub *logic.Publication) ([]logic.User, error) // Returns owner of publication
+	// IsUserAdmin(user *logic.User) bool
+	// IsChatAdmin(userID int64) bool
+}
+
+// User interface defines methods for User Storage
 type User interface {
 	Register(user *logic.User) error                                    // Adds user in databse
 	Unregister(user *logic.User) error                                  // Removes user from database
@@ -41,6 +53,7 @@ type Storage struct {
 	User
 	Subscription
 	Info
+	Group
 }
 
 // NewStorage constructor of Storage
@@ -49,5 +62,6 @@ func NewStorage(db *gorm.DB, cfg *InitDatabase) *Storage {
 		User:         NewUserPostgres(db, cfg),
 		Subscription: NewSubscriptionPostgres(db),
 		Info:         NewInfoPostgres(db),
+		Group:        NewGroupMysql(db),
 	}
 }

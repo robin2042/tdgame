@@ -26,6 +26,7 @@ type MessageSender interface {
 
 // TgBot represents telegram bot view
 type TgBot struct {
+	Me         *telebot.User
 	Bot        MessageSender
 	Controller *controller.Controller
 	Downloader *downloader.Downloader
@@ -60,6 +61,7 @@ func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Down
 	}
 
 	return &TgBot{
+		Me:         bot.Me,
 		Bot:        bot,
 		Controller: cnt,
 		Downloader: d,
@@ -69,8 +71,10 @@ func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Down
 // SetupHandlers to default values
 func SetupHandlers(tb *TgBot) {
 	tb.Bot.Handle("/huanleniuniu", start(tb))
-	tb.Bot.Handle(telebot.OnUserLeft, NiuniuStart(tb))   //欢乐牛牛
-	tb.Bot.Handle(telebot.OnUserJoined, NiuniuStart(tb)) //欢乐牛牛
+
+	tb.Bot.Handle(telebot.OnAddedToGroup, OnBotAddGroups(tb))
+	tb.Bot.Handle(telebot.OnUserJoined, EnterGroups(tb))
+	tb.Bot.Handle(telebot.OnUserLeft, LeaveGroups(tb))
 
 	// tb.Bot.Handle("/hlniuniu", NiuniuStart(tb)) //欢乐牛牛
 	// tb.Bot.Handle("/list", list(tb))

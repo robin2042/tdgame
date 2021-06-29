@@ -6,6 +6,12 @@ import (
 )
 
 // User interface defines methods for User Controller
+type Group interface {
+	GroupRegister(chatID int64) error   // Performs user registration
+	UnGroupregister(chatID int64) error // Performs user deregistration
+}
+
+// User interface defines methods for User Controller
 type User interface {
 	Register(chatID int64) error                                        // Performs user registration
 	Unregister(chatID int64) error                                      // Performs user deregistration
@@ -36,6 +42,7 @@ type Controller struct {
 	User
 	Subscription
 	Info
+	Group
 }
 
 // NewController constructor of Controller
@@ -44,5 +51,6 @@ func NewController(stg *storage.Storage) *Controller {
 		User:         NewUserController(stg),
 		Subscription: NewSubscriptionController(stg),
 		Info:         NewInfoController(stg),
+		Group:        NewGroupController(stg),
 	}
 }

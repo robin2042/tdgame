@@ -1,6 +1,13 @@
 package logic
 
 // User stores info about user
+type Group struct {
+	ID     int
+	ChatID int64 `gorm:"uniqueIndex"` // Telegram's chat id
+
+}
+
+// User stores info about user
 type User struct {
 	ID        int
 	ChatID    int64         `gorm:"uniqueIndex"` // Telegram's chat id
