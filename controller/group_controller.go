@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
 )
 
@@ -16,10 +17,12 @@ func NewGroupController(stg *storage.Storage) *GroupController {
 
 // NewUserController constructor of UserController struct
 func (ucon *GroupController) GroupRegister(chatID int64) error {
-	// user := &logic.Group{
-	// 	ChatID: chatID,
-	// }
-	return nil
+
+	user := &logic.Group{
+		ChatID: chatID,
+	}
+	return ucon.stg.GroupRegister(user)
+
 }
 
 // NewUserController constructor of UserController struct

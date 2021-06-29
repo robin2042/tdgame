@@ -7,7 +7,7 @@ import (
 
 // User interface defines methods for User Storage
 type Group interface {
-	Register(user *logic.Group) error // Adds user in databse
+	GroupRegister(user *logic.Group) error // Adds user in databse
 	// Unregister(user *logic.Group) error                                 // Removes user from database
 	// GetUserByChatID(chatID int64) (*logic.User, error)                  // Returns user by chat id
 	// Update(user *logic.User) error                                      // Updates user

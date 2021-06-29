@@ -18,6 +18,6 @@ func NewGroupMysql(db *gorm.DB) *GroupMysql {
 }
 
 // Register adds user in databse
-func (groupStorage *GroupMysql) Register(user *logic.Group) error {
+func (groupStorage *GroupMysql) GroupRegister(user *logic.Group) error {
 	return nil
 }

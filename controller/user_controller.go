@@ -17,10 +17,11 @@ func NewUserController(stg *storage.Storage) *UserController {
 
 // Register performs user registration
 func (ucon *UserController) Register(chatID int64) error {
-	user := &logic.User{
-		ChatID: chatID,
-	}
-	return ucon.stg.Register(user)
+	return nil
+	// user := &logic.User{
+	// 	ChatID: chatID,
+	// }
+	// return ucon.stg.Register(user)
 }
 
 // Unregister performs user deregistration

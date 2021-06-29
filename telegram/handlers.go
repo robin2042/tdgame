@@ -46,7 +46,7 @@ func subs(tb *TgBot) func(m *telebot.Message) {
 // /add bot to groups
 func OnBotAddGroups(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		err := tb.Controller.Register(m.Chat.ID)
+		err := tb.Controller.GroupRegister(m.Chat.ID)
 		if err != nil {
 			log.Println(err)
 		}
