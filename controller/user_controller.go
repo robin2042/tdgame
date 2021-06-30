@@ -17,11 +17,11 @@ func NewUserController(stg *storage.Storage) *UserController {
 
 // Register performs user registration
 func (ucon *UserController) Register(chatID int64) error {
-	return nil
-	// user := &logic.User{
-	// 	ChatID: chatID,
-	// }
-	// return ucon.stg.Register(user)
+
+	user := &logic.User{
+		ChatID: chatID,
+	}
+	return ucon.stg.Register(user)
 }
 
 // Unregister performs user deregistration
@@ -37,4 +37,9 @@ func (ucon *UserController) GetUsersByPublication(pub *logic.Publication) ([]log
 	users, err := ucon.stg.GetUsersByPublication(pub)
 
 	return users, err
+}
+
+// GetUsersByPublication returns subscribers of publication
+func (ucon *UserController) Relief(chatID int64) int64 {
+	return 0
 }

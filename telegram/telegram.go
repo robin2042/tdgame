@@ -9,6 +9,7 @@ import (
 
 	"github.com/aoyako/telegram_2ch_res_bot/controller"
 	"github.com/aoyako/telegram_2ch_res_bot/downloader"
+	"github.com/aoyako/telegram_2ch_res_bot/games"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/xfrr/goffmpeg/transcoder"
 
@@ -30,10 +31,11 @@ type TgBot struct {
 	Bot        MessageSender
 	Controller *controller.Controller
 	Downloader *downloader.Downloader
+	Games      *games.GameManager
 }
 
 // NewTelegramBot constructor of TelegramBot
-func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader) *TgBot {
+func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader, g *games.GameManager) *TgBot {
 	settings := telebot.Settings{
 		Token:  token,
 		Poller: &telebot.LongPoller{Timeout: 30 * time.Second},
@@ -65,16 +67,21 @@ func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Down
 		Bot:        bot,
 		Controller: cnt,
 		Downloader: d,
+		Games:      g,
 	}
 }
 
 // SetupHandlers to default values
 func SetupHandlers(tb *TgBot) {
-	tb.Bot.Handle("/huanleniuniu", start(tb))
-
+	//组
 	tb.Bot.Handle(telebot.OnAddedToGroup, OnBotAddGroups(tb))
 	tb.Bot.Handle(telebot.OnUserJoined, EnterGroups(tb))
 	tb.Bot.Handle(telebot.OnUserLeft, LeaveGroups(tb))
+
+	//games
+	tb.Bot.Handle("/huanleniuniu", NiuniuStart(tb))
+
+	tb.Bot.Handle("/relief", LeaveGroups(tb))
 
 	// tb.Bot.Handle("/hlniuniu", NiuniuStart(tb)) //欢乐牛牛
 	// tb.Bot.Handle("/list", list(tb))

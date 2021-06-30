@@ -9,6 +9,7 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/controller"
 	"github.com/aoyako/telegram_2ch_res_bot/downloader"
 	"github.com/aoyako/telegram_2ch_res_bot/dvach"
+	"github.com/aoyako/telegram_2ch_res_bot/games"
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
 	"github.com/aoyako/telegram_2ch_res_bot/telegram"
 	"github.com/spf13/viper"
@@ -46,10 +47,12 @@ func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 
 	Storage := storage.NewStorage(db, &admins)
 	controller := controller.NewController(Storage)
+	games := games.NewGameManager(Storage)
 
 	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), controller, downloader.NewDownloader(
 		viper.GetString("disk.path"),
-		viper.GetUint64("disk.size")))
+		viper.GetUint64("disk.size")),
+		games)
 	requester := dvach.NewRequester(requestURL)
 	apicnt := dvach.NewAPIController(controller, bot, requester)
 

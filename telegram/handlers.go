@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"fmt"
 	"log"
 
 	telebot "gopkg.in/tucnak/telebot.v2"
@@ -21,12 +22,8 @@ func start(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func NiuniuStart(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		err := tb.Controller.Register(m.Chat.ID)
-		if err != nil {
-
-		}
-
-		// help(tb)(m)
+		bet := TemplateNiuniu_Bet()
+		fmt.Println(bet)
 	}
 }
 
@@ -58,9 +55,9 @@ func OnBotAddGroups(tb *TgBot) func(m *telebot.Message) {
 func EnterGroups(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
 
-		err := tb.Controller.User.Register(int64(m.Contact.UserID))
+		err := tb.Controller.Register(int64(m.Chat.ID))
 		if err != nil {
-
+			log.Println("插入用户失败: ", m.Chat.ID)
 		}
 
 		// help(tb)(m)
@@ -69,6 +66,18 @@ func EnterGroups(tb *TgBot) func(m *telebot.Message) {
 
 // /start endpoint
 func LeaveGroups(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		err := tb.Controller.Unregister(m.Chat.ID)
+		if err != nil {
+
+		}
+
+		// help(tb)(m)
+	}
+}
+
+// /救济金
+func Relief(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
 		err := tb.Controller.Unregister(m.Chat.ID)
 		if err != nil {
