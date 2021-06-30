@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"errors"
+
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"gorm.io/gorm"
 )
@@ -19,5 +21,24 @@ func NewGroupMysql(db *gorm.DB) *GroupMysql {
 
 // Register adds user in databse
 func (groupStorage *GroupMysql) GroupRegister(user *logic.Group) error {
-	return nil
+	var count int64
+	groupStorage.db.Model(&logic.Group{}).Where("groupid = ?", user.Groupid).Count(&count)
+	if count == 0 {
+		result := groupStorage.db.Create(user)
+
+		if result.Error != nil {
+			return result.Error
+		}
+
+		return nil
+	}
+
+	return errors.New("User already exists")
+}
+
+// Register adds user in databse
+func (groupStorage *GroupMysql) UnGroupRegister(user *logic.Group) error {
+
+	result := groupStorage.db.Delete(user)
+	return result.Error
 }

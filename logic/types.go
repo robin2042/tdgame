@@ -2,8 +2,8 @@ package logic
 
 // User stores info about user
 type Group struct {
-	ID     int
-	ChatID int64 `gorm:"uniqueIndex"` // Telegram's chat id
+	// ID     int
+	Groupid int64 `gorm:"uniqueIndex"` // Telegram's chat id
 
 }
 

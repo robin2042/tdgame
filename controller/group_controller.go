@@ -19,13 +19,16 @@ func NewGroupController(stg *storage.Storage) *GroupController {
 func (ucon *GroupController) GroupRegister(chatID int64) error {
 
 	user := &logic.Group{
-		ChatID: chatID,
+		Groupid: chatID,
 	}
 	return ucon.stg.GroupRegister(user)
 
 }
 
 // NewUserController constructor of UserController struct
-func (g *GroupController) UnGroupregister(chatID int64) error {
-	return nil
+func (ucon *GroupController) UnGroupregister(chatID int64) error {
+	user := &logic.Group{
+		Groupid: chatID,
+	}
+	return ucon.stg.UnGroupRegister(user)
 }
