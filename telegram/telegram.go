@@ -77,9 +77,10 @@ func SetupHandlers(tb *TgBot) {
 	tb.Bot.Handle(telebot.OnAddedToGroup, OnBotAddGroups(tb))
 	tb.Bot.Handle(telebot.OnUserJoined, EnterGroups(tb))
 	tb.Bot.Handle(telebot.OnUserLeft, LeaveGroups(tb))
+	tb.Bot.Handle(telebot.OnCallback, Callback(tb))
 
 	//games
-	tb.Bot.Handle("/huanleniuniu", NiuniuStart(tb))
+	tb.Bot.Handle("/huanleniuniu", NiuniuBet(tb))
 
 	tb.Bot.Handle("/relief", LeaveGroups(tb))
 

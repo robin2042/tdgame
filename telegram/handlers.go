@@ -7,6 +7,10 @@ import (
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
+func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *telebot.Message) {
+	tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeHTML})
+}
+
 // /start endpoint
 func start(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
@@ -20,10 +24,14 @@ func start(tb *TgBot) func(m *telebot.Message) {
 }
 
 // /start endpoint
-func NiuniuStart(tb *TgBot) func(m *telebot.Message) {
+func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		bet := TemplateNiuniu_Bet()
-		fmt.Println(bet)
+		text := TemplateNiuniu_Text()
+		btn := TemplateNiuniu_Bet(tb)
+
+		tb.SendHtmlMessage(text, btn, m)
+		// fmt.Println(text, menu)
+
 	}
 }
 
@@ -76,6 +84,13 @@ func LeaveGroups(tb *TgBot) func(m *telebot.Message) {
 	}
 }
 
+// /start endpoint
+func Callback(tb *TgBot) func(c *telebot.Callback) {
+	return func(m *telebot.Callback) {
+		fmt.Println(m)
+	}
+}
+
 // /救济金
 func Relief(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
@@ -121,5 +136,12 @@ func Niuniu_EndGame(tb *TgBot) func(m *telebot.Message) {
 		}
 
 		// help(tb)(m)
+	}
+}
+
+// /start endpoint
+func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
+	return func(c *telebot.Callback) {
+		fmt.Println(c)
 	}
 }

@@ -26,71 +26,55 @@ niuniu_start_button:
     - 
       - text: 5%
         data: .5
-        unique: "niuniu_bet_5"
         url: "http://www.sohu.com"
       - text: 10%
         data: .10
-        unique: "niuniu_bet_10"
         url: "http://www.nab.com"
       - text: 10%
         data: .5
-        unique: "niuniu_bet_12"
         url: "http://www.nab.com"
       - text: 30%
         data: .30
-        unique: "niuniu_bet_11112"
         url: "http://www.nab.com"
       - text: 50%
         data: .50
-        unique: "niuniu_bet_13"
         url: "http://www.nab.com"
       - text: 80%
         data: .80
-        unique: "niuniu_bet_16"
         url: "http://www.nab.com"
       - text: 梭哈
         data: 1.0
-        unique: "niuniu_bet_17"
         url: "http://www.nab.com"
     -
       - text: 51%
         data: .5
-        unique: "niuniu_bet_18"
         url: "http://www.sohu.com"
       - text: 110%
         data: .10
-        unique: "niuniu_bet_19"
         url: "http://www.nab.com"
       - text: 110%
         data: .5
-        unique: "niuniu_bet_122"
         url: "http://www.nab.com"
       - text: 310%
         data: .30
-        unique: "niuniu_bet_126"
         url: "http://www.nab.com"
       - text: 510%
         data: .50
-        unique: "niuniu_bet_1211"
         url: "http://www.nab.com"
       - text: 810%
         data: .80
-        unique: "niuniu_bet_1211111"
         url: "http://www.nab.com"
       - text: 梭1哈
         data: 1.0
-        unique: "niuniu_bet_121111111"
         url: "http://www.nab.com"
-    -
-      - text: ▶️开始游戏
-        data: .5
-        unique: "niuniu_bet_121111111"
-        url: "http://www.sohu.com"
-      - text: 💰️查看余额
-        data: .5
-        unique: "niuniu_bet_121111111"
-        url: "http://www.sohu.com"
-      - text: ✅️签到领钱
-        data: .5
-        unique: "niuniu_bet_121111111"
-        url: "http://www.sohu.com"
+    
+start:
+  - text: :arrow_forward:开始游戏
+    data: .5
+    url: "http://www.sohu.com"
+  - text: :moneybag:查看余额
+    data: .5
+    url: "http://www.sohu.com"
+  - text: 签到领钱
+    data: .5
+    url: "http://www.sohu.com"
