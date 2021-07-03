@@ -26,25 +26,14 @@ func start(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		text := TemplateNiuniu_Text()
-		btn := TemplateNiuniu_Bet(tb)
-
-		tb.SendHtmlMessage(text, btn, m)
-		// fmt.Println(text, menu)
-
+		// tb.Games.CreateTable(games.GAME_NIUNIU, int(m.Chat.ID))
 	}
 }
 
 // /subs endpoint
 func subs(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		// subs, err := tb.Controller.Subscription.GetSubsByChatID(m.Chat.ID)
-		// if err != nil {
-		// 	tb.Bot.Send(m.Sender, "Bad request")
-		// 	return
-		// }
-		// result := fmt.Sprintf("Your subs:%s", marshallSubs(subs, true))
-		// tb.Bot.Send(m.Sender, result)
+		// tb.Games.HandleMessage(m)
 	}
 }
 
@@ -139,9 +128,10 @@ func Niuniu_EndGame(tb *TgBot) func(m *telebot.Message) {
 	}
 }
 
-// /start endpoint
+// /下注
 func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
-		fmt.Println(c)
+		// err := tb.Controller.Register(m.Chat.ID)
+		// err := tb.Controller.Register(m.Chat.ID)
 	}
 }

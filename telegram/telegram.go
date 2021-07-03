@@ -10,6 +10,7 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/controller"
 	"github.com/aoyako/telegram_2ch_res_bot/downloader"
 	"github.com/aoyako/telegram_2ch_res_bot/games"
+
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/xfrr/goffmpeg/transcoder"
 
@@ -31,11 +32,11 @@ type TgBot struct {
 	Bot        MessageSender
 	Controller *controller.Controller
 	Downloader *downloader.Downloader
-	Games      *games.GameManager
+	Games      games.Games
 }
 
 // NewTelegramBot constructor of TelegramBot
-func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader, g *games.GameManager) *TgBot {
+func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader, g *games.GameMainManage) *TgBot {
 	settings := telebot.Settings{
 		Token:  token,
 		Poller: &telebot.LongPoller{Timeout: 30 * time.Second},

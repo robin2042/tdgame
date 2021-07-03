@@ -58,8 +58,6 @@ func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 			btn.Data = restlt["text"].(string)
 			btn.Unique = restlt["unique"].(string)
 			tb.Bot.Handle(&btn, Niuniu_BetCallBack(tb))
-			fmt.Println(btn.Unique)
-			// btn.URL = restlt["url"].(string)
 			keys = append(keys, btn)
 		}
 		btnarray = append(btnarray, keys)
