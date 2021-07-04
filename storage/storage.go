@@ -48,12 +48,18 @@ type Info interface {
 	SetLastTimestamp(tsp uint64) // Sets time of the latest post
 }
 
+// Info interface definces methods for Info Storage
+type Games interface {
+	SaveGameRound(game *logic.GameRounds) error
+}
+
 // Storage struct is used to access database
 type Storage struct {
 	User
 	Subscription
 	Info
 	Group
+	Games
 }
 
 // NewStorage constructor of Storage
@@ -63,5 +69,6 @@ func NewStorage(db *gorm.DB, cfg *InitDatabase) *Storage {
 		Subscription: NewSubscriptionPostgres(db),
 		Info:         NewInfoPostgres(db),
 		Group:        NewGroupMysql(db),
+		Games:        NewGamesMysql(db),
 	}
 }

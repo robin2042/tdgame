@@ -16,7 +16,7 @@ import (
 )
 
 // App initializes application
-func App() (*telegram.TgBot, *dvach.APIController, *games.GameMainManage, uint64) {
+func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 	if err := initConfig(); err != nil {
 		log.Fatalf("Error initializing config file: %s", err.Error())
 	}
@@ -59,7 +59,7 @@ func App() (*telegram.TgBot, *dvach.APIController, *games.GameMainManage, uint64
 	telegram.SetupHandlers(bot)
 	storage.MigrateDatabase(db)
 
-	return bot, apicnt, games, viper.GetUint64("polling.time")
+	return bot, apicnt, viper.GetUint64("polling.time")
 }
 
 func initConfig() error {

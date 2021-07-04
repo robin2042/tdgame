@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/aoyako/telegram_2ch_res_bot/games"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -26,7 +27,17 @@ func start(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		// tb.Games.CreateTable(games.GAME_NIUNIU, int(m.Chat.ID))
+		start := tb.Games.GameBegin(games.GAME_NIUNIU, m.Chat.ID)
+		if start { //已经开局
+			msg := TemplateNiuniu_limit()
+			tb.SendHtmlMessage(msg, nil, m)
+		} else {
+			msg := TemplateNiuniu_Text()
+			reply := TemplateNiuniu_Bet(tb)
+			tb.SendHtmlMessage(msg, reply, m)
+
+		}
+
 	}
 }
 

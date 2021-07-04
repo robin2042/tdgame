@@ -24,10 +24,5 @@ func (icon *InfoController) GetLastTimestamp() uint64 {
 
 // SetLastTimestamp sets time of the latest post
 func (icon *InfoController) SetLastTimestamp(tsp uint64) {
-	icon.m.Lock()
-	last := icon.GetLastTimestamp()
-	if last < tsp {
-		icon.stg.SetLastTimestamp(tsp)
-	}
-	icon.m.Unlock()
+
 }

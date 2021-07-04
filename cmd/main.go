@@ -11,7 +11,7 @@ import (
 
 func main() {
 	log.Println("Starting...")
-	bot, apicnt, games, duration := initialize.App()
+	bot, apicnt, duration := initialize.App()
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
@@ -19,7 +19,6 @@ func main() {
 	go bot.Bot.Start()
 	go initialize.StartPolling(apicnt, duration)
 
-	go games.LoadGames()
 	log.Println("Started")
 
 	<-quit

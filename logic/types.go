@@ -38,3 +38,27 @@ type Info struct {
 	ID       int
 	LastPost uint64 // Time of the latest post
 }
+
+// User stores info about user
+type Gamerounds struct {
+	Playid     string
+	Chatid     int64
+	Nameid     int
+	Createtime int `gorm:"default:now()"`
+	Status     int
+}
+
+// User stores info about user
+type Scorelogs struct {
+	Userid      int64
+	Playid      string
+	Chatid      int64
+	Nameid      int
+	Bet         int
+	Changescore int64
+	Score       int64
+	Status      int
+	Createtime  int `gorm:"default:now()"`
+	Endtime     int `gorm:"default:now()"`
+	Details     string
+}

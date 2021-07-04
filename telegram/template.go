@@ -28,6 +28,18 @@ func TemplateNiuniu_Text() string {
 	return b.String()
 }
 
+func TemplateNiuniu_limit() string {
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/niuniu/block.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, nil)
+	return b.String()
+}
+
 func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 	menu := telebot.ReplyMarkup{}
 	menu.ResizeReplyKeyboard = true
