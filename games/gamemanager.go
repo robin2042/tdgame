@@ -107,7 +107,7 @@ func (g *GameMainManage) GameBegin(nameid int, chatid int64) bool {
 	table := g.GetTable(GAME_NIUNIU, chatid)
 	_, playid := table.StartGame() //新开局
 	fmt.Println(playid)
-	round := &logic.GameRounds{
+	round := &logic.Gamerounds{
 		Playid: GenerateID(nameid, chatid),
 		Chatid: chatid,
 		Nameid: nameid,
