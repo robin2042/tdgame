@@ -22,6 +22,7 @@ var fileHandlersQueue = make(chan bool, 100)
 // MessageSender defines interface for bot-sender
 type MessageSender interface {
 	Send(r telebot.Recipient, value interface{}, args ...interface{}) (*telebot.Message, error)
+	Edit(msg telebot.Editable, what interface{}, options ...interface{}) (*telebot.Message, error)
 	Handle(interface{}, interface{})
 	Start()
 }
