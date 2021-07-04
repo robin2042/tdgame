@@ -8,8 +8,8 @@ import (
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
-func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *telebot.Message) {
-	tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeHTML})
+func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *telebot.Message) (*telebot.Message, error) {
+	return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeHTML})
 }
 
 // /start endpoint
@@ -34,9 +34,9 @@ func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 		} else {
 			msg := TemplateNiuniu_Text()
 			reply := TemplateNiuniu_Bet(tb)
-			tb.SendHtmlMessage(msg, reply, m)
-			a, b := m.MessageSig()
-			fmt.Println(a, b)
+			message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+			fmt.Println(message.ID)
 
 		}
 
@@ -144,9 +144,15 @@ func Niuniu_EndGame(tb *TgBot) func(m *telebot.Message) {
 // /下注
 func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
-		table := tb.Games.GetTable(games.GAME_NIUNIU, int64(c.Message.ID))
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 
 		fmt.Println(c.MessageID, table.GetMsgID())
 		tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		m := &telebot.StoredMessage{
+			MessageID: string(table.GetMsgID()),
+			ChatID:    c.Message.Chat.ID,
+		}
+
+		tb.Bot.Edit(m, "Updated text")
 	}
 }

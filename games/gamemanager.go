@@ -112,7 +112,7 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 		return table.GetStatus()
 	}
 
-	table.GetStatus()
+	table.SetMsgID(msgid)
 	_, playid := table.StartGame() //新开局
 
 	fmt.Println(playid)
