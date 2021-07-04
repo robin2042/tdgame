@@ -12,6 +12,10 @@ func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *teleb
 	return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeHTML})
 }
 
+func (tb *TgBot) EditHtmlMessage(m *telebot.Message, msg string, menu *telebot.ReplyMarkup) (*telebot.Message, error) {
+	return tb.Bot.Edit(m, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeHTML})
+}
+
 // /start endpoint
 func start(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
@@ -147,12 +151,13 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 
 		fmt.Println(c.MessageID, table.GetMsgID())
-		tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
-		m := &telebot.StoredMessage{
-			MessageID: string(table.GetMsgID()),
-			ChatID:    c.Message.Chat.ID,
-		}
+		// tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		// m := telebot.StoredMessage{
+		// 	MessageID: fmt.Sprintf("%d", c.Message.ID),
+		// 	ChatID:    c.Message.Chat.ID,
+		// }
 
-		tb.Bot.Edit(m, "Updated text")
+		a, b := tb.Bot.Edit(c.Message, "Updated text")
+		fmt.Println(a, b)
 	}
 }
