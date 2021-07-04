@@ -23,6 +23,8 @@ const (
 )
 
 type GameTable interface {
+	GetMsgID() int  //获取游戏状态
+	SetMsgID(int)   //获取游戏状态
 	GetStatus() int //获取游戏状态
 	StartGame() (bool, string)
 	// Bet()
@@ -31,9 +33,11 @@ type GameTable interface {
 }
 
 type GameDesk struct {
-	PlayID      string
-	GameStation int
-	StartTime   time.Time
+	MsgID         int //消息ID
+	PlayID        string
+	GameStation   int
+	StartTime     time.Time
+	NextStartTime time.Time //
 }
 
 type GameManage interface {
@@ -41,9 +45,8 @@ type GameManage interface {
 }
 
 type Games interface {
-	GameBegin(nameid int, chatid int64) bool
+	GameBegin(nameid, msgid int, chatid int64) int
 	GetTable(nameid int, chatid int64) GameTable //返回桌台
-
 	// GetStatus() int                              //获取游戏状态
 	// Bet(userid int64, score int64) (bool, error) // bet
 	// StartGame()                                  //开始
@@ -102,20 +105,27 @@ func (g *GameMainManage) SaveGameRounds(nameid int, chatid int64, playid string)
 
 }
 
-func (g *GameMainManage) GameBegin(nameid int, chatid int64) bool {
+func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 
 	table := g.GetTable(GAME_NIUNIU, chatid)
+	if table.GetStatus() != GS_TK_FREE { //存在就返回
+		return table.GetStatus()
+	}
+
+	table.GetStatus()
 	_, playid := table.StartGame() //新开局
+
 	fmt.Println(playid)
 	round := &logic.Gamerounds{
 		Playid: GenerateID(nameid, chatid),
 		Chatid: chatid,
+		Msgid:  msgid,
 		Nameid: nameid,
 		Status: GS_TK_BET,
 	}
 	g.stg.SaveGameRound(round)
 
-	return table.GetStatus() != GS_TK_FREE
+	return GS_TK_FREE
 
 }
 
@@ -130,7 +140,9 @@ func (g *GameDesk) StartGame() (bool, string) {
 		return false, ""
 	}
 	//记录牌局
-
+	later := time.Now()
+	g.StartTime = later
+	g.NextStartTime = later.Add(time.Second * 90) //90S后
 	g.GameStation = GS_TK_BET
 	return true, ""
 }
@@ -138,6 +150,19 @@ func (g *GameDesk) StartGame() (bool, string) {
 //开始
 func (g *GameDesk) GetStatus() int {
 	return g.GameStation
+}
+
+// GetMsgID() int  //获取游戏状态
+// 	SetMsgID(int)   //获取游戏状态
+
+//开始
+func (g *GameDesk) GetMsgID() int {
+	return g.MsgID
+}
+
+//开始
+func (g *GameDesk) SetMsgID(m int) {
+	g.MsgID = m
 }
 
 func CreateTable(nameid int, chatid int64) GameTable {

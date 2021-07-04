@@ -27,14 +27,16 @@ func start(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		start := tb.Games.GameBegin(games.GAME_NIUNIU, m.Chat.ID)
-		if start { //已经开局
+		start := tb.Games.GameBegin(games.GAME_NIUNIU, m.ID, m.Chat.ID)
+		if start != games.GS_TK_FREE { //已经开局
 			msg := TemplateNiuniu_limit()
 			tb.SendHtmlMessage(msg, nil, m)
 		} else {
 			msg := TemplateNiuniu_Text()
 			reply := TemplateNiuniu_Bet(tb)
 			tb.SendHtmlMessage(msg, reply, m)
+			a, b := m.MessageSig()
+			fmt.Println(a, b)
 
 		}
 
@@ -142,7 +144,9 @@ func Niuniu_EndGame(tb *TgBot) func(m *telebot.Message) {
 // /下注
 func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
-		// err := tb.Controller.Register(m.Chat.ID)
-		// err := tb.Controller.Register(m.Chat.ID)
+		table := tb.Games.GetTable(games.GAME_NIUNIU, int64(c.Message.ID))
+
+		fmt.Println(c.MessageID, table.GetMsgID())
+		tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 	}
 }

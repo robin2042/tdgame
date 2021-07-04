@@ -43,6 +43,7 @@ type Info struct {
 type Gamerounds struct {
 	Playid     string
 	Chatid     int64
+	Msgid      int
 	Nameid     int
 	Createtime int `gorm:"default:now()"`
 	Status     int
