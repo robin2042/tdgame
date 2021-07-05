@@ -1,3 +1,6 @@
-<p>Hello {{.Name}}</p>
-<p>性别：{{.Gender}}</p>
-<p>年龄：{{.Age}}</p>
+<b>欢乐牛牛</b> 正在投注
+玩家列表:
+{{range $val := .}}
+【富可敌国 (https://t.me/gameyyds)】{{$val.Name}} ：{{$val.Gender}}
+{{end}}
+

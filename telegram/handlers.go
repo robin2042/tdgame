@@ -12,8 +12,14 @@ func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *teleb
 	return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeHTML})
 }
 
-func (tb *TgBot) EditHtmlMessage(m *telebot.Message, msg string, menu *telebot.ReplyMarkup) (*telebot.Message, error) {
-	return tb.Bot.Edit(m, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeHTML})
+func (tb *TgBot) EditHtmlMessage(m *telebot.Message, msg string) (*telebot.Message, error) {
+
+	replay := &telebot.ReplyMarkup{InlineKeyboard: m.ReplyMarkup.InlineKeyboard}
+	fmt.Println(replay)
+
+	return tb.Bot.Edit(m, msg, &telebot.SendOptions{ReplyMarkup: replay, ParseMode: telebot.ModeHTML})
+
+	//return tb.Bot.Edit(m, msg)
 }
 
 // /start endpoint
@@ -157,7 +163,7 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 		// 	ChatID:    c.Message.Chat.ID,
 		// }
 
-		a, b := tb.Bot.Edit(c.Message, "Updated text")
-		fmt.Println(a, b)
+		tb.EditHtmlMessage(c.Message, "update text")
+		// fmt.Println(a, b)
 	}
 }

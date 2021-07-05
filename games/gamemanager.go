@@ -27,9 +27,15 @@ type GameTable interface {
 	SetMsgID(int)   //获取游戏状态
 	GetStatus() int //获取游戏状态
 	StartGame() (bool, string)
-	// Bet()
+	Bet(int64, int64, int) (bool, string)
 
 	// GameEnd()
+}
+
+type PlayInfo struct {
+	Name   string
+	UserID int64
+	Title  string //头衔，富可敌国 小康之家
 }
 
 type GameDesk struct {
@@ -37,7 +43,11 @@ type GameDesk struct {
 	PlayID        string
 	GameStation   int
 	StartTime     time.Time
-	NextStartTime time.Time //
+	NextStartTime time.Time
+	Bets          map[PlayInfo]int64 //下注额
+	Area          map[PlayInfo]int64 //下注区域
+	Changes       map[PlayInfo]int64 //胜负
+
 }
 
 type GameManage interface {
@@ -46,11 +56,8 @@ type GameManage interface {
 
 type Games interface {
 	GameBegin(nameid, msgid int, chatid int64) int
-	GetTable(nameid int, chatid int64) GameTable //返回桌台
-	// GetStatus() int                              //获取游戏状态
-	// Bet(userid int64, score int64) (bool, error) // bet
-	// StartGame()                                  //开始
-	// EndGame()                                    //结束
+	GetTable(nameid int, chatid int64) GameTable //桌台
+	Bet(table GameTable, userid int64, score int64, area int) bool
 }
 
 type GameMainManage struct {
@@ -67,15 +74,6 @@ func NewGameManager(stg *storage.Storage) Games {
 		stg:    stg,
 		Tables: map[int64]GameTable{},
 	}
-}
-
-//下注
-func (g *GameMainManage) Bet(userid int64, score int64) (bool, error) {
-	// if g.bGameStation != GS_TK_CALL {
-	// 	return true, nil
-	// }
-
-	return true, nil
 }
 
 //下注
@@ -129,6 +127,12 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 
 }
 
+func (g *GameMainManage) Bet(table GameTable, userid int64, score int64, area int) bool {
+	g.stg.AddScore(nil)
+
+	return true
+}
+
 //GameTable
 func (g *GameDesk) SetPlayID(playid string) {
 	g.PlayID = playid
@@ -163,6 +167,13 @@ func (g *GameDesk) GetMsgID() int {
 //开始
 func (g *GameDesk) SetMsgID(m int) {
 	g.MsgID = m
+}
+
+//投注
+//数据库先扣除
+func (g *GameDesk) Bet(userid int64, score int64, area int) (bool, string) {
+
+	return true, ""
 }
 
 func CreateTable(nameid int, chatid int64) GameTable {

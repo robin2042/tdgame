@@ -18,13 +18,42 @@ type UserInfo struct {
 
 func TemplateNiuniu_Text() string {
 	var b bytes.Buffer
-	tmpl, err := template.ParseFiles("./templates/niuniu/bet.tmpl")
+	tmpl, err := template.ParseFiles("./templates/niuniu/start.tmpl")
 	if err != nil {
 		fmt.Println("create template failed,err:", err)
 		return "无效"
 	}
 
 	tmpl.Execute(&b, nil)
+	return b.String()
+}
+
+func TemplateNiuniu_BetText() string {
+	sweaters := []UserInfo{
+		{
+			Name:   "tom",
+			Gender: "男人",
+			Age:    1,
+		},
+		{
+			Name:   "john",
+			Gender: "女人人",
+			Age:    1,
+		},
+	}
+	fmt.Println(sweaters)
+
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("hello.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	err = tmpl.Execute(&b, sweaters)
+	fmt.Println(err)
+	fmt.Println(b.String())
+
 	return b.String()
 }
 

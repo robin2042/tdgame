@@ -51,6 +51,8 @@ type Info interface {
 // Info interface definces methods for Info Storage
 type Games interface {
 	SaveGameRound(game *logic.Gamerounds) error
+	AddScore(game *logic.Gamerounds) error
+	// PlayBet(game *logic.Gamerounds) error
 }
 
 // Storage struct is used to access database
