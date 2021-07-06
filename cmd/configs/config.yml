@@ -123,15 +123,19 @@ niuniu_start_button:
         data: 5000000000000
         unique: "niuniu_bet_5we"
         url: "http://www.nab.com"
-    -
-      - text: ▶️开始游戏
+
+ start:  
+    - text: ▶️开始游戏
         data: .5
         unique: "niuniu_bet_121111111"
         url: "http://www.sohu.com"
+        
+ balance:
       - text: 💰️查看余额
         data: .5
         unique: "niuniu_bet_121111111"
         url: "http://www.sohu.com"
+ sign:
       - text: ✅️签到领钱
         data: .5
         unique: "niuniu_bet_121111111"
