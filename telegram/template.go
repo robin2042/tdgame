@@ -86,14 +86,16 @@ func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 
 	starts := make([][]telebot.InlineButton, 0)
 
+	buttons := make([]telebot.InlineButton, 0)
 	start := TemplateNiuniu_Start(tb, viper.GetViper()) //开始
-	starts = append(starts, start)
-
+	buttons = append(buttons, start)
 	balance := TemplateNiuniu_Balance(tb, viper.GetViper()) //余额
-	starts = append(starts, balance)
-
+	buttons = append(buttons, balance)
 	sign := TemplateNiuniu_Sign(tb, viper.GetViper()) //签到
-	starts = append(starts, sign)
+	buttons = append(buttons, sign)
+	// starts = append(starts, balance...)
+
+	starts = append(starts, buttons)
 
 	btnarray = append(btnarray, starts...)
 
@@ -163,15 +165,15 @@ func TemplateNiuniu_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButt
 }
 
 //开始
-func TemplateNiuniu_Start(tb *TgBot, viper *viper.Viper) []telebot.InlineButton {
+func TemplateNiuniu_Start(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
 	jetton := viper.Get("niuniu_start_button.start")
 
 	restlt := jetton.([]interface{})
 	fmt.Println(restlt)
 
-	btnarray := make([]telebot.InlineButton, 0)
+	// btnarray := make([][]telebot.InlineButton, 0)
 	for _, row := range restlt {
-
+		// keys := make([]telebot.InlineButton, 0)
 		var btn telebot.InlineButton
 
 		restlt := row.(map[interface{}]interface{})
@@ -185,21 +187,22 @@ func TemplateNiuniu_Start(tb *TgBot, viper *viper.Viper) []telebot.InlineButton 
 
 		btn.Unique = restlt["unique"].(string)
 		tb.Bot.Handle(&btn, Niuniu_StartCallBack(tb))
-		btnarray = append(btnarray, btn)
+		// keys = append(keys, btn)
+		return btn
 	}
-	// 	// btnarray = append(btnarray, keys)
+
 	// }
-	return btnarray
+	return telebot.InlineButton{}
 }
 
 //余额
-func TemplateNiuniu_Balance(tb *TgBot, viper *viper.Viper) []telebot.InlineButton {
+func TemplateNiuniu_Balance(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
 	jetton := viper.Get("niuniu_start_button.balance")
 
 	arr := jetton.([]interface{})
-	btnarray := make([]telebot.InlineButton, 0)
+	// btnarray := make([][]telebot.InlineButton, 0)
 	for _, row := range arr {
-		// keys := make([]telebot.InlineButton, 0, len(row.([]interface{})))
+		// keys := make(telebot.InlineButton, 0)
 		// for _, v := range row.([]interface{}) {
 		var btn telebot.InlineButton
 
@@ -214,21 +217,23 @@ func TemplateNiuniu_Balance(tb *TgBot, viper *viper.Viper) []telebot.InlineButto
 
 		btn.Unique = restlt["unique"].(string)
 		tb.Bot.Handle(&btn, Niuniu_StartCallBack(tb))
-		btnarray = append(btnarray, btn)
+		return btn
+
+		// keys = append(keys, btn)
+		// btnarray = append(btnarray, keys)
 	}
-	// btnarray = append(btnarray, keys)
-	// }
-	return btnarray
+
+	return telebot.InlineButton{}
 }
 
 //签到
-func TemplateNiuniu_Sign(tb *TgBot, viper *viper.Viper) []telebot.InlineButton {
+func TemplateNiuniu_Sign(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
 	jetton := viper.Get("niuniu_start_button.sign")
 
 	arr := jetton.([]interface{})
-	btnarray := make([]telebot.InlineButton, 0)
+	// btnarray := make([][]telebot.InlineButton, 0)
 	for _, row := range arr {
-		// keys := make([]telebot.InlineButton, 0, len(row.([]interface{})))
+		// keys := make([]telebot.InlineButton, 0)
 		// for _, v := range row.([]interface{}) {
 		var btn telebot.InlineButton
 
@@ -243,11 +248,13 @@ func TemplateNiuniu_Sign(tb *TgBot, viper *viper.Viper) []telebot.InlineButton {
 
 		btn.Unique = restlt["unique"].(string)
 		tb.Bot.Handle(&btn, Niuniu_SignCallBack(tb))
-		btnarray = append(btnarray, btn)
+		return btn
+		// keys = append(keys, btn)
+		// btnarray = append(btnarray, keys)
 	}
 	// btnarray = append(btnarray, keys)
 	// }
-	return btnarray
+	return telebot.InlineButton{}
 }
 
 func updateSlice(first [][]telebot.InlineButton, second [][]telebot.InlineButton) [][]telebot.InlineButton {
