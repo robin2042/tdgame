@@ -25,23 +25,23 @@ niuniu_start_button:
  bet:
     - 
       - text: 5%
-        data: .5
+        data: 0.05
         unique: "niuniu_bet_5"
         url: "http://www.sohu.com"
       - text: 10%
-        data: .10
+        data: 0.10
         unique: "niuniu_bet_10"
         url: "http://www.nab.com"
       - text: 30%
-        data: .30
+        data: 0.30
         unique: "niuniu_bet_30"
         url: "http://www.nab.com"
       - text: 50%
-        data: .50
+        data: 0.50
         unique: "niuniu_bet_50"
         url: "http://www.nab.com"
       - text: 80%
-        data: .80
+        data: 0.80
         unique: "niuniu_bet_80"
         url: "http://www.nab.com"
       - text: 梭哈

@@ -96,7 +96,13 @@ func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 
 			restlt := v.(map[interface{}]interface{})
 			btn.Text = restlt["text"].(string)
-			btn.Data = restlt["text"].(string)
+			switch restlt["data"].(type) {
+			case float64:
+				btn.Data = fmt.Sprintf("%f", restlt["data"].(float64))
+			case int:
+				btn.Data = fmt.Sprintf("%d", restlt["data"].(int))
+			}
+
 			btn.Unique = restlt["unique"].(string)
 			tb.Bot.Handle(&btn, Niuniu_BetCallBack(tb))
 			keys = append(keys, btn)

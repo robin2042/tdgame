@@ -3,6 +3,7 @@ package telegram
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
 	telebot "gopkg.in/tucnak/telebot.v2"
@@ -128,18 +129,6 @@ func Niuniu_StartGame(tb *TgBot) func(m *telebot.Message) {
 }
 
 // /start endpoint
-func Niuniu_Bet(tb *TgBot) func(m *telebot.Message) {
-	return func(m *telebot.Message) {
-		err := tb.Controller.Register(m.Chat.ID)
-		if err != nil {
-
-		}
-
-		// help(tb)(m)
-	}
-}
-
-// /start endpoint
 func Niuniu_EndGame(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
 		err := tb.Controller.Register(m.Chat.ID)
@@ -155,16 +144,12 @@ func Niuniu_EndGame(tb *TgBot) func(m *telebot.Message) {
 func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		floatvar, _ := strconv.ParseFloat(c.Data, 64)
+		fmt.Println(floatvar)
 
-		tb.Games.AddScore(table, c.Message.Chat.ID, 0)
-		// fmt.Println(c.MessageID, table.GetMsgID())
-		// tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
-		// m := telebot.StoredMessage{
-		// 	MessageID: fmt.Sprintf("%d", c.Message.ID),
-		// 	ChatID:    c.Message.Chat.ID,
-		// }
+		tb.Games.AddScore(table, int64(c.Sender.ID), floatvar)
 
-		tb.EditHtmlMessage(c.Message, "update text")
+		// tb.EditHtmlMessage(c.Message, "update text")
 		// fmt.Println(a, b)
 	}
 }

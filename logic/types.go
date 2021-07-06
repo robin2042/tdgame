@@ -10,7 +10,9 @@ type Group struct {
 // User stores info about user
 type User struct {
 	ID        int
-	ChatID    int64         `gorm:"uniqueIndex"` // Telegram's chat id
+	ChatID    int64 `gorm:"uniqueIndex"` // Telegram's chat id
+	Wallmoney int64
+	Bank      int64
 	SubsCount uint          // Amount of current subscribtions
 	Subs      []Publication `gorm:"many2many:user_subscribtion;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // User's subscriptions
 	Admin     Admin         `gorm:"foreignKey:UserID"`
@@ -65,8 +67,9 @@ type Bet struct {
 type AddScore struct {
 	Playid string
 	Nameid int
-	Chatid int64 //用户
-	Bet    int64
+	Chatid int64
+	Userid int64 //用户
+	Bet    float64
 	Score  int64
 
 	Createtime int `gorm:"default:now()"`
