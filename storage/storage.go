@@ -51,7 +51,7 @@ type Info interface {
 // Info interface definces methods for Info Storage
 type Games interface {
 	SaveGameRound(game *logic.Gamerounds) error
-	AddScore(game *logic.Gamerounds) error
+	AddScore(game *logic.AddScore) error
 	// PlayBet(game *logic.Gamerounds) error
 }
 

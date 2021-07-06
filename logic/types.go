@@ -50,6 +50,34 @@ type Gamerounds struct {
 }
 
 // User stores info about user
+type Bet struct {
+	Playid string
+	Nameid int
+	Chatid int64 //用户
+	Bet    int64
+	Score  int64
+
+	Createtime int `gorm:"default:now()"`
+	Status     int `gorm:"default:1"` //下注
+}
+
+// User stores info about user
+type AddScore struct {
+	Playid string
+	Nameid int
+	Chatid int64 //用户
+	Bet    int64
+	Score  int64
+
+	Createtime int `gorm:"default:now()"`
+	Status     int `gorm:"default:1"` //下注
+}
+
+func (AddScore) TableName() string {
+	return "scorelogs"
+}
+
+// User stores info about user
 type Scorelogs struct {
 	Userid      int64
 	Playid      string

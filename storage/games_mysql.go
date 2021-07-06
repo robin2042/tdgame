@@ -23,3 +23,9 @@ func (groupStorage *GamesMysql) SaveGameRound(game *logic.Gamerounds) error {
 	result := groupStorage.db.Create(game)
 	return result.Error
 }
+
+func (groupStorage *GamesMysql) AddScore(game *logic.AddScore) error {
+
+	result := groupStorage.db.Create(game)
+	return result.Error
+}

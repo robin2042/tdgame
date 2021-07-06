@@ -39,8 +39,11 @@ type PlayInfo struct {
 }
 
 type GameDesk struct {
+	GameTable
 	MsgID         int //消息ID
 	PlayID        string
+	ChatID        int64
+	NameID        int
 	GameStation   int
 	StartTime     time.Time
 	NextStartTime time.Time
@@ -57,7 +60,8 @@ type GameManage interface {
 type Games interface {
 	GameBegin(nameid, msgid int, chatid int64) int
 	GetTable(nameid int, chatid int64) GameTable //桌台
-	Bet(table GameTable, userid int64, score int64, area int) bool
+	Bet(table *GameDesk, userid int64, area int) bool
+	AddScore(table GameTable, userid int64, score int64) bool
 }
 
 type GameMainManage struct {
@@ -127,10 +131,25 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 
 }
 
-func (g *GameMainManage) Bet(table GameTable, userid int64, score int64, area int) bool {
-	g.stg.AddScore(nil)
+func (g *GameMainManage) Bet(table *GameDesk, userid int64, area int) bool {
+	addscore := &logic.AddScore{
+		Playid: table.PlayID,
+		Chatid: userid,
+		Nameid: table.NameID,
+	}
+	return g.stg.AddScore(addscore) == nil
 
-	return true
+}
+func (g *GameMainManage) AddScore(table GameTable, userid int64, score int64) bool {
+	gamedesk := table.(*GameDesk)
+
+	addscore := &logic.AddScore{
+		Playid: gamedesk.PlayID,
+		Chatid: userid,
+		Nameid: gamedesk.NameID,
+	}
+	return g.stg.AddScore(addscore) == nil
+
 }
 
 //GameTable

@@ -156,7 +156,8 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 
-		fmt.Println(c.MessageID, table.GetMsgID())
+		tb.Games.AddScore(table, c.Message.Chat.ID, 0)
+		// fmt.Println(c.MessageID, table.GetMsgID())
 		// tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 		// m := telebot.StoredMessage{
 		// 	MessageID: fmt.Sprintf("%d", c.Message.ID),
