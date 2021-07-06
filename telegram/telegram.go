@@ -23,6 +23,7 @@ var fileHandlersQueue = make(chan bool, 100)
 type MessageSender interface {
 	Send(r telebot.Recipient, value interface{}, args ...interface{}) (*telebot.Message, error)
 	Edit(msg telebot.Editable, what interface{}, options ...interface{}) (*telebot.Message, error)
+	Respond(c *telebot.Callback, resp ...*telebot.CallbackResponse) error
 	Handle(interface{}, interface{})
 	Start()
 }

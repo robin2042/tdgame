@@ -3,7 +3,6 @@ package telegram
 import (
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
 	telebot "gopkg.in/tucnak/telebot.v2"
@@ -143,11 +142,19 @@ func Niuniu_EndGame(tb *TgBot) func(m *telebot.Message) {
 // /下注
 func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
-		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
-		floatvar, _ := strconv.ParseFloat(c.Data, 64)
-		fmt.Println(floatvar)
 
-		tb.Games.AddScore(table, int64(c.Sender.ID), floatvar)
+		err := tb.Bot.Respond(c, &telebot.CallbackResponse{Text: "余额不足", ShowAlert: true})
+
+		fmt.Println(err)
+
+		// table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		// floatvar, _ := strconv.ParseFloat(c.Data, 64)
+		// fmt.Println(floatvar)
+
+		// score, err := tb.Games.AddScore(table, int64(c.Sender.ID), floatvar)
+		// if err != nil {
+		// 	tb.Bot.Send()
+		// }
 
 		// tb.EditHtmlMessage(c.Message, "update text")
 		// fmt.Println(a, b)
