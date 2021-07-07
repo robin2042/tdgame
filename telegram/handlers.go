@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
+	"github.com/leekchan/accounting"
+
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -206,16 +208,24 @@ func Niuniu_BalanceCallBack(tb *TgBot) func(c *telebot.Callback) {
 // /签到表
 func Niuniu_SignCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
+		ac := accounting.Accounting{Symbol: "$"}
 
-		sign := 700000
+		str := fmt.Sprintf("签到成功\n\t\t系统赠送了您:%s\n\t\t当前总余额:%s\n\t\t每间隔150秒可再次点击签到领取", ac.FormatMoney(12345678), ac.FormatMoney(12345678))
+		reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
+		tb.Bot.Respond(c, &reply)
+		return
 
-		score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
-		if err {
-			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
-			tb.Bot.Respond(c, &reply)
-		} else {
-			fmt.Println(score)
-		}
+		// sign := 700000
+
+		// score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
+		// if !err {
+		// 	reply := telebot.CallbackResponse{Text: "150秒内限定签到一次", ShowAlert: true}
+		// 	tb.Bot.Respond(c, &reply)
+		// } else {
+		// 	str := fmt.Sprintf("签到成功 系统赠送了您:$d,当前总余额:%d")
+		// 	reply := telebot.CallbackResponse{Text: "150秒内限定签到一次", ShowAlert: true}
+		// 	tb.Bot.Respond(c, &reply)
+		// }
 
 		// table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 		// floatvar, _ := strconv.ParseFloat(c.Data, 64)

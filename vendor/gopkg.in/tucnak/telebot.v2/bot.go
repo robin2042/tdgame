@@ -756,7 +756,7 @@ func (b *Bot) EditReplyMarkup(msg Editable, markup *ReplyMarkup) (*Message, erro
 	data, _ := json.Marshal(markup)
 	params["reply_markup"] = string(data)
 
-	data, err := b.Raw("", params)
+	data, err := b.Raw("editMessageReplyMarkup", params)
 	if err != nil {
 		return nil, err
 	}
