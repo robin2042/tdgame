@@ -119,6 +119,19 @@ func contains(slice []int64, val int64) (int, bool) {
 	return -1, false
 }
 
+func (userStorage *UserPostgres) Balance(userID int64) (*logic.Leaderboard, error) {
+	var user logic.User
+	var board logic.Leaderboard
+
+	userStorage.db.Where("chat_id = ?", userID).First(&user)
+	board.Userid = user.ChatID
+	board.Score = user.Wallmoney
+	board.Win = 0
+
+	return &board, nil
+
+}
+
 // IsUserAdmin checks if user has administrator privileges
 func (userStorage *UserPostgres) Sign(userID int64, sign int) (int64, bool) {
 	var user logic.User

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/spf13/viper"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
@@ -28,29 +29,16 @@ func TemplateNiuniu_Text() string {
 	return b.String()
 }
 
-func TemplateNiuniu_BetText() string {
-	sweaters := []UserInfo{
-		{
-			Name:   "tom",
-			Gender: "男人",
-			Age:    1,
-		},
-		{
-			Name:   "john",
-			Gender: "女人人",
-			Age:    1,
-		},
-	}
-	fmt.Println(sweaters)
+func TemplateNiuniu_BetText(score []logic.Bets) string {
 
 	var b bytes.Buffer
-	tmpl, err := template.ParseFiles("hello.tmpl")
+	tmpl, err := template.ParseFiles("./templates/niuniu/bet.tmpl")
 	if err != nil {
 		fmt.Println("create template failed,err:", err)
 		return "无效"
 	}
 
-	err = tmpl.Execute(&b, sweaters)
+	err = tmpl.Execute(&b, score)
 	fmt.Println(err)
 	fmt.Println(b.String())
 
@@ -184,7 +172,7 @@ func TemplateNiuniu_Balance(tb *TgBot, viper *viper.Viper) telebot.InlineButton 
 		}
 
 		btn.Unique = restlt["unique"].(string)
-		tb.Bot.Handle(&btn, Niuniu_StartCallBack(tb))
+		tb.Bot.Handle(&btn, Niuniu_BalanceCallBack(tb))
 		return btn
 
 		// keys = append(keys, btn)
@@ -223,16 +211,4 @@ func TemplateNiuniu_Sign(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
 	// btnarray = append(btnarray, keys)
 	// }
 	return telebot.InlineButton{}
-}
-
-func updateSlice(first [][]telebot.InlineButton, second [][]telebot.InlineButton) [][]telebot.InlineButton {
-	btnarray := make([][]telebot.InlineButton, 0)
-
-	for _, row := range first {
-		btnarray = append(btnarray, row)
-	}
-	for _, row := range second {
-		btnarray = append(btnarray, row)
-	}
-	return btnarray
 }

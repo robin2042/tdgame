@@ -32,7 +32,7 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error
 	// var score int64
 	var floatscore float64
 
-	groupStorage.db.Where("chat_id = ?", addscore.Chatid).First(&user)
+	groupStorage.db.Where("chat_id = ?", addscore.Userid).First(&user)
 
 	if user.ChatID == 0 {
 		return 0, errors.New("找不到用户!")
@@ -48,7 +48,8 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error
 			return 0, errors.New("金额不足!")
 		}
 		user.Wallmoney = user.Wallmoney - int64(floatscore)
-		result := groupStorage.db.Save(&user)
+		result := groupStorage.db.Model(&logic.User{}).Where("chat_id = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", int64(floatscore)))
+		// result := groupStorage.db.Update(&user)
 		if result.Error != nil {
 			return 0, errors.New("金额不足!")
 		}
@@ -65,4 +66,14 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error
 	// user := groupStorage.db.get
 	result := groupStorage.db.Create(addscore)
 	return int64(addscore.Bet), result.Error
+}
+
+//获取所有投注人
+func (groupStorage *GamesMysql) BetInfos(playid string) ([]logic.Scorelogs, error) {
+
+	var score []logic.Scorelogs
+
+	result := groupStorage.db.Model(&logic.Scorelogs{}).Where("playid = ? order by createtime asc", playid).Find(&score)
+
+	return score, result.Error
 }

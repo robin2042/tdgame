@@ -23,7 +23,8 @@ const (
 )
 
 type GameTable interface {
-	GetMsgID() int  //获取游戏状态
+	GetChatID() int64
+	GetPlayID() string
 	SetMsgID(int)   //获取游戏状态
 	GetStatus() int //获取游戏状态
 	StartGame() (bool, string)
@@ -61,7 +62,8 @@ type Games interface {
 	GameBegin(nameid, msgid int, chatid int64) int
 	GetTable(nameid int, chatid int64) GameTable //桌台
 	Bet(table *GameDesk, userid int64, area int) bool
-	AddScore(table GameTable, userid int64, score float64) (int64, error)
+	AddScore(GameTable, PlayInfo, float64) (int64, error)
+	BetInfos(chatid int64) ([]logic.Bets, error)
 }
 
 type GameMainManage struct {
@@ -142,23 +144,58 @@ func (g *GameMainManage) Bet(table *GameDesk, userid int64, area int) bool {
 
 }
 
-func (g *GameMainManage) AddScore(table GameTable, userid int64, score float64) (int64, error) {
+func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float64) (int64, error) {
 	gamedesk := table.(*GameDesk)
 
 	addscore := &logic.AddScore{
 		Playid: gamedesk.PlayID,
 		Chatid: gamedesk.ChatID,
-		Userid: userid,
+		Userid: player.UserID,
 		Nameid: gamedesk.NameID,
 		Bet:    score,
 	}
-	return g.stg.AddScore(addscore)
+
+	betscore, err := g.stg.AddScore(addscore)
+	if err != nil {
+		return 0, err
+	}
+	gamedesk.Bets[player] = betscore //下注
+
+	return betscore, err
+
+}
+
+//获取下注列表
+func (g *GameMainManage) BetInfos(chatid int64) ([]logic.Bets, error) {
+	table := g.Tables[chatid]
+	gamedesk := table.(*GameDesk)
+
+	s := make([]logic.Bets, 0, len(gamedesk.Bets))
+
+	for k, v := range gamedesk.Bets {
+		var bet logic.Bets
+		bet.Userid = k.UserID
+		bet.UserName = k.Name
+		bet.Bet = v
+		s = append(s, bet)
+	}
+
+	return s, nil
 
 }
 
 //GameTable
 func (g *GameDesk) SetPlayID(playid string) {
 	g.PlayID = playid
+}
+
+func (g *GameDesk) GetChatID() int64 {
+	return g.ChatID
+}
+
+//GameTable
+func (g *GameDesk) GetPlayID() string {
+	return g.PlayID
 }
 
 //开始
@@ -206,6 +243,9 @@ func CreateTable(nameid int, chatid int64) GameTable {
 	table.SetPlayID(playid)
 	table.NameID = nameid
 	table.ChatID = chatid
+	table.Bets = make(map[PlayInfo]int64)
+	table.Changes = make(map[PlayInfo]int64)
+
 	table.GameStation = GS_TK_FREE
 	return table
 }

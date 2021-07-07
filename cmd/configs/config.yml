@@ -127,16 +127,16 @@ niuniu_start_button:
  start:  
     - text: ▶️开始游戏
       data: .5
-      unique: "niuniu_bet_121111111"
+      unique: "niuniu_start"
       url: "http://www.sohu.com"
         
  balance:
     - text: 💰️查看余额
       data: .5
-      unique: "niuniu_bet_121111111"
+      unique: "niuniu_balance"
       url: "http://www.sohu.com"
  sign:
     - text: ✅️签到领钱
       data: .5
-      unique: "niuniu_bet_121111111"
+      unique: "niuniu_sign"
       url: "http://www.sohu.com"

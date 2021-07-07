@@ -81,6 +81,13 @@ func (AddScore) TableName() string {
 }
 
 // User stores info about user
+type Bets struct {
+	Userid   int64
+	UserName string
+	Bet      int64
+}
+
+// User stores info about user
 type Scorelogs struct {
 	Userid      int64
 	Playid      string
@@ -90,8 +97,8 @@ type Scorelogs struct {
 	Changescore int64
 	Score       int64
 	Status      int
-	Createtime  int `gorm:"default:now()"`
-	Endtime     int `gorm:"default:now()"`
+	Createtime  string `gorm:"default:now()"`
+	Endtime     string `gorm:"default:now()"`
 	Details     string
 }
 
@@ -107,4 +114,11 @@ type Signlogs struct {
 	Sign       int //签到金额
 	Score      int64
 	Createtime string `gorm:"default:now()"`
+}
+
+type Leaderboard struct {
+	Userid int64
+	Score  int64
+	Win    int64
+	Grades int //名次
 }

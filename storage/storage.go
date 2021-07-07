@@ -27,7 +27,8 @@ type User interface {
 	GetUsersByPublication(pub *logic.Publication) ([]logic.User, error) // Returns owner of publication
 	IsUserAdmin(user *logic.User) bool
 	IsChatAdmin(userID int64) bool
-	Sign(userID int64, sign int) (int64,bool) //签到
+	Sign(userID int64, sign int) (int64, bool)        //签到
+	Balance(userID int64) (*logic.Leaderboard, error) //余额
 }
 
 // Subscription interface defines methods for Publicaiton Storage
@@ -53,7 +54,7 @@ type Info interface {
 type Games interface {
 	SaveGameRound(game *logic.Gamerounds) error
 	AddScore(game *logic.AddScore) (int64, error)
-	// PlayBet(game *logic.Gamerounds) error
+	BetInfos(playid string) ([]logic.Scorelogs, error)
 }
 
 // Storage struct is used to access database
