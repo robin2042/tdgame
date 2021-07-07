@@ -203,21 +203,31 @@ func Niuniu_BalanceCallBack(tb *TgBot) func(c *telebot.Callback) {
 	}
 }
 
-// /签到
+// /签到表
 func Niuniu_SignCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
-		floatvar, _ := strconv.ParseFloat(c.Data, 64)
-		fmt.Println(floatvar)
+		sign := 700000
 
-		score, err := tb.Games.AddScore(table, int64(c.Sender.ID), floatvar)
-		if err != nil {
+		score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
+		if err {
 			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
 			tb.Bot.Respond(c, &reply)
 		} else {
 			fmt.Println(score)
 		}
+
+		// table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		// floatvar, _ := strconv.ParseFloat(c.Data, 64)
+		// fmt.Println(floatvar)
+
+		// score, err := tb.Controller.Register()
+		// if err != nil {
+		// 	reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
+		// 	tb.Bot.Respond(c, &reply)
+		// } else {
+		// 	fmt.Println(score)
+		// }
 
 		// tb.EditHtmlMessage(c.Message, "update text")
 		// fmt.Println(a, b)

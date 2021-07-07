@@ -94,3 +94,17 @@ type Scorelogs struct {
 	Endtime     int `gorm:"default:now()"`
 	Details     string
 }
+
+// 签到表
+// id int AI PK
+// userid int
+// chatid bigint
+// score bigint
+// createtime timestamp
+type Signlogs struct {
+	Userid     int64
+	Chatid     int64
+	Sign       int //签到金额
+	Score      int64
+	Createtime string `gorm:"default:now()"`
+}

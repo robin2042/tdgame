@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"gorm.io/gorm"
@@ -116,4 +117,45 @@ func contains(slice []int64, val int64) (int, bool) {
 		}
 	}
 	return -1, false
+}
+
+// IsUserAdmin checks if user has administrator privileges
+func (userStorage *UserPostgres) Sign(userID int64, sign int) (int64, bool) {
+	var user logic.User
+	var scorelog logic.Signlogs
+	userStorage.db.Where("chat_id = ?", userID).First(&user)
+
+	//没有签到过
+	if err := userStorage.db.Where("userid  = ? order by createtime desc ", userID).Find(&scorelog).RowsAffected; err == 0 {
+
+		result := userStorage.db.Model(&logic.User{}).Where("chat_id = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
+		if result.Error != nil {
+			return 0, false
+		}
+
+		scorelog.Score = user.Wallmoney
+		scorelog.Sign = sign
+		scorelog.Userid = userID
+
+		// 处理错误...
+		userStorage.db.Create(scorelog)
+		return user.Wallmoney + int64(sign), true
+	} else {
+
+		timer, _ := time.ParseInLocation("2006-01-02 15:04:05", scorelog.Createtime, time.Local)
+
+		if time.Since(timer).Seconds() <= 150 {
+			return 0, true
+		}
+		userStorage.db.Model(&logic.User{}).Where("chat_id = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
+		var scorelog logic.Signlogs
+		scorelog.Score = user.Wallmoney
+		scorelog.Sign = sign
+		scorelog.Userid = userID
+
+		// 处理错误...
+		userStorage.db.Create(scorelog)
+	}
+
+	return 0, false
 }

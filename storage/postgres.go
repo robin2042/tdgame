@@ -8,12 +8,15 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // NewPostgresDB constructor of gorm.DB databse with postgresql database
 func NewPostgresDB(cfg Config) (*gorm.DB, error) {
 	connStr := formatPostgresConfig(cfg)
-	return gorm.Open(mysql.Open(connStr), &gorm.Config{})
+	return gorm.Open(mysql.Open(connStr), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 }
 
 // Formats config struct to meet gorm's expectations

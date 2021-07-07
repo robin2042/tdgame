@@ -40,6 +40,7 @@ func (ucon *UserController) GetUsersByPublication(pub *logic.Publication) ([]log
 }
 
 // GetUsersByPublication returns subscribers of publication
-func (ucon *UserController) Relief(chatID int64) int64 {
-	return 0
+func (ucon *UserController) Sign(chatID int64, sign int) (int64,bool) {
+	return ucon.stg.Sign(chatID, sign)
+
 }

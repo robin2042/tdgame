@@ -16,7 +16,7 @@ type User interface {
 	Register(chatID int64) error                                        // Performs user registration
 	Unregister(chatID int64) error                                      // Performs user deregistration
 	GetUsersByPublication(pub *logic.Publication) ([]logic.User, error) // Returns owner of publication
-	Relief(chatID int64) int64                                          // Returns owner of wallmoney
+	Sign(chatID int64, sign int) (int64,bool)                                  // 签到
 
 }
 

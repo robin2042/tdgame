@@ -99,38 +99,6 @@ func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 
 	btnarray = append(btnarray, starts...)
 
-	// btnarray := append()
-
-	// TemplateNiuniu_Jetton(tb, viper.GetViper(), &btnarray)
-
-	// // groups := viper.Get("niuniu_start_button.bet")
-	// // fmt.Println(groups)
-	// groups1 := viper.Get("niuniu_start_button.bet")
-
-	// a := groups1.([]interface{})
-
-	// for _, row := range a {
-	// 	keys := make([]telebot.InlineButton, 0, len(row.([]interface{})))
-	// 	fmt.Println(row)
-	// 	for _, v := range row.([]interface{}) {
-	// 		var btn telebot.InlineButton
-
-	// 		restlt := v.(map[interface{}]interface{})
-	// 		btn.Text = restlt["text"].(string)
-	// 		switch restlt["data"].(type) {
-	// 		case float64:
-	// 			btn.Data = fmt.Sprintf("%f", restlt["data"].(float64))
-	// 		case int:
-	// 			btn.Data = fmt.Sprintf("%d", restlt["data"].(int))
-	// 		}
-
-	// 		btn.Unique = restlt["unique"].(string)
-	// 		tb.Bot.Handle(&btn, Niuniu_BetCallBack(tb))
-	// 		keys = append(keys, btn)
-	// 	}
-	// 	btnarray = append(btnarray, keys)
-	// }
-
 	menu.InlineKeyboard = btnarray
 	return &menu
 }
