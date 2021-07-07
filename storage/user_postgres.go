@@ -145,7 +145,7 @@ func (userStorage *UserPostgres) Sign(userID int64, sign int) (int64, bool) {
 		timer, _ := time.ParseInLocation("2006-01-02 15:04:05", scorelog.Createtime, time.Local)
 
 		if time.Since(timer).Seconds() <= 150 {
-			return 0, true
+			return 0, false
 		}
 		userStorage.db.Model(&logic.User{}).Where("chat_id = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
 		var scorelog logic.Signlogs
@@ -157,5 +157,5 @@ func (userStorage *UserPostgres) Sign(userID int64, sign int) (int64, bool) {
 		userStorage.db.Create(scorelog)
 	}
 
-	return 0, false
+	return user.Wallmoney, true
 }
