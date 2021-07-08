@@ -38,23 +38,23 @@ var m_cbCardListData = [...]byte{
 
 //生成若干个不重复的随机数
 
-func main() {
-	// var cbdatas [54]byte
-	nums := generateRandomNumber(0, 54, 54)
+// func main() {
+// 	// var cbdatas [54]byte
+// 	nums := generateRandomNumber(0, 54, 54)
 
-	fmt.Println(nums)
-	var ncard int
-	for i := 0; i < GAME_PLAYER; i++ {
+// 	fmt.Println(nums)
+// 	var ncard int
+// 	for i := 0; i < GAME_PLAYER; i++ {
 
-		for j := 0; j < MAX_COUNT; j++ {
-			ncard++
-			m_cbTableCardArray[i][j] = m_cbCardListData[nums[ncard]]
+// 		for j := 0; j < MAX_COUNT; j++ {
+// 			ncard++
+// 			m_cbTableCardArray[i][j] = m_cbCardListData[nums[ncard]]
 
-		}
-	}
-	fmt.Println(m_cbTableCardArray)
-	GetUnicode(m_cbTableCardArray[0], MAX_COUNT)
-}
+// 		}
+// 	}
+// 	fmt.Println(m_cbTableCardArray)
+// 	GetUnicode(m_cbTableCardArray[0], MAX_COUNT)
+// }
 
 //逻辑数值
 func GetCardLogicValue(cbCardData byte) int {
@@ -609,7 +609,7 @@ func SortCardList(cbCardData *[5]byte, cbCardCount int) {
 			}
 		}
 		bLast--
-		if bSorted == false {
+		if !bSorted {
 			return
 		}
 	}
