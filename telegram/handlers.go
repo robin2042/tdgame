@@ -20,7 +20,7 @@ func (tb *TgBot) EditHtmlMessage(m *telebot.Message, msg string) (*telebot.Messa
 	replay := &telebot.ReplyMarkup{InlineKeyboard: m.ReplyMarkup.InlineKeyboard}
 	fmt.Println(replay)
 
-	return tb.Bot.Edit(m, msg, &telebot.SendOptions{ReplyMarkup: replay, ParseMode: telebot.ModeHTML})
+	return tb.Bot.Edit(m, msg, &telebot.SendOptions{ReplyMarkup: replay, ParseMode: telebot.ModeMarkdownV2})
 
 	//return tb.Bot.Edit(m, msg)
 }
@@ -45,6 +45,7 @@ func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 			msg := TemplateNiuniu_limit()
 			tb.SendHtmlMessage(msg, nil, m)
 		} else {
+
 			msg := TemplateNiuniu_Text()
 			reply := TemplateNiuniu_Bet(tb)
 			message, _ := tb.SendHtmlMessage(msg, reply, m)
@@ -155,20 +156,21 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 			UserID: int64(c.Sender.ID),
 		}
 
-		score, err := tb.Games.AddScore(table, player, floatvar)
+		score, totalscore, err := tb.Games.AddScore(table, player, floatvar)
 
 		if err != nil {
 			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
 			tb.Bot.Respond(c, &reply)
 		} else {
 			bets, _ := tb.Games.BetInfos(table.GetChatID())
-
+			//下注成功
+			SendBetMessage(tb, c, score)
 			players := TemplateNiuniu_BetText(bets)
 			tb.EditHtmlMessage(c.Message, players)
 		}
 
 		// tb.EditHtmlMessage(c.Message, "update text")
-		fmt.Println(score)
+		fmt.Println(score, totalscore)
 	}
 }
 
@@ -244,4 +246,12 @@ func Niuniu_SignCallBack(tb *TgBot) func(c *telebot.Callback) {
 		// tb.EditHtmlMessage(c.Message, "update text")
 		// fmt.Println(a, b)
 	}
+}
+func SendBetMessage(tb *TgBot, c *telebot.Callback, score int64) {
+	ac := accounting.Accounting{Symbol: "$"}
+
+	str := fmt.Sprintf("下注成功\n您当前下注总额:%s\n请在无人跟注6s后点击开始游戏！", ac.FormatMoney(score))
+	reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
+	tb.Bot.Respond(c, &reply)
+
 }

@@ -62,7 +62,7 @@ type Games interface {
 	GameBegin(nameid, msgid int, chatid int64) int
 	GetTable(nameid int, chatid int64) GameTable //桌台
 	Bet(table *GameDesk, userid int64, area int) bool
-	AddScore(GameTable, PlayInfo, float64) (int64, error)
+	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64) ([]logic.Bets, error)
 }
 
@@ -144,7 +144,7 @@ func (g *GameMainManage) Bet(table *GameDesk, userid int64, area int) bool {
 
 }
 
-func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float64) (int64, error) {
+func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float64) (int64, int64, error) {
 	gamedesk := table.(*GameDesk)
 
 	addscore := &logic.AddScore{
@@ -157,11 +157,11 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 
 	betscore, err := g.stg.AddScore(addscore)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	gamedesk.Bets[player] = betscore //下注
 
-	return betscore, err
+	return betscore, 0, err
 
 }
 
