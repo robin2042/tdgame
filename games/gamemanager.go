@@ -1,12 +1,14 @@
 package games
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"github.com/leekchan/accounting"
 )
 
 const (
@@ -27,7 +29,7 @@ type GameTable interface {
 	GetPlayID() string
 	SetMsgID(int)   //获取游戏状态
 	GetStatus() int //获取游戏状态
-	StartGame() (bool, string)
+	StartGame(int64) (bool, error)
 	Bet(int64, int64, int) (bool, string)
 
 	// GameEnd()
@@ -46,6 +48,7 @@ type GameDesk struct {
 	ChatID        int64
 	NameID        int
 	GameStation   int
+	LastBetTime   time.Time //最后一次下注时间
 	StartTime     time.Time
 	NextStartTime time.Time
 	Bets          map[PlayInfo]int64 //下注额
@@ -117,9 +120,8 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 	}
 
 	table.SetMsgID(msgid)
-	_, playid := table.StartGame() //新开局
+	// _, playid := table.StartGame() //新开局
 
-	fmt.Println(playid)
 	round := &logic.Gamerounds{
 		Playid: GenerateID(nameid, chatid),
 		Chatid: chatid,
@@ -159,9 +161,10 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 	if err != nil {
 		return 0, 0, err
 	}
-	gamedesk.Bets[player] = betscore //下注
+	gamedesk.LastBetTime = time.Now()
+	gamedesk.Bets[player] += betscore //下注
 
-	return betscore, 0, err
+	return betscore, gamedesk.Bets[player], err
 
 }
 
@@ -171,12 +174,14 @@ func (g *GameMainManage) BetInfos(chatid int64) ([]logic.Bets, error) {
 	gamedesk := table.(*GameDesk)
 
 	s := make([]logic.Bets, 0, len(gamedesk.Bets))
+	ac := accounting.Accounting{Symbol: "$"}
 
 	for k, v := range gamedesk.Bets {
 		var bet logic.Bets
 		bet.Userid = k.UserID
 		bet.UserName = k.Name
 		bet.Bet = v
+		bet.FmtBet = ac.FormatMoney(v)
 		s = append(s, bet)
 	}
 
@@ -199,16 +204,28 @@ func (g *GameDesk) GetPlayID() string {
 }
 
 //开始
-func (g *GameDesk) StartGame() (bool, string) {
+func (g *GameDesk) StartGame(userid int64) (bool, error) {
 	if g.GameStation != GS_TK_FREE {
-		return false, ""
+		return false, errors.New("已经开局请等待本局结束！")
+	}
+	if time.Now().Before(g.LastBetTime.Add(time.Second * 6)) {
+		return false, errors.New("所有用户无操作6s后才能开始游戏")
+	}
+
+	var bfind bool
+	for i, _ := range g.Bets {
+		if i.UserID == userid {
+			bfind = true
+			break
+		}
+	}
+	if !bfind {
+		return false, errors.New("您没有参与此游戏，无权更改游戏状态")
 	}
 	//记录牌局
-	later := time.Now()
-	g.StartTime = later
-	g.NextStartTime = later.Add(time.Second * 90) //90S后
-	g.GameStation = GS_TK_BET
-	return true, ""
+
+	g.GameStation = GS_TK_PLAYING
+	return true, nil
 }
 
 //开始

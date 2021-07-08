@@ -93,7 +93,7 @@ func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 
 //下注按钮
 func TemplateNiuniu_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButton {
-	jetton := viper.Get("niuniu_start_button.bet")
+	jetton := viper.Get("niuniu_jetton_button.bet")
 
 	arr := jetton.([]interface{})
 	btnarray := make([][]telebot.InlineButton, 0)
@@ -122,7 +122,7 @@ func TemplateNiuniu_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButt
 
 //开始
 func TemplateNiuniu_Start(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
-	jetton := viper.Get("niuniu_start_button.start")
+	jetton := viper.Get("niuniu_jetton_button.start")
 
 	restlt := jetton.([]interface{})
 	fmt.Println(restlt)
@@ -153,7 +153,7 @@ func TemplateNiuniu_Start(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
 
 //余额
 func TemplateNiuniu_Balance(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
-	jetton := viper.Get("niuniu_start_button.balance")
+	jetton := viper.Get("niuniu_jetton_button.balance")
 
 	arr := jetton.([]interface{})
 	// btnarray := make([][]telebot.InlineButton, 0)
@@ -184,7 +184,7 @@ func TemplateNiuniu_Balance(tb *TgBot, viper *viper.Viper) telebot.InlineButton 
 
 //签到
 func TemplateNiuniu_Sign(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
-	jetton := viper.Get("niuniu_start_button.sign")
+	jetton := viper.Get("niuniu_jetton_button.sign")
 
 	arr := jetton.([]interface{})
 	// btnarray := make([][]telebot.InlineButton, 0)

@@ -148,6 +148,10 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		if table.GetStatus() > games.GS_TK_BET {
+			reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
+			tb.Bot.Respond(c, &reply)
+		}
 		floatvar, _ := strconv.ParseFloat(c.Data, 64)
 		fmt.Println(floatvar)
 
@@ -164,7 +168,7 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 		} else {
 			bets, _ := tb.Games.BetInfos(table.GetChatID())
 			//下注成功
-			SendBetMessage(tb, c, score)
+			SendBetMessage(tb, c, totalscore)
 			players := TemplateNiuniu_BetText(bets)
 			tb.EditHtmlMessage(c.Message, players)
 		}
@@ -174,11 +178,18 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	}
 }
 
-// /下注
+// /开始游戏
 func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		// table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		start, err := table.StartGame(int64(c.Sender.ID))
+		if !start {
+			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
+			tb.Bot.Respond(c, &reply)
+			return
+		}
+
 		// floatvar, _ := strconv.ParseFloat(c.Data, 64)
 		// fmt.Println(floatvar)
 

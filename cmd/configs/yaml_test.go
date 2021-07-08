@@ -15,9 +15,7 @@ func TestInfoController_GetLastTimestamp(t *testing.T) {
 	viper.ReadInConfig()
 	// fmt.Println(viper.AllKeys())
 
-	// groups := viper.Get("niuniu_start_button.bet")
-	// fmt.Println(groups)
-	groups1 := viper.Get("niuniu_start_button.bet")
+	groups1 := viper.Get("niuniu_jetton_button.bet")
 
 	for _, v := range groups1.([]interface{}) {
 		// fmt.Println(v)
@@ -37,7 +35,7 @@ func TestInfoController_GetLastTimestamp(t *testing.T) {
 }
 func loadMenu() *telebot.ReplyMarkup {
 
-	fmt.Println(viper.Get("niuniu_start_button.bet"))
+	fmt.Println(viper.Get("niuniu_jetton_button.bet"))
 
 	return nil
 

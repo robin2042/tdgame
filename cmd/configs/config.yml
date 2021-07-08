@@ -21,7 +21,7 @@ polling:
 niuniu_start_text:
   username: "postgres"
 
-niuniu_start_button:
+niuniu_jetton_button:
  bet:
     - 
       - text: 5%
@@ -139,4 +139,28 @@ niuniu_start_button:
     - text: ✅️签到领钱
       data: .5
       unique: "niuniu_sign"
+      url: "http://www.sohu.com"
+
+niuniu_start_button:
+  select:
+    - text: 青龙
+      data: 0
+      unique: "niuniu_select_0"
+      url: "http://www.sohu.com"
+    - text: 白虎
+      data: 1
+      unique: "niuniu_select_1"
+      url: "http://www.sohu.com"
+    - text: 朱雀
+      data: 2
+      unique: "niuniu_select_2"
+      url: "http://www.sohu.com"
+    - text: 玄武
+      data: 3
+      unique: "niuniu_select_3"
+      url: "http://www.sohu.com"
+  settle:
+    - text: 结算
+      data: 0
+      unique: "niuniu_settle"
       url: "http://www.sohu.com"

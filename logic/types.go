@@ -85,6 +85,7 @@ type Bets struct {
 	Userid   int64
 	UserName string
 	Bet      int64
+	FmtBet   string
 }
 
 // User stores info about user
