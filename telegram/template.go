@@ -30,7 +30,7 @@ func TemplateNiuniu_Text() string {
 }
 
 //选择按钮
-func TemplateNiuniu_SelectText(score []logic.Bets) string {
+func TemplateNiuniu_SelectText(plays *logic.Select) string {
 	var b bytes.Buffer
 	tmpl, err := template.ParseFiles("./templates/niuniu/select.tmpl")
 	if err != nil {
@@ -38,7 +38,8 @@ func TemplateNiuniu_SelectText(score []logic.Bets) string {
 		return "无效"
 	}
 
-	tmpl.Execute(&b, nil)
+	a := tmpl.Execute(&b, plays)
+	fmt.Println(a)
 	fmt.Println(b.String())
 	return b.String()
 }

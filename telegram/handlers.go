@@ -182,17 +182,19 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		// table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
-		// start, err := table.StartGame(int64(c.Sender.ID))
-		// if !start {
-		// 	reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
-		// 	tb.Bot.Respond(c, &reply)
-		// 	return
-		// }
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		start, err := table.StartGame(int64(c.Sender.ID))
+		if !start {
+			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
+			tb.Bot.Respond(c, &reply)
+			return
+		}
+		betsinfo, _ := table.GetBetInfos()
+		fmt.Println(betsinfo)
 
-		msg := TemplateNiuniu_SelectText(nil)
+		msg := TemplateNiuniu_SelectText(betsinfo)
 		reply := TemplateNiuniu_Select(tb)
-		fmt.Println(msg)
+
 		tb.EditHtmlMessage(c.Message, msg, reply)
 
 	}
@@ -254,14 +256,23 @@ func Niuniu_SignCallBack(tb *TgBot) func(c *telebot.Callback) {
 // 选择
 func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
-		ac := accounting.Accounting{Symbol: "$"}
-		name := c.Sender.FirstName
 
-		board, _ := tb.Controller.Balance(int64(c.Sender.ID))
-		str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		data, _ := strconv.Atoi(c.Data)
 
-		reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
-		tb.Bot.Respond(c, &reply)
+		tb.Games.Bet(table, int64(c.Sender.ID), data)
+
+		// str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
+
+		// TemplateNiuniu_SelectText()
+		// ac := accounting.Accounting{Symbol: "$"}
+		// name := c.Sender.FirstName
+
+		// board, _ := tb.Controller.Balance(int64(c.Sender.ID))
+		// str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
+
+		// reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
+		// tb.Bot.Respond(c, &reply)
 
 		// score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
 

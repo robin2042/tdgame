@@ -82,10 +82,13 @@ func (AddScore) TableName() string {
 
 // User stores info about user
 type Bets struct {
-	Userid   int64
-	UserName string
-	Bet      int64
-	FmtBet   string
+	Userid     int64
+	UserName   string
+	Bet        int64
+	FmtBet     string //下注额格式化
+	BetArea    int
+	FmtBetArea string //下注格式化
+
 }
 
 // User stores info about user
@@ -124,10 +127,13 @@ type Leaderboard struct {
 	Grades int //名次
 }
 
+//开奖记录
+type Records struct {
+}
+
 // User stores info about user
 type Select struct {
-	Userid   int64
-	UserName string
-	Bet      int64
-	FmtBet   string
+	Countdown int    //倒计时
+	Players   []Bets //选择区域
+
 }

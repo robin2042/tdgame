@@ -15,6 +15,8 @@ const (
 	GAME_NIUNIU = 40022000
 )
 
+var betsinfo map[int]string = map[int]string{-1: "未选择", 0: "青龙", 1: "白虎", 2: "朱雀", 3: "玄武"}
+
 // Controller struct is used to access database
 const (
 
@@ -31,6 +33,7 @@ type GameTable interface {
 	GetStatus() int //获取游戏状态
 	StartGame(int64) (bool, error)
 	Bet(int64, int64, int) (bool, string)
+	GetBetInfos() (*logic.Select, error)
 }
 
 type PlayInfo struct {
@@ -41,18 +44,19 @@ type PlayInfo struct {
 
 type GameDesk struct {
 	GameTable
-	MsgID              int //消息ID
-	PlayID             string
-	ChatID             int64
+	MsgID              int    //消息ID
+	PlayID             string //局号
+	ChatID             int64  //桌台号
 	NameID             int
-	GameStation        int
+	GameStation        int       //游戏状态
 	LastBetTime        time.Time //最后一次下注时间
-	StartTime          time.Time
+	BeginTime          time.Time //开局时间
+	StartTime          time.Time //开始游戏时间
 	NextStartTime      time.Time
 	m_cbTableCardArray [5][5]byte //牌
 
 	Bets     map[PlayInfo]int64 //下注额
-	Area     map[PlayInfo]int64 //下注区域
+	Area     map[PlayInfo]int   //下注区域
 	Changes  map[PlayInfo]int64 //胜负
 	Historys map[PlayInfo]int64 //历史开奖记录
 
@@ -66,7 +70,7 @@ type Games interface {
 	GameBegin(nameid, msgid int, chatid int64) int
 	GameEnd(nameid, chatid int64) int
 	GetTable(nameid int, chatid int64) GameTable //桌台
-	Bet(table *GameDesk, userid int64, area int) bool
+	Bet(table GameTable, userid int64, area int) (bool, error)
 	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64) ([]logic.Bets, error)
 }
@@ -156,14 +160,13 @@ func (g *GameMainManage) GameEnd(nameid, chatid int64) int {
 	return 0
 }
 
-func (g *GameMainManage) Bet(table *GameDesk, userid int64, area int) bool {
-	addscore := &logic.AddScore{
-		Playid: table.PlayID,
-		Chatid: userid,
-		Nameid: table.NameID,
+func (g *GameMainManage) Bet(table GameTable, userid int64, area int) (bool, error) {
+	gamedesk := table.(*GameDesk)
+	if gamedesk.GetStatus() != GS_TK_PLAYING {
+		return false, nil
 	}
-	g.stg.AddScore(addscore)
-	return true
+
+	return true, nil
 
 }
 
@@ -184,6 +187,7 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 	}
 	gamedesk.LastBetTime = time.Now()
 	gamedesk.Bets[player] += betscore //下注
+	gamedesk.Area[player] = -1        //未选择
 
 	return betscore, gamedesk.Bets[player], err
 
@@ -222,6 +226,20 @@ func (g *GameDesk) GetChatID() int64 {
 //GameTable
 func (g *GameDesk) GetPlayID() string {
 	return g.PlayID
+}
+
+//开始
+func (g *GameDesk) GetBetInfos() (*logic.Select, error) {
+	betinfo := &logic.Select{}
+	betinfo.Players = make([]logic.Bets, 0)
+	for k, v := range g.Area {
+		bet := logic.Bets{}
+		bet.UserName = k.Name
+		bet.FmtBetArea = betsinfo[v]
+		betinfo.Players = append(betinfo.Players, bet)
+
+	}
+	return betinfo, nil
 }
 
 //开始
@@ -293,6 +311,7 @@ func CreateTable(nameid int, chatid int64) GameTable {
 	table.NameID = nameid
 	table.ChatID = chatid
 	table.Bets = make(map[PlayInfo]int64)
+	table.Area = make(map[PlayInfo]int)
 	table.Changes = make(map[PlayInfo]int64)
 
 	table.GameStation = GS_TK_FREE
