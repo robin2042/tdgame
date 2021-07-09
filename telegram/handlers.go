@@ -15,11 +15,11 @@ func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *teleb
 	return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeMarkdownV2})
 }
 
-func (tb *TgBot) EditHtmlMessage(m *telebot.Message, msg string) (*telebot.Message, error) {
-
+func (tb *TgBot) EditHtmlMessage(m *telebot.Message, msg string, menu *telebot.ReplyMarkup) (*telebot.Message, error) {
 	replay := &telebot.ReplyMarkup{InlineKeyboard: m.ReplyMarkup.InlineKeyboard}
-	fmt.Println(replay)
-
+	if menu != nil {
+		replay = menu
+	}
 	return tb.Bot.Edit(m, msg, &telebot.SendOptions{ReplyMarkup: replay, ParseMode: telebot.ModeMarkdownV2})
 
 	//return tb.Bot.Edit(m, msg)
@@ -170,7 +170,7 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 			//下注成功
 			SendBetMessage(tb, c, totalscore)
 			players := TemplateNiuniu_BetText(bets)
-			tb.EditHtmlMessage(c.Message, players)
+			tb.EditHtmlMessage(c.Message, players, nil)
 		}
 
 		// tb.EditHtmlMessage(c.Message, "update text")
@@ -182,27 +182,19 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
-		start, err := table.StartGame(int64(c.Sender.ID))
-		if !start {
-			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
-			tb.Bot.Respond(c, &reply)
-			return
-		}
-
-		// floatvar, _ := strconv.ParseFloat(c.Data, 64)
-		// fmt.Println(floatvar)
-
-		// score, err := tb.Games.AddScore(table, int64(c.Sender.ID), floatvar)
-		// if err != nil {
-		// 	reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
+		// table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
+		// start, err := table.StartGame(int64(c.Sender.ID))
+		// if !start {
+		// 	reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
 		// 	tb.Bot.Respond(c, &reply)
-		// } else {
-		// 	fmt.Println(score)
+		// 	return
 		// }
 
-		// tb.EditHtmlMessage(c.Message, "update text")
-		// fmt.Println(a, b)
+		msg := TemplateNiuniu_SelectText(nil)
+		reply := TemplateNiuniu_Select(tb)
+		fmt.Println(msg)
+		tb.EditHtmlMessage(c.Message, msg, reply)
+
 	}
 }
 
@@ -258,6 +250,41 @@ func Niuniu_SignCallBack(tb *TgBot) func(c *telebot.Callback) {
 		// fmt.Println(a, b)
 	}
 }
+
+// 选择
+func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
+	return func(c *telebot.Callback) {
+		ac := accounting.Accounting{Symbol: "$"}
+		name := c.Sender.FirstName
+
+		board, _ := tb.Controller.Balance(int64(c.Sender.ID))
+		str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
+
+		reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
+		tb.Bot.Respond(c, &reply)
+
+		// score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
+
+	}
+}
+
+// 结算
+func Niuniu_SettleCallBack(tb *TgBot) func(c *telebot.Callback) {
+	return func(c *telebot.Callback) {
+		ac := accounting.Accounting{Symbol: "$"}
+		name := c.Sender.FirstName
+
+		board, _ := tb.Controller.Balance(int64(c.Sender.ID))
+		str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
+
+		reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
+		tb.Bot.Respond(c, &reply)
+
+		// score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
+
+	}
+}
+
 func SendBetMessage(tb *TgBot, c *telebot.Callback, score int64) {
 	ac := accounting.Accounting{Symbol: "$"}
 

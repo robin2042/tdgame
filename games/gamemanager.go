@@ -31,8 +31,6 @@ type GameTable interface {
 	GetStatus() int //获取游戏状态
 	StartGame(int64) (bool, error)
 	Bet(int64, int64, int) (bool, string)
-
-	// GameEnd()
 }
 
 type PlayInfo struct {
@@ -43,17 +41,20 @@ type PlayInfo struct {
 
 type GameDesk struct {
 	GameTable
-	MsgID         int //消息ID
-	PlayID        string
-	ChatID        int64
-	NameID        int
-	GameStation   int
-	LastBetTime   time.Time //最后一次下注时间
-	StartTime     time.Time
-	NextStartTime time.Time
-	Bets          map[PlayInfo]int64 //下注额
-	Area          map[PlayInfo]int64 //下注区域
-	Changes       map[PlayInfo]int64 //胜负
+	MsgID              int //消息ID
+	PlayID             string
+	ChatID             int64
+	NameID             int
+	GameStation        int
+	LastBetTime        time.Time //最后一次下注时间
+	StartTime          time.Time
+	NextStartTime      time.Time
+	m_cbTableCardArray [5][5]byte //牌
+
+	Bets     map[PlayInfo]int64 //下注额
+	Area     map[PlayInfo]int64 //下注区域
+	Changes  map[PlayInfo]int64 //胜负
+	Historys map[PlayInfo]int64 //历史开奖记录
 
 }
 
@@ -63,6 +64,7 @@ type GameManage interface {
 
 type Games interface {
 	GameBegin(nameid, msgid int, chatid int64) int
+	GameEnd(nameid, chatid int64) int
 	GetTable(nameid int, chatid int64) GameTable //桌台
 	Bet(table *GameDesk, userid int64, area int) bool
 	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
@@ -120,7 +122,6 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 	}
 
 	table.SetMsgID(msgid)
-	// _, playid := table.StartGame() //新开局
 
 	round := &logic.Gamerounds{
 		Playid: GenerateID(nameid, chatid),
@@ -133,6 +134,26 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 
 	return GS_TK_FREE
 
+}
+
+//游戏结束，清理用户下注信息
+func (g *GameMainManage) GameEnd(nameid, chatid int64) int {
+	table := g.GetTable(GAME_NIUNIU, chatid)
+	gamedesk := table.(*GameDesk)
+
+	for pi := range gamedesk.Area {
+		delete(gamedesk.Area, pi)
+	}
+
+	for pi := range gamedesk.Changes {
+		delete(gamedesk.Changes, pi)
+	}
+
+	for pi := range gamedesk.Bets {
+		delete(gamedesk.Bets, pi)
+	}
+
+	return 0
 }
 
 func (g *GameMainManage) Bet(table *GameDesk, userid int64, area int) bool {
@@ -213,7 +234,7 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 	}
 
 	var bfind bool
-	for i, _ := range g.Bets {
+	for i := range g.Bets {
 		if i.UserID == userid {
 			bfind = true
 			break
@@ -223,8 +244,8 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 		return false, errors.New("您没有参与此游戏，无权更改游戏状态")
 	}
 	//记录牌局
-
 	g.GameStation = GS_TK_PLAYING
+
 	return true, nil
 }
 
@@ -233,8 +254,19 @@ func (g *GameDesk) GetStatus() int {
 	return g.GameStation
 }
 
-// GetMsgID() int  //获取游戏状态
-// 	SetMsgID(int)   //获取游戏状态
+func (g *GameDesk) DispatchTableCard() {
+	nums := GenerateRandomNumber(0, 54, 54)
+	var ncard int
+	for i := 0; i < GAME_PLAYER; i++ {
+
+		for j := 0; j < MAX_COUNT; j++ {
+			ncard++
+			g.m_cbTableCardArray[i][j] = m_cbCardListData[nums[ncard]]
+
+		}
+	}
+
+}
 
 //开始
 func (g *GameDesk) GetMsgID() int {

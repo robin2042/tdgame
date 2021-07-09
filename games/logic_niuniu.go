@@ -36,26 +36,6 @@ var m_cbCardListData = [...]byte{
 	0x4E, 0x4F,
 }
 
-//生成若干个不重复的随机数
-
-// func main() {
-// 	// var cbdatas [54]byte
-// 	nums := generateRandomNumber(0, 54, 54)
-
-// 	fmt.Println(nums)
-// 	var ncard int
-// 	for i := 0; i < GAME_PLAYER; i++ {
-
-// 		for j := 0; j < MAX_COUNT; j++ {
-// 			ncard++
-// 			m_cbTableCardArray[i][j] = m_cbCardListData[nums[ncard]]
-
-// 		}
-// 	}
-// 	fmt.Println(m_cbTableCardArray)
-// 	GetUnicode(m_cbTableCardArray[0], MAX_COUNT)
-// }
-
 //逻辑数值
 func GetCardLogicValue(cbCardData byte) int {
 	//扑克属性
@@ -63,13 +43,13 @@ func GetCardLogicValue(cbCardData byte) int {
 	bCardValue := GetCardValue(cbCardData)
 
 	//转换数值
-	return If(bCardValue > 10, 10, bCardValue).(int)
+	return If(int(bCardValue) > 10, 10, int(bCardValue)).(int)
 
 }
 
 //生成count个[start,end)结束的不重复的随机数
 
-func generateRandomNumber(start int, end int, count int) []int {
+func GenerateRandomNumber(start int, end int, count int) []int {
 
 	//范围检查
 
@@ -530,9 +510,10 @@ func CompareCard(cbFirstData [MAX_COUNT]byte, cbNextData [MAX_COUNT]byte, cbCard
 	}
 
 	//排序大小
-	var bFirstTemp [MAX_COUNT]byte
-	var bNextTemp [MAX_COUNT]byte
-
+	// var bFirstTemp [MAX_COUNT]byte
+	// var bNextTemp [MAX_COUNT]byte
+	bFirstTemp := cbFirstData
+	bNextTemp := cbNextData
 	SortCardList(&bFirstTemp, cbCardCount)
 	SortCardList(&bNextTemp, cbCardCount)
 
@@ -623,7 +604,7 @@ func If(condition bool, trueVal, falseVal interface{}) interface{} {
 }
 
 //获取倍数
-func GetTimes(cbCardData [5]byte, cbCardCount byte, lMultiple int) int {
+func GetTimes(cbCardData [MAX_COUNT]byte, cbCardCount byte, lMultiple int) int {
 	if cbCardCount != MAX_COUNT {
 		return 0
 	}
@@ -633,13 +614,11 @@ func GetTimes(cbCardData [5]byte, cbCardCount byte, lMultiple int) int {
 		if bTimes < 2 {
 			return 1
 		}
-
 		if bTimes >= 2 && bTimes <= 9 {
 			return bTimes
 		} else if bTimes >= OX_DOUBLECOW {
 			return 10
 		}
-
 	} else if lMultiple == 4 {
 		if bTimes < 7 {
 			return 1
@@ -651,7 +630,6 @@ func GetTimes(cbCardData [5]byte, cbCardCount byte, lMultiple int) int {
 		} else if bTimes >= OX_DOUBLECOW {
 			return 4
 		}
-
 	}
 
 	return 0

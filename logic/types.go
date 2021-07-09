@@ -123,3 +123,11 @@ type Leaderboard struct {
 	Win    int64
 	Grades int //名次
 }
+
+// User stores info about user
+type Select struct {
+	Userid   int64
+	UserName string
+	Bet      int64
+	FmtBet   string
+}

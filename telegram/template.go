@@ -29,6 +29,47 @@ func TemplateNiuniu_Text() string {
 	return b.String()
 }
 
+//选择按钮
+func TemplateNiuniu_SelectText(score []logic.Bets) string {
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/niuniu/select.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, nil)
+	fmt.Println(b.String())
+	return b.String()
+}
+
+//选择按钮
+func TemplateNiuniu_Select(tb *TgBot) *telebot.ReplyMarkup {
+	menu := telebot.ReplyMarkup{}
+	menu.ResizeReplyKeyboard = true
+	menu.Selective = true
+
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config")
+
+	viper.ReadInConfig()
+	fmt.Println(viper.AllKeys())
+	btnarray := make([][]telebot.InlineButton, 0)
+	jettons := TemplateNiuniu_SelectJetton(tb, viper.GetViper())
+
+	btnarray = append(btnarray, jettons...)
+
+	buttons := make([]telebot.InlineButton, 0)
+	start := TemplateNiuniu_SettlementButton(tb, viper.GetViper()) //开始
+
+	buttons = append(buttons, start)
+
+	btnarray = append(btnarray, buttons)
+
+	menu.InlineKeyboard = btnarray
+	return &menu
+}
+
 func TemplateNiuniu_BetText(score []logic.Bets) string {
 
 	var b bytes.Buffer
@@ -91,6 +132,65 @@ func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 	return &menu
 }
 
+//余额
+func TemplateNiuniu_SettlementButton(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
+	jetton := viper.Get("niuniu_start_button.settle")
+
+	arr := jetton.([]interface{})
+	// btnarray := make([][]telebot.InlineButton, 0)
+	for _, row := range arr {
+		// keys := make(telebot.InlineButton, 0)
+		// for _, v := range row.([]interface{}) {
+		var btn telebot.InlineButton
+
+		restlt := row.(map[interface{}]interface{})
+		btn.Text = restlt["text"].(string)
+		switch restlt["data"].(type) {
+		case float64:
+			btn.Data = fmt.Sprintf("%f", restlt["data"].(float64))
+		case int:
+			btn.Data = fmt.Sprintf("%d", restlt["data"].(int))
+		}
+
+		btn.Unique = restlt["unique"].(string)
+		//tb.Bot.Handle(&btn, Niuniu_BalanceCallBack(tb))
+		return btn
+
+		// keys = append(keys, btn)
+		// btnarray = append(btnarray, keys)
+	}
+
+	return telebot.InlineButton{}
+}
+
+//青龙白虎
+func TemplateNiuniu_SelectJetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButton {
+	jetton := viper.Get("niuniu_start_button.select")
+	arr := jetton.([]interface{})
+	btnarray := make([][]telebot.InlineButton, 0)
+	// for _, row := range arr {
+	keys := make([]telebot.InlineButton, 0)
+	for _, v := range arr {
+		var btn telebot.InlineButton
+
+		restlt := v.(map[interface{}]interface{})
+		btn.Text = restlt["text"].(string)
+		switch restlt["data"].(type) {
+		case float64:
+			btn.Data = fmt.Sprintf("%f", restlt["data"].(float64))
+		case int:
+			btn.Data = fmt.Sprintf("%d", restlt["data"].(int))
+		}
+
+		btn.Unique = restlt["unique"].(string)
+		tb.Bot.Handle(&btn, Niuniu_SelectCallBack(tb))
+		keys = append(keys, btn)
+	}
+	btnarray = append(btnarray, keys)
+	// }
+	return btnarray
+}
+
 //下注按钮
 func TemplateNiuniu_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButton {
 	jetton := viper.Get("niuniu_jetton_button.bet")
@@ -118,6 +218,37 @@ func TemplateNiuniu_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButt
 		btnarray = append(btnarray, keys)
 	}
 	return btnarray
+}
+
+//结算
+func TemplateNiuniu_Settlement(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
+	jetton := viper.Get("niuniu_start_button.settle")
+
+	restlt := jetton.([]interface{})
+	fmt.Println(restlt)
+
+	// btnarray := make([][]telebot.InlineButton, 0)
+	for _, row := range restlt {
+		// keys := make([]telebot.InlineButton, 0)
+		var btn telebot.InlineButton
+
+		restlt := row.(map[interface{}]interface{})
+		btn.Text = restlt["text"].(string)
+		switch restlt["data"].(type) {
+		case float64:
+			btn.Data = fmt.Sprintf("%f", restlt["data"].(float64))
+		case int:
+			btn.Data = fmt.Sprintf("%d", restlt["data"].(int))
+		}
+
+		btn.Unique = restlt["unique"].(string)
+		tb.Bot.Handle(&btn, Niuniu_SettleCallBack(tb))
+		// keys = append(keys, btn)
+		return btn
+	}
+
+	// }
+	return telebot.InlineButton{}
 }
 
 //开始

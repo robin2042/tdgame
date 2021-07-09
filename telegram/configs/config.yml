@@ -1,0 +1,166 @@
+db:
+  username: "root"
+  host: "127.0.0.1"
+  dbname: "tdgames"
+
+dapi:
+  all: "https://2ch.pm/%s/threads.json"
+  thread: "https://2ch.pm/%s/res/%s.json"
+  resource: "https://2ch.hk%s"
+
+tg:
+  admin_id: ["232469683"]
+
+disk:
+  path: "src"
+  size: 1073714824
+
+polling:
+  time: 20
+
+niuniu_start_text:
+  username: "postgres"
+
+niuniu_jetton_button:
+ bet:
+    - 
+      - text: 5%
+        data: 0.05
+        unique: "niuniu_bet_5"
+        url: "http://www.sohu.com"
+      - text: 10%
+        data: 0.10
+        unique: "niuniu_bet_10"
+        url: "http://www.nab.com"
+      - text: 30%
+        data: 0.30
+        unique: "niuniu_bet_30"
+        url: "http://www.nab.com"
+      - text: 50%
+        data: 0.50
+        unique: "niuniu_bet_50"
+        url: "http://www.nab.com"
+      - text: 80%
+        data: 0.80
+        unique: "niuniu_bet_80"
+        url: "http://www.nab.com"
+      - text: 梭哈
+        data: 1.0
+        unique: "niuniu_bet_stub"
+        url: "http://www.nab.com"
+    -
+      - text: 1W
+        data: 10000
+        unique: "niuniu_bet_10000"
+        url: "http://www.sohu.com"
+      - text: 5W
+        data: 50000
+        unique: "niuniu_bet_50000"
+        url: "http://www.nab.com"
+      - text: 10W
+        data: 100000
+        unique: "niuniu_bet_100000"
+        url: "http://www.nab.com"
+      - text: 50W
+        data: 500000
+        unique: "niuniu_bet_100w"
+        url: "http://www.nab.com"
+      - text: 200W
+        data: 2000000
+        unique: "niuniu_bet_200w"
+        url: "http://www.nab.com"
+      - text: 500W
+        data: 5000000
+        unique: "niuniu_bet_500w"
+        url: "http://www.nab.com"
+    -
+      - text: 2KW
+        data: 20000000
+        unique: "niuniu_bet_2kw"
+        url: "http://www.sohu.com"
+      - text: 5KW
+        data: 50000000
+        unique: "niuniu_bet_5kw"
+        url: "http://www.nab.com"
+      - text: 2E
+        data: 200000000
+        unique: "niuniu_bet_2e"
+        url: "http://www.nab.com"
+      - text: 5E
+        data: 500000000
+        unique: "niuniu_bet_5e"
+        url: "http://www.nab.com"
+      - text: 20E
+        data: 2000000000
+        unique: "niuniu_bet_20e"
+        url: "http://www.nab.com"
+      - text: 50E
+        data: 5000000000
+        unique: "niuniu_bet_50e"
+        url: "http://www.nab.com"
+    -
+      - text: 200E
+        data: 20000000000
+        unique: "niuniu_bet_200e"
+        url: "http://www.sohu.com"
+      - text: 500E
+        data: 50000000000
+        unique: "niuniu_bet_500e"
+        url: "http://www.nab.com"
+      - text: 2KE
+        data: 200000000000
+        unique: "niuniu_bet_2ke"
+        url: "http://www.nab.com"
+      - text: 5KE
+        data: 50000000000
+        unique: "niuniu_bet_5ke"
+        url: "http://www.nab.com"
+      - text: 1WE
+        data: 1000000000000
+        unique: "niuniu_bet_1we"
+        url: "http://www.nab.com"
+      - text: 5WE
+        data: 5000000000000
+        unique: "niuniu_bet_5we"
+        url: "http://www.nab.com"
+
+ start:  
+    - text: ▶️开始游戏
+      data: .5
+      unique: "niuniu_start"
+      url: "http://www.sohu.com"
+        
+ balance:
+    - text: 💰️查看余额
+      data: .5
+      unique: "niuniu_balance"
+      url: "http://www.sohu.com"
+ sign:
+    - text: ✅️签到领钱
+      data: .5
+      unique: "niuniu_sign"
+      url: "http://www.sohu.com"
+
+niuniu_start_button:
+  select:
+    - text: 青龙
+      data: 0
+      unique: "niuniu_select_0"
+      url: "http://www.sohu.com"
+    - text: 白虎
+      data: 1
+      unique: "niuniu_select_1"
+      url: "http://www.sohu.com"
+    - text: 朱雀
+      data: 2
+      unique: "niuniu_select_2"
+      url: "http://www.sohu.com"
+    - text: 玄武
+      data: 3
+      unique: "niuniu_select_3"
+      url: "http://www.sohu.com"
+  settle:
+    - text: 结算
+      data: 0
+      unique: "niuniu_settle"
+      url: "http://www.sohu.com"
