@@ -32,7 +32,7 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error
 	// var score int64
 	var floatscore float64
 
-	groupStorage.db.Where("chat_id = ?", addscore.Userid).First(&user)
+	groupStorage.db.Where("userid = ?", addscore.Userid).First(&user)
 
 	if user.ChatID == 0 {
 		return 0, errors.New("找不到用户!")
@@ -48,7 +48,7 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error
 			return 0, errors.New("金额不足!")
 		}
 		user.Wallmoney = user.Wallmoney - int64(floatscore)
-		result := groupStorage.db.Model(&logic.User{}).Where("chat_id = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", int64(floatscore)))
+		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", int64(floatscore)))
 		// result := groupStorage.db.Update(&user)
 		if result.Error != nil {
 			return 0, errors.New("金额不足!")

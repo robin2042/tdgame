@@ -57,7 +57,7 @@ func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 	apicnt := dvach.NewAPIController(controller, bot, requester)
 
 	telegram.SetupHandlers(bot)
-	storage.MigrateDatabase(db)
+	// storage.MigrateDatabase(db)
 
 	return bot, apicnt, viper.GetUint64("polling.time")
 }

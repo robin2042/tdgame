@@ -26,14 +26,12 @@ const (
 	OX_FIVESMALL = 17 //五小
 )
 
-var m_cbTableCardArray [5][5]byte //牌
-
 var m_cbCardListData = [...]byte{
 	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, //方块 A - K
 	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, //梅花 A - K
 	0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, //红桃 A - K
 	0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, //黑桃 A - K
-	0x4E, 0x4F,
+	// 0x4E, 0x4F,
 }
 
 //逻辑数值
@@ -205,8 +203,7 @@ func GetCardType(cbCardData [MAX_COUNT]byte, cbCardCount int) int {
 		return OX_FIVEKING
 	}
 
-	var bFirstTemp [MAX_COUNT]byte
-	bFirstTemp = cbCardData
+	bFirstTemp := cbCardData
 
 	SortCardList(&bFirstTemp, cbCardCount)
 	fmt.Println(bSmallWang, bBigWang)
@@ -338,167 +335,6 @@ func GetCardType(cbCardData [MAX_COUNT]byte, cbCardCount int) int {
 
 }
 
-// {
-// 	ASSERT(cbCardCount==MAX_COUNT);
-
-// 	BYTE bKingCount=0,bTenCount=0;
-// 	bool bSmallWang(false),bBigWang(false);
-// 	for(BYTE i=0;i<cbCardCount;i++)
-// 	{
-// 		//大小王可以变花牌
-// 		if(cbCardData[i]==0x4E)
-// 		{
-// 			bSmallWang=true;
-// 			bKingCount++;
-// 			continue;
-// 		}
-// 		if(cbCardData[i]==0x4F)
-// 		{
-// 			bBigWang=true;
-// 			bKingCount++;
-// 			continue;
-// 		}
-// 		if(GetCardValue(cbCardData[i])>10)
-// 		{
-// 			bKingCount++;
-// 		}
-// 		else if(GetCardValue(cbCardData[i])==10)
-// 		{
-// 			bTenCount++;
-// 		}
-// 	}
-// 	if(bKingCount==MAX_COUNT) return OX_FIVEKING;
-
-// 	BYTE bFirstTemp[MAX_COUNT];
-// 	CopyMemory(bFirstTemp,cbCardData,cbCardCount);
-
-// 	SortCardList(bFirstTemp,cbCardCount);
-
-// 	BYTE TempSum=0;
-// 	for (BYTE i=0;i<cbCardCount;i++)
-// 	{
-// 		if(cbCardData[i]==0x4E)
-// 		{
-// 			TempSum++;
-// 			continue;
-// 		}
-// 		if(cbCardData[i]==0x4F)
-// 		{
-// 			TempSum++;
-// 			continue;
-// 		}
-// 		TempSum+=GetCardLogicValue(cbCardData[i]);
-// 	}
-// 	if (TempSum<=10)
-// 		return OX_FIVESMALL;
-
-// 	//有大小王的情况
-// 	if(bSmallWang || bBigWang)
-// 	{
-// 		//大小王都有，那就只要判断有两张一样的牌
-// 		if (bSmallWang && bBigWang)
-// 		{
-// 			if(GetCardValue(bFirstTemp[2])==GetCardValue(bFirstTemp[3])||GetCardValue(bFirstTemp[3])==GetCardValue(bFirstTemp[4]))
-// 			{
-// 				return OX_FOUR_SAME;
-// 			}
-// 		}
-// 		//只有一个大小王，那就判断三张一样的牌
-// 		else
-// 		{
-// 			if(GetCardValue(bFirstTemp[1])==GetCardValue(bFirstTemp[3])||GetCardValue(bFirstTemp[2])==GetCardValue(bFirstTemp[4]))
-// 			{
-// 				return OX_FOUR_SAME;
-// 			}
-// 		}
-// 	}
-// 	//没有大小王的情况，判断四张
-// 	else
-// 	{
-// 		if(GetCardValue(bFirstTemp[0])==GetCardValue(bFirstTemp[3])||GetCardValue(bFirstTemp[1])==GetCardValue(bFirstTemp[4]))
-// 		{
-// 			return OX_FOUR_SAME;
-// 		}
-// 	}
-
-// 	if(bKingCount==MAX_COUNT-1 && bTenCount==1) return OX_FOURKING;
-
-// 	if(bSmallWang || bBigWang)
-// 	{
-// 		if(bSmallWang && bBigWang)
-// 		{
-// 			return OX_DOUBLECOW;
-// 		}
-// 		BYTE cbMaxTwoCardValue(0),cbTemp(0);
-// 		BYTE cbTempValue[3];
-// 		ZeroMemory(cbTempValue,sizeof(cbTempValue));
-// 		for(BYTE i=0;i<cbCardCount-1;i++)
-// 		{
-// 			if(cbCardData[i]==0x4E || cbCardData[i]==0x4F)
-// 				continue;
-// 			for(BYTE j=i+1;j<cbCardCount;j++)
-// 			{
-// 				if(cbCardData[j]==0x4E || cbCardData[j]==0x4F)
-// 					continue;
-// 				cbTempValue[0]=GetCardLogicValue(cbCardData[i]);
-// 				cbTempValue[1]=GetCardLogicValue(cbCardData[j]);
-// 				cbTemp=(cbTempValue[0]+cbTempValue[1]>10)?(cbTempValue[0]+cbTempValue[1]-10):(cbTempValue[0]+cbTempValue[1]);
-// 				if(cbMaxTwoCardValue<cbTemp)cbMaxTwoCardValue=cbTemp;
-// 			}
-// 		}
-// 		for(BYTE i=0;i<cbCardCount-1;i++)
-// 		{
-// 			if(cbCardData[i]==0x4E || cbCardData[i]==0x4F)
-// 				continue;
-// 			for(BYTE j=i+1;j<cbCardCount;j++)
-// 			{
-// 				if(cbCardData[j]==0x4E || cbCardData[j]==0x4F)
-// 					continue;
-// 				for(BYTE k=0;k<cbCardCount;k++)
-// 				{
-// 					if(cbCardData[k]==cbCardData[i] || cbCardData[k]== cbCardData[j] || cbCardData[k]==0x4E || cbCardData[k]==0x4F)
-// 						continue;
-// 					cbTempValue[0]=GetCardLogicValue(cbCardData[i]);
-// 					cbTempValue[1]=GetCardLogicValue(cbCardData[j]);
-// 					cbTempValue[2]=GetCardLogicValue(cbCardData[k]);
-// 					if((cbTempValue[0]+cbTempValue[1]+cbTempValue[2])%10==0)
-// 					{
-// 						return bSmallWang ? OX_DOUBLECOW:OX_DOUBLECOW;
-// 					}
-// 				}
-// 			}
-// 		}
-// 		if(cbMaxTwoCardValue==10)
-// 			return bSmallWang?OX_DOUBLECOW:OX_DOUBLECOW;
-// 		else
-// 			return cbMaxTwoCardValue;
-// 	}
-
-// 	BYTE bTemp[MAX_COUNT];
-// 	BYTE bSum=0;
-// 	for (BYTE i=0;i<cbCardCount;i++)
-// 	{
-// 		bTemp[i]=GetCardLogicValue(cbCardData[i]);
-// 		bSum+=bTemp[i];
-// 	}
-// 	BYTE cbTempValue(0);
-// 	for (BYTE i=0;i<cbCardCount-1;i++)
-// 	{
-// 		for (BYTE j=i+1;j<cbCardCount;j++)
-// 		{
-// 			if((bSum-bTemp[i]-bTemp[j])%10==0)
-// 			{
-// 				cbTempValue=((bTemp[i]+bTemp[j])>10)?(bTemp[i]+bTemp[j]-10):(bTemp[i]+bTemp[j]);
-// 				if(cbTempValue==10)
-// 					return OX_DOUBLECOW;
-// 				else
-// 					return cbTempValue;
-// 			}
-// 		}
-// 	}
-// 	return OX_VALUE0;
-// }
-
 // //对比扑克
 func CompareCard(cbFirstData [MAX_COUNT]byte, cbNextData [MAX_COUNT]byte, cbCardCount int) bool {
 	// 	//获取点数
@@ -529,38 +365,6 @@ func CompareCard(cbFirstData [MAX_COUNT]byte, cbNextData [MAX_COUNT]byte, cbCard
 
 }
 
-// {
-// 	ASSERT(cbCardCount==MAX_COUNT);
-// 	//获取点数
-// 	BYTE cbNextType=GetCardType(cbNextData,cbCardCount);
-// 	BYTE cbFirstType=GetCardType(cbFirstData,cbCardCount);
-
-// 	//点数判断
-// 	if (cbFirstType!=cbNextType) return (cbFirstType>cbNextType);
-
-// 	//排序大小
-// 	BYTE bFirstTemp[MAX_COUNT],bNextTemp[MAX_COUNT];
-// 	CopyMemory(bFirstTemp,cbFirstData,cbCardCount);
-// 	CopyMemory(bNextTemp,cbNextData,cbCardCount);
-// 	SortCardList(bFirstTemp,cbCardCount);
-// 	SortCardList(bNextTemp,cbCardCount);
-
-// 	//比较数值
-// 	BYTE cbNextMaxValue=GetCardValue(bNextTemp[0]);
-// 	BYTE cbFirstMaxValue=GetCardValue(bFirstTemp[0]);
-// 	BYTE cbPosFirst(0),cbPosNext(0);
-// 	if(cbNextMaxValue!=cbFirstMaxValue)return cbFirstMaxValue>cbNextMaxValue;
-
-// 	//CString str;
-// 	//str.Format("\n%x  %x",bFirstTemp[cbPosFirst],bNextTemp[cbPosNext]);
-// 	//OutputDebugString(str);
-// 	//比较颜色
-// 	return GetCardColor(bFirstTemp[cbPosFirst]) > GetCardColor(bNextTemp[cbPosNext]);
-
-// 	return false;
-// }
-
-//排列扑克
 func SortCardList(cbCardData *[5]byte, cbCardCount int) {
 	//转换数值
 	var cbLogicValue [MAX_COUNT]byte
@@ -572,11 +376,9 @@ func SortCardList(cbCardData *[5]byte, cbCardCount int) {
 	var bSorted bool
 	var cbTempData byte
 	var bLast = cbCardCount - 1
-
 	for {
 		bSorted = true
 		for i := 0; i < bLast; i++ {
-
 			if (cbLogicValue[i] < cbLogicValue[i+1]) ||
 				((cbLogicValue[i] == cbLogicValue[i+1]) && (cbCardData[i] < cbCardData[i+1])) {
 				//交换位置
@@ -591,11 +393,49 @@ func SortCardList(cbCardData *[5]byte, cbCardCount int) {
 		}
 		bLast--
 		if !bSorted {
-			return
-		}
-	}
+			break
 
+		}
+
+	}
 }
+
+// //排列扑克
+// func SortCardList(cbCardData *[5]byte, cbCardCount int) {
+// 	//转换数值
+// 	var cbLogicValue [MAX_COUNT]byte
+// 	for i := 0; i < cbCardCount; i++ {
+// 		cbLogicValue[i] = GetCardValue(cbCardData[i])
+// 	}
+
+// 	//排序操作
+// 	var bSorted bool
+// 	var cbTempData byte
+// 	var bLast = cbCardCount - 1
+
+// 	for {
+// 		bSorted = true
+// 		for i := 0; i < bLast; i++ {
+
+// 			if (cbLogicValue[i] < cbLogicValue[i+1]) ||
+// 				((cbLogicValue[i] == cbLogicValue[i+1]) && (cbCardData[i] < cbCardData[i+1])) {
+// 				//交换位置
+// 				cbTempData = cbCardData[i]
+// 				cbCardData[i] = cbCardData[i+1]
+// 				cbCardData[i+1] = cbTempData
+// 				cbTempData = cbLogicValue[i]
+// 				cbLogicValue[i] = cbLogicValue[i+1]
+// 				cbLogicValue[i+1] = cbTempData
+// 				bSorted = false
+// 			}
+// 		}
+// 		bLast--
+// 		if !bSorted {
+// 			return
+// 		}
+// 	}
+
+// }
 func If(condition bool, trueVal, falseVal interface{}) interface{} {
 	if condition {
 		return trueVal

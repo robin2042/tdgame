@@ -223,7 +223,7 @@ func Niuniu_SignCallBack(tb *TgBot) func(c *telebot.Callback) {
 
 		sign := 700000
 
-		score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
+		score, err := tb.Controller.Sign(c.Sender.ID, c.Message.Chat.ID, sign)
 		if !err {
 			reply := telebot.CallbackResponse{Text: "150秒内限定签到一次", ShowAlert: true}
 			tb.Bot.Respond(c, &reply)

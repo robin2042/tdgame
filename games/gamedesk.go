@@ -2,10 +2,31 @@ package games
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 )
+
+var (
+	ID_TIAN_MARK  byte = 0x01
+	ID_DI_MARK    byte = 0x02
+	ID_XUAN_MARK  byte = 0x04
+	ID_HUANG_MARK byte = 0x08
+	ID_QUAN_SHU   byte = 0x10
+)
+
+const (
+	//索引定义
+	INDEX_BANKER  = 0 //庄家索引
+	INDEX_PLAYER1 = 1 //天
+	INDEX_PLAYER2 = 2 //地
+	INDEX_PLAYER3 = 3 //玄
+	INDEX_PLAYER4 = 4 //黄
+
+)
+
+var betsinfo map[int]string = map[int]string{0: "🕒未选择", 1: "🐉青龙", 2: "🐅白虎", 3: "🦚朱雀", 4: "🐢玄武"}
 
 type GameTable interface {
 	GetChatID() int64
@@ -31,11 +52,29 @@ type GameDesk struct {
 	m_cbTableCardArray [5][5]byte         //牌
 	Players            map[int64]PlayInfo //在线用户
 
-	Bets     map[PlayInfo]int64 //下注额
-	Areas    map[PlayInfo]int   //下注区域
-	Changes  map[PlayInfo]int64 //胜负
-	Historys map[PlayInfo]int64 //历史开奖记录
+	Bets            map[PlayInfo]int64 //下注额
+	Areas           map[PlayInfo]int   //下注区域
+	Changes         map[PlayInfo]int64 //胜负
+	Historys        map[PlayInfo]int64 //历史开奖记录
+	m_cbTimers      [5]int             //牛几倍率
+	m_lUserWinScore map[int64]int64    //赢钱
 
+	m_lUserReturnScore map[int64]int64 //赢钱
+
+}
+
+func (g *GameDesk) InitTable(playid string, nameid int, chatid int64) {
+	g.PlayID = playid
+
+	g.NameID = nameid
+	g.ChatID = chatid
+
+	g.Players = make(map[int64]PlayInfo) //在线用户
+	g.Bets = make(map[PlayInfo]int64)
+	g.Areas = make(map[PlayInfo]int)
+	g.Changes = make(map[PlayInfo]int64)
+
+	g.GameStation = GS_TK_FREE
 }
 
 //GameTable
@@ -88,6 +127,11 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 	//记录牌局
 	g.GameStation = GS_TK_PLAYING
 
+	//发牌
+	g.DispatchTableCard()
+	//结算
+	g.CalculateScore()
+
 	return true, nil
 }
 
@@ -97,7 +141,7 @@ func (g *GameDesk) GetStatus() int {
 }
 
 func (g *GameDesk) DispatchTableCard() {
-	nums := GenerateRandomNumber(0, 54, 54)
+	nums := GenerateRandomNumber(0, 52, 52)
 	var ncard int
 	for i := 0; i < GAME_PLAYER; i++ {
 
@@ -130,6 +174,79 @@ func (g *GameDesk) Bet(userid int64, area int) (bool, error) {
 	}
 	g.Areas[user] = area
 	user.BetCount++
-	
+
 	return true, nil
+}
+func (g *GameDesk) CalculateScore() {
+
+	// var lUserLostScore map[int64]int64 //输
+	lUserLostScore := make(map[int64]int64)
+
+	//推断赢家
+	var cbWinner byte
+
+	for i := 1; i <= INDEX_PLAYER4; i++ {
+		var cbMarkType byte
+		switch i {
+		case 1:
+			cbMarkType = ID_TIAN_MARK
+		case 2:
+			cbMarkType = ID_DI_MARK
+		case 3:
+			cbMarkType = ID_XUAN_MARK
+		case 4:
+			cbMarkType = ID_HUANG_MARK
+		}
+		if CompareCard(g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER], MAX_COUNT) {
+
+			cbWinner |= cbMarkType
+		} else {
+			cbWinner = (cbWinner & (^cbMarkType + 1))
+		}
+
+	}
+
+	for i := 0; i < MAX_COUNT; i++ {
+		g.m_cbTimers[i] = GetTimes(g.m_cbTableCardArray[i], 5, 5)
+	}
+	//计算积分
+	//遍历下注人员
+	for k, v := range g.Areas {
+
+		if (ID_TIAN_MARK & cbWinner) > 0 {
+			g.m_lUserWinScore[k.UserID] += g.Bets[k] * int64(g.m_cbTimers[1])
+			g.m_lUserReturnScore[k.UserID] += g.Bets[k]
+
+		} else {
+			lUserLostScore[k.UserID] -= g.Bets[k] * int64(g.m_cbTimers[0])
+			// lUserLostScore[i] -= g.Bets[k] * int64(g.m_cbTimers[0])
+
+		}
+
+		if (ID_DI_MARK & cbWinner) > 0 {
+			g.m_lUserWinScore[k.UserID] += g.Bets[k] * int64(g.m_cbTimers[2])
+			g.m_lUserReturnScore[k.UserID] += g.Bets[k]
+		} else {
+			lUserLostScore[k.UserID] -= g.Bets[k] * int64(g.m_cbTimers[0])
+			// lBankerWinScore += m_lUserDiScore[i]*m_cbTimers[0] ;
+		}
+
+		if (ID_XUAN_MARK & cbWinner) > 0 {
+			g.m_lUserWinScore[k.UserID] += g.Bets[k] * int64(g.m_cbTimers[3])
+			g.m_lUserReturnScore[k.UserID] += g.Bets[k]
+		} else {
+			lUserLostScore[k.UserID] -= g.Bets[k] * int64(g.m_cbTimers[0])
+		}
+		if (ID_HUANG_MARK & cbWinner) > 0 {
+			g.m_lUserWinScore[k.UserID] += g.Bets[k] * int64(g.m_cbTimers[4])
+			g.m_lUserReturnScore[k.UserID] += g.Bets[k]
+		} else {
+			lUserLostScore[k.UserID] -= g.Bets[k] * int64(g.m_cbTimers[0])
+
+		}
+		g.m_lUserWinScore[k.UserID] += lUserLostScore[k.UserID] //总成绩
+		fmt.Println(v)
+
+	}
+
 }

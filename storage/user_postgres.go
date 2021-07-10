@@ -25,7 +25,7 @@ func NewUserPostgres(db *gorm.DB, cfg *InitDatabase) *UserPostgres {
 // Register adds user in databse
 func (userStorage *UserPostgres) Register(user *logic.User) error {
 	var count int64
-	userStorage.db.Model(&logic.User{}).Where("chat_id = ?", user.ChatID).Count(&count)
+	userStorage.db.Model(&logic.User{}).Where("userid = ?", user.ChatID).Count(&count)
 	if count == 0 {
 		result := userStorage.db.Create(user)
 
@@ -59,11 +59,11 @@ func (userStorage *UserPostgres) Unregister(user *logic.User) error {
 func (userStorage *UserPostgres) GetUserByChatID(chatID int64) (*logic.User, error) {
 	var user logic.User
 	var count int64
-	userStorage.db.Model(&logic.User{}).Where("chat_id = ?", chatID).Count(&count)
+	userStorage.db.Model(&logic.User{}).Where("userid = ?", chatID).Count(&count)
 	if count == 0 {
 		return nil, errors.New("No user found")
 	}
-	result := userStorage.db.Where("chat_id = ?", chatID).First(&user)
+	result := userStorage.db.Where("userid = ?", chatID).First(&user)
 	return &user, result.Error
 }
 
@@ -123,7 +123,7 @@ func (userStorage *UserPostgres) Balance(userID int64) (*logic.Leaderboard, erro
 	var user logic.User
 	var board logic.Leaderboard
 
-	userStorage.db.Where("chat_id = ?", userID).First(&user)
+	userStorage.db.Where("userid = ?", userID).First(&user)
 	board.Userid = user.ChatID
 	board.Score = user.Wallmoney
 	board.Win = 0
@@ -133,22 +133,28 @@ func (userStorage *UserPostgres) Balance(userID int64) (*logic.Leaderboard, erro
 }
 
 // IsUserAdmin checks if user has administrator privileges
-func (userStorage *UserPostgres) Sign(userID int64, sign int) (int64, bool) {
+func (userStorage *UserPostgres) Sign(userID int, chatid int64, sign int) (int64, bool) {
 	var user logic.User
 	var scorelog logic.Signlogs
-	userStorage.db.Where("chat_id = ?", userID).First(&user)
+	var ncount int64
+	userStorage.db.Where("userid = ?", userID).First(&user).Count(&ncount)
+	if ncount == 0 {
+		user.Userid = int64(userID)
+		user.ChatID = chatid
+		userStorage.Register(&user)
+	}
 
 	//没有签到过
 	if err := userStorage.db.Where("userid  = ? order by createtime desc ", userID).Find(&scorelog).RowsAffected; err == 0 {
 
-		result := userStorage.db.Model(&logic.User{}).Where("chat_id = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
+		result := userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
 		if result.Error != nil {
 			return 0, false
 		}
 
 		scorelog.Score = user.Wallmoney
 		scorelog.Sign = sign
-		scorelog.Userid = userID
+		scorelog.Userid = int64(userID)
 
 		// 处理错误...
 		userStorage.db.Create(scorelog)
@@ -160,11 +166,11 @@ func (userStorage *UserPostgres) Sign(userID int64, sign int) (int64, bool) {
 		if time.Since(timer).Seconds() <= 150 {
 			return 0, false
 		}
-		userStorage.db.Model(&logic.User{}).Where("chat_id = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
+		userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
 		var scorelog logic.Signlogs
 		scorelog.Score = user.Wallmoney
 		scorelog.Sign = sign
-		scorelog.Userid = userID
+		scorelog.Userid = int64(userID)
 
 		// 处理错误...
 		userStorage.db.Create(scorelog)

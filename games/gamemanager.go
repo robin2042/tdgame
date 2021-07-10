@@ -15,8 +15,6 @@ const (
 	GAME_NIUNIU = 40022000
 )
 
-var betsinfo map[int]string = map[int]string{-1: "🕒未选择", 0: "🐉青龙", 1: "🐅白虎", 2: "🦚朱雀", 3: "🐢玄武"}
-
 // Controller struct is used to access database
 const (
 
@@ -167,7 +165,6 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 	gamedesk.LastBetTime = time.Now()
 
 	gamedesk.Bets[player] += betscore //下注
-	gamedesk.Areas[player] = -1       //未选择
 
 	return betscore, gamedesk.Bets[player], err
 
@@ -198,16 +195,8 @@ func CreateTable(nameid int, chatid int64) GameTable {
 	playid := GenerateID(nameid, chatid)
 
 	table := new(GameDesk)
-	table.SetPlayID(playid)
-	table.NameID = nameid
-	table.ChatID = chatid
+	table.InitTable(playid, nameid, chatid)
 
-	table.Players = make(map[int64]PlayInfo) //在线用户
-	table.Bets = make(map[PlayInfo]int64)
-	table.Areas = make(map[PlayInfo]int)
-	table.Changes = make(map[PlayInfo]int64)
-
-	table.GameStation = GS_TK_FREE
 	return table
 }
 func GenerateID(nameid int, chatid int64) string {

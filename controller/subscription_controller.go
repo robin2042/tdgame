@@ -89,7 +89,7 @@ func (scon *SubscriptionController) Subscribe(chatID int64, request string) erro
 func (scon *SubscriptionController) Remove(chatID int64, request string) error {
 	user, err := scon.stg.User.GetUserByChatID(chatID)
 	if err != nil {
-		return fmt.Errorf("Cannot find user with chat_id=%d", chatID)
+		return fmt.Errorf("Cannot find user with userid=%d", chatID)
 	}
 
 	subs, err := scon.stg.Subscription.GetSubsByUser(user)
@@ -164,7 +164,7 @@ func (scon *SubscriptionController) Update(chatID int64, request string) error {
 func (scon *SubscriptionController) GetSubsByChatID(chatID int64) ([]logic.Publication, error) {
 	user, err := scon.stg.GetUserByChatID(chatID)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot find user with chat_id=%d", chatID)
+		return nil, fmt.Errorf("Cannot find user with userid=%d", chatID)
 	}
 
 	subs, err := scon.stg.GetSubsByUser(user)

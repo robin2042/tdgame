@@ -10,6 +10,7 @@ type Group struct {
 // User stores info about user
 type User struct {
 	ID        int
+	Userid    int64
 	ChatID    int64 `gorm:"uniqueIndex"` // Telegram's chat id
 	Wallmoney int64
 	Bank      int64
