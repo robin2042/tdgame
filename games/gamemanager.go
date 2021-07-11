@@ -37,7 +37,7 @@ type GameManage interface {
 
 type Games interface {
 	GameBegin(nameid, msgid int, chatid int64) int
-	GameEnd(nameid, chatid int64) int
+	GameEnd(nameid, chatid int64) error
 	GetTable(nameid int, chatid int64) GameTable //桌台
 	Bet(table GameTable, userid int64, area int) (bool, error)
 	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
@@ -110,23 +110,13 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 }
 
 //游戏结束，清理用户下注信息
-func (g *GameMainManage) GameEnd(nameid, chatid int64) int {
+func (g *GameMainManage) GameEnd(nameid, chatid int64) error {
 	table := g.GetTable(GAME_NIUNIU, chatid)
-	gamedesk := table.(*GameDesk)
+	table.EndGame()
 
-	for pi := range gamedesk.Areas {
-		delete(gamedesk.Areas, pi)
-	}
+	// gamedesk := table.(*GameDesk)
 
-	for pi := range gamedesk.Changes {
-		delete(gamedesk.Changes, pi)
-	}
-
-	for pi := range gamedesk.Bets {
-		delete(gamedesk.Bets, pi)
-	}
-
-	return 0
+	return nil
 }
 
 func (g *GameMainManage) Bet(table GameTable, userid int64, area int) (bool, error) {

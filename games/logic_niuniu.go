@@ -11,6 +11,7 @@ import (
 const (
 	GAME_PLAYER      = 5
 	MAX_COUNT        = 5
+	MAX_MULTIPLE     = 10   //最高倍数
 	LOGIC_MASK_COLOR = 0xF0 //花色掩码
 	LOGIC_MASK_VALUE = 0x0F //数值掩码
 	//扑克类型
@@ -206,7 +207,7 @@ func GetCardType(cbCardData [MAX_COUNT]byte, cbCardCount int) int {
 	bFirstTemp := cbCardData
 
 	SortCardList(&bFirstTemp, cbCardCount)
-	fmt.Println(bSmallWang, bBigWang)
+	//fmt.Println(bSmallWang, bBigWang)
 
 	var TempSum int
 	for i := 0; i < cbCardCount; i++ {
@@ -473,4 +474,77 @@ func GetTimes(cbCardData [MAX_COUNT]byte, cbCardCount byte, lMultiple int) int {
 	}
 
 	return 0
+}
+
+//获取花色
+func GetCardColorEmoj(cbCardData byte) string {
+	var str string
+	//var card string
+	value := int(GetCardValue(cbCardData))
+	card := fmt.Sprintf("%d", value)
+
+	if value == 11 {
+		card = "J"
+	} else if value == 12 {
+		card = "Q"
+	} else if value == 13 {
+		card = "K"
+	}
+
+	switch GetCardColor(cbCardData) {
+	case 0x00:
+		str = "♦️"
+
+	case 0x10:
+		str = "♣"
+
+	case 0x20:
+		str = "♥️"
+
+	case 0x30:
+		str = "♠️"
+
+	}
+	str = fmt.Sprintf("%s%s", card, str)
+	return str
+}
+
+//获取牌
+func GetCardTimesEmoj(cbCardData [MAX_COUNT]byte) string {
+	var str string
+	value := GetTimes(cbCardData, MAX_COUNT, MAX_MULTIPLE)
+	if value == 0 {
+		str = "无牛"
+	} else if value == 1 {
+		str = "牛一"
+	} else if value == 2 {
+		str = "牛二"
+	} else if value == 3 {
+		str = "牛三"
+	} else if value == 4 {
+		str = "牛四"
+	} else if value == 5 {
+		str = "牛五"
+	} else if value == 6 {
+		str = "牛六"
+	} else if value == 7 {
+		str = "牛七"
+	} else if value == 8 {
+		str = "牛八"
+	} else if value == 9 {
+		str = "牛九"
+	} else if value == 10 {
+		str = "牛牛"
+	}
+
+	return str
+}
+
+//获取花色
+func GetCardValueEmoj(cbCardData [MAX_COUNT]byte) string {
+	var str string
+	for i := 0; i < MAX_COUNT; i++ {
+		str += GetCardColorEmoj(cbCardData[i])
+	}
+	return str
 }

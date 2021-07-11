@@ -280,6 +280,8 @@ func Niuniu_SettleCallBack(tb *TgBot) func(c *telebot.Callback) {
 		ac := accounting.Accounting{Symbol: "$"}
 		name := c.Sender.FirstName
 
+		tb.Games.GameEnd(games.GAME_NIUNIU, c.Message.Chat.ID)
+
 		board, _ := tb.Controller.Balance(int64(c.Sender.ID))
 		str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
 

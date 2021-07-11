@@ -130,6 +130,7 @@ type Leaderboard struct {
 
 //开奖记录
 type Records struct {
+	Detail string
 }
 
 // User stores info about user
