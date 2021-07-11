@@ -321,8 +321,8 @@ func GetCardType(cbCardData [MAX_COUNT]byte, cbCardCount int) int {
 		for j := 0; j < cbCardCount; j++ {
 
 			if (bSum-bTemp[i]-bTemp[j])%10 == 0 {
-				If((bTemp[i]+bTemp[j]) > 10, bTemp[i]+bTemp[j]-10, bTemp[i]+bTemp[j])
 
+				cbTempValue = If((bTemp[i]+bTemp[j]) > 10, bTemp[i]+bTemp[j]-10, bTemp[i]+bTemp[j]).(int)
 				if cbTempValue == 10 {
 					return OX_DOUBLECOW
 				} else {
@@ -392,7 +392,7 @@ func SortCardList(cbCardData *[5]byte, cbCardCount int) {
 			}
 		}
 		bLast--
-		if !bSorted {
+		if bSorted {
 			break
 
 		}
