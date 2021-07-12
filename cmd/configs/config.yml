@@ -143,11 +143,11 @@ niuniu_jetton_button:
 
 niuniu_start_button:
   select:
-    - text: 🐉 青龙
+    - text: 🐲 青龙
       data: 1
       unique: "niuniu_select_0"
       url: "http://www.sohu.com"
-    - text: 🐅 白虎
+    - text: 🐯 白虎
       data: 2
       unique: "niuniu_select_1"
       url: "http://www.sohu.com"
@@ -162,5 +162,5 @@ niuniu_start_button:
   settle:
     - text: 🐮 结算 🐮
       data: 0
-      unique: "niuniu_settle"
+      unique: "niuniu_endame"
       url: "http://www.sohu.com"

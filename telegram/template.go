@@ -45,6 +45,21 @@ func TemplateNiuniu_SelectText(plays *logic.Select) string {
 }
 
 //选择按钮
+func TemplateNiuniu_EndGameText(plays *logic.Select) string {
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/niuniu/end.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	a := tmpl.Execute(&b, plays)
+	fmt.Println(a)
+	fmt.Println(b.String())
+	return b.String()
+}
+
+//选择按钮
 func TemplateNiuniu_Select(tb *TgBot) *telebot.ReplyMarkup {
 	menu := telebot.ReplyMarkup{}
 	menu.ResizeReplyKeyboard = true
@@ -154,7 +169,7 @@ func TemplateNiuniu_SettlementButton(tb *TgBot, viper *viper.Viper) telebot.Inli
 		}
 
 		btn.Unique = restlt["unique"].(string)
-		//tb.Bot.Handle(&btn, Niuniu_BalanceCallBack(tb))
+		tb.Bot.Handle(&btn, Niuniu_EndGameCallBack(tb))
 		return btn
 
 		// keys = append(keys, btn)
@@ -219,37 +234,6 @@ func TemplateNiuniu_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButt
 		btnarray = append(btnarray, keys)
 	}
 	return btnarray
-}
-
-//结算
-func TemplateNiuniu_Settlement(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
-	jetton := viper.Get("niuniu_start_button.settle")
-
-	restlt := jetton.([]interface{})
-	fmt.Println(restlt)
-
-	// btnarray := make([][]telebot.InlineButton, 0)
-	for _, row := range restlt {
-		// keys := make([]telebot.InlineButton, 0)
-		var btn telebot.InlineButton
-
-		restlt := row.(map[interface{}]interface{})
-		btn.Text = restlt["text"].(string)
-		switch restlt["data"].(type) {
-		case float64:
-			btn.Data = fmt.Sprintf("%f", restlt["data"].(float64))
-		case int:
-			btn.Data = fmt.Sprintf("%d", restlt["data"].(int))
-		}
-
-		btn.Unique = restlt["unique"].(string)
-		tb.Bot.Handle(&btn, Niuniu_SettleCallBack(tb))
-		// keys = append(keys, btn)
-		return btn
-	}
-
-	// }
-	return telebot.InlineButton{}
 }
 
 //开始

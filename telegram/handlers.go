@@ -189,7 +189,7 @@ func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 			tb.Bot.Respond(c, &reply)
 			return
 		}
-		betsinfo, _ := table.GetBetInfos()
+		betsinfo, _ := table.GetStartInfos()
 		fmt.Println(betsinfo)
 
 		msg := TemplateNiuniu_SelectText(betsinfo)
@@ -263,7 +263,7 @@ func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 		success, err := tb.Games.Bet(table, int64(c.Sender.ID), data)
 		fmt.Println(success, err)
 
-		betsinfo, _ := table.GetBetInfos()
+		betsinfo, _ := table.GetSelectInfos()
 		fmt.Println(betsinfo)
 
 		msg := TemplateNiuniu_SelectText(betsinfo)
@@ -274,21 +274,31 @@ func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 	}
 }
 
-// 结算
-func Niuniu_SettleCallBack(tb *TgBot) func(c *telebot.Callback) {
+// 结束游戏
+func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
-		ac := accounting.Accounting{Symbol: "$"}
-		name := c.Sender.FirstName
 
-		tb.Games.GameEnd(games.GAME_NIUNIU, c.Message.Chat.ID)
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 
-		board, _ := tb.Controller.Balance(int64(c.Sender.ID))
-		str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
+		betsinfo, _ := table.SettleGame()
 
-		reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
-		tb.Bot.Respond(c, &reply)
+		//回写数据库
+		fmt.Println(betsinfo)
 
-		// score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
+		//获取游戏记录
+		records, _ := table.GetSettleInfos()
+		fmt.Println(records)
+
+		msg := TemplateNiuniu_SelectText(betsinfo)
+		reply := TemplateNiuniu_Select(tb)
+
+		// tb.Games.GameEnd(games.GAME_NIUNIU, c.Message.Chat.ID) //最终清理了
+
+		// board, _ := tb.Controller.Balance(int64(c.Sender.ID))
+		// str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
+
+		// reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
+		// tb.Bot.Respond(c, &reply)
 
 	}
 }

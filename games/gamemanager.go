@@ -8,7 +8,6 @@ import (
 
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
-	"github.com/leekchan/accounting"
 )
 
 const (
@@ -112,9 +111,8 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 //游戏结束，清理用户下注信息
 func (g *GameMainManage) GameEnd(nameid, chatid int64) error {
 	table := g.GetTable(GAME_NIUNIU, chatid)
-	table.EndGame()
-
-	// gamedesk := table.(*GameDesk)
+	scores, _ := table.EndGame()
+	fmt.Println(scores) //回写数据库
 
 	return nil
 }
@@ -127,6 +125,12 @@ func (g *GameMainManage) Bet(table GameTable, userid int64, area int) (bool, err
 	gamedesk.Bet(userid, area)
 
 	return true, nil
+
+}
+
+func (g *GameMainManage) BetInfos(chatid int64) ([]logic.Bets, error) {
+	table := g.Tables[int64(chatid)]
+	return table.GetBetInfos()
 
 }
 
@@ -154,30 +158,9 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 
 	gamedesk.LastBetTime = time.Now()
 
-	gamedesk.Bets[player] += betscore //下注
+	gamedesk.Bets[player.UserID] += betscore //下注
 
-	return betscore, gamedesk.Bets[player], err
-
-}
-
-//获取下注列表
-func (g *GameMainManage) BetInfos(chatid int64) ([]logic.Bets, error) {
-	table := g.Tables[chatid]
-	gamedesk := table.(*GameDesk)
-
-	s := make([]logic.Bets, 0, len(gamedesk.Bets))
-	ac := accounting.Accounting{Symbol: "$"}
-
-	for k, v := range gamedesk.Bets {
-		var bet logic.Bets
-		bet.Userid = k.UserID
-		bet.UserName = k.Name
-		bet.Bet = v
-		bet.FmtBet = ac.FormatMoney(v)
-		s = append(s, bet)
-	}
-
-	return s, nil
+	return betscore, gamedesk.Bets[player.UserID], err
 
 }
 

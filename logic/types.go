@@ -98,7 +98,7 @@ type Scorelogs struct {
 	Playid      string
 	Chatid      int64
 	Nameid      int
-	Bet         int
+	Bet         int64
 	Changescore int64
 	Score       int64
 	Status      int
@@ -130,7 +130,9 @@ type Leaderboard struct {
 
 //开奖记录
 type Records struct {
-	Detail string
+	Detail string //庄闲牌
+	Change []ChangeScore
+	Ways   Way		//路子
 }
 
 // User stores info about user
@@ -138,4 +140,18 @@ type Select struct {
 	Countdown int    //倒计时
 	Players   []Bets //选择区域
 
+}
+
+// 扣钱
+type ChangeScore struct {
+	UserName    string
+	Changescore int64
+}
+
+// 扣钱
+type Way struct {
+	Tian  string
+	Di    string
+	Xuan  string
+	Huang string
 }
