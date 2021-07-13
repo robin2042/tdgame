@@ -540,7 +540,7 @@ func GetCardTimesEmoj(cbCardData [MAX_COUNT]byte) string {
 	return str
 }
 
-//获取花色
+//获取牌
 func GetCardValueEmoj(cbCardData [MAX_COUNT]byte) string {
 	var str string
 	for i := 0; i < MAX_COUNT; i++ {

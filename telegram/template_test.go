@@ -23,3 +23,7 @@ func TestTemplateNiuniu_SelectText(t *testing.T) {
 	}
 	TemplateNiuniu_SelectText(plays)
 }
+
+func TestTemplateNiuniu_EndGameReplyMarkUp(t *testing.T) {
+	TemplateNiuniu_EndGameReplyMarkUp(nil)
+}

@@ -144,22 +144,29 @@ func (g *GameDesk) GetSettleInfos() (*logic.Records, error) {
 
 		if i == INDEX_BANKER {
 			str += "🎴庄家"
+			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
 			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
 			str += "<br>"
 		} else if i == INDEX_PLAYER1 {
 			str += "🐲青龙"
+			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
 			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
+			str += " "
 			str += ""
 		} else if i == INDEX_PLAYER2 {
 			str += "🐯白虎"
+			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
 			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
+
 			str += "<br>"
 		} else if i == INDEX_PLAYER3 {
 			str += "🦚朱雀"
+			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
 			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-			str += ""
+			str += " "
 		} else if i == INDEX_PLAYER4 {
 			str += "🐢玄武"
+			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
 			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
 			str += "<br>"
 		}

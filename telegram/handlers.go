@@ -289,16 +289,12 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 		records, _ := table.GetSettleInfos()
 		fmt.Println(records)
 
-		msg := TemplateNiuniu_SelectText(betsinfo)
-		reply := TemplateNiuniu_Select(tb)
+		msg := TemplateNiuniu_EndGameText(records)
+		fmt.Println(msg)
 
-		// tb.Games.GameEnd(games.GAME_NIUNIU, c.Message.Chat.ID) //最终清理了
+		reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
 
-		// board, _ := tb.Controller.Balance(int64(c.Sender.ID))
-		// str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
-
-		// reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
-		// tb.Bot.Respond(c, &reply)
+		tb.EditHtmlMessage(c.Message, msg, reply)
 
 	}
 }

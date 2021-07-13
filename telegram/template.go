@@ -45,9 +45,9 @@ func TemplateNiuniu_SelectText(plays *logic.Select) string {
 }
 
 //选择按钮
-func TemplateNiuniu_EndGameText(plays *logic.Select) string {
+func TemplateNiuniu_EndGameText(plays *logic.Records) string {
 	var b bytes.Buffer
-	tmpl, err := template.ParseFiles("./templates/niuniu/end.tmpl")
+	tmpl, err := template.ParseFiles("./templates/niuniu/endgame.tmpl")
 	if err != nil {
 		fmt.Println("create template failed,err:", err)
 		return "无效"
@@ -321,10 +321,52 @@ func TemplateNiuniu_Sign(tb *TgBot, viper *viper.Viper) telebot.InlineButton {
 		btn.Unique = restlt["unique"].(string)
 		tb.Bot.Handle(&btn, Niuniu_SignCallBack(tb))
 		return btn
-		// keys = append(keys, btn)
-		// btnarray = append(btnarray, keys)
+
 	}
 	// btnarray = append(btnarray, keys)
 	// }
 	return telebot.InlineButton{}
+}
+
+//青龙白虎
+func TemplateNiuniu_EndGameReplyMarkUp(tb *TgBot) *telebot.ReplyMarkup {
+
+	menu := telebot.ReplyMarkup{}
+	menu.ResizeReplyKeyboard = true
+	menu.Selective = true
+
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config")
+
+	viper.ReadInConfig()
+
+	btnarray := make([][]telebot.InlineButton, 0)
+
+	TemplateNiuniu_EndGameJetton(tb, viper.GetViper())
+
+	fmt.Println(btnarray)
+	menu.InlineKeyboard = btnarray
+	return &menu
+}
+
+//青龙白虎
+func TemplateNiuniu_EndGameJetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButton {
+
+	btnarray := TemplateNiuniu_BuildJetton(tb)
+	fmt.Println(btnarray)
+	buttons := make([]telebot.InlineButton, 0)
+
+	balance := TemplateNiuniu_Balance(tb, viper) //余额
+	buttons = append(buttons, balance)
+	sign := TemplateNiuniu_Sign(tb, viper) //签到
+	buttons = append(buttons, sign)
+
+	btnarray = append(btnarray, buttons)
+	return btnarray
+}
+
+func TemplateNiuniu_BuildJetton(tb *TgBot) [][]telebot.InlineButton {
+
+	btnarray := make([][]telebot.InlineButton, 0)
+	return btnarray
 }

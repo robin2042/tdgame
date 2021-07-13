@@ -1,6 +1,7 @@
 package games
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -39,5 +40,19 @@ func TestGameDesk_CalculateScore(t *testing.T) {
 }
 
 func TestGameDesk_GetSettleInfos(t *testing.T) {
+	g := &GameDesk{}
 
+	g.InitTable("1", 1, 2)
+	g.m_cbTableCardArray = [5][5]byte{{39, 25, 29, 53, 58}, //27 19
+		{17, 23, 5, 28, 26},
+
+		{50, 59, 27, 41, 61}, //2
+
+		{49, 54, 11, 10, 45},
+
+		{56, 2, 53, 12, 20},
+	}
+	record, _ := g.GetSettleInfos()
+	fmt.Println(record)
+	
 }
