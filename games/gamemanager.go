@@ -10,6 +10,10 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
 )
 
+var (
+	GAME_Title map[int]string = map[int]string{100000: "一贫如洗"}
+)
+
 const (
 	GAME_NIUNIU = 40022000
 )
@@ -80,12 +84,6 @@ func (g *GameMainManage) GetTable(nameid int, chatid int64) GameTable {
 	return table
 }
 
-func (g *GameMainManage) SaveGameRounds(nameid int, chatid int64, playid string) bool {
-
-	return g.stg.IsChatAdmin(chatid)
-
-}
-
 func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 
 	table := g.GetTable(GAME_NIUNIU, chatid)
@@ -111,7 +109,7 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 //游戏结束，清理用户下注信息
 func (g *GameMainManage) GameEnd(nameid, chatid int64) error {
 	table := g.GetTable(GAME_NIUNIU, chatid)
-	scores, _ := table.EndGame()
+	scores := table.EndGame()
 	fmt.Println(scores) //回写数据库
 
 	return nil

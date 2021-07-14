@@ -156,7 +156,7 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 		fmt.Println(floatvar)
 
 		player := games.PlayInfo{
-			Name:   c.Sender.FirstName,
+			Name:   fmt.Sprintf("%s %s", c.Sender.FirstName, c.Sender.LastName),
 			UserID: int64(c.Sender.ID),
 		}
 
@@ -288,6 +288,8 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 		//获取游戏记录
 		records, _ := table.GetSettleInfos()
 		fmt.Println(records)
+
+		tb.Games.GameEnd(games.GAME_NIUNIU, c.Message.Chat.ID) //结算游戏
 
 		msg := TemplateNiuniu_EndGameText(records)
 

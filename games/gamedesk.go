@@ -36,7 +36,7 @@ type GameTable interface {
 	GetStatus() int //获取游戏状态
 	StartGame(int64) (bool, error)
 	SettleGame() ([]logic.Scorelogs, error)
-	EndGame() ([]logic.Scorelogs, error)
+	EndGame() error
 
 	Bet(int64, int) (bool, error)           //用户,下注区域
 	GetStartInfos() (*logic.Select, error)  //显示下注人员
@@ -102,6 +102,10 @@ func (g *GameDesk) UnInitTable() {
 
 	for pi := range g.Areas {
 		delete(g.Areas, pi)
+	}
+
+	for pi := range g.Players {
+		delete(g.Players, pi)
 	}
 
 }
@@ -254,9 +258,12 @@ func (g *GameDesk) SettleGame() ([]logic.Scorelogs, error) {
 
 //结束游戏,清理本局变量
 
-func (g *GameDesk) EndGame() ([]logic.Scorelogs, error) {
+func (g *GameDesk) EndGame() error {
 
-	return nil, nil
+	g.UnInitTable()
+	g.GameStation = GS_TK_FREE
+
+	return nil
 }
 
 //开始

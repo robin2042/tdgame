@@ -340,9 +340,7 @@ func TemplateNiuniu_EndGameReplyMarkUp(tb *TgBot) *telebot.ReplyMarkup {
 
 	viper.ReadInConfig()
 
-	btnarray := make([][]telebot.InlineButton, 0)
-
-	TemplateNiuniu_EndGameJetton(tb, viper.GetViper())
+	btnarray := TemplateNiuniu_EndGameJetton(tb, viper.GetViper())
 
 	fmt.Println(btnarray)
 	menu.InlineKeyboard = btnarray

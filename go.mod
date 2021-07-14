@@ -7,6 +7,7 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1 // indirect
 	github.com/golang/mock v1.3.1
 	github.com/leekchan/accounting v1.0.0
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.5.1
 	github.com/xfrr/goffmpeg v0.0.0-20200825100927-5550d238df5c

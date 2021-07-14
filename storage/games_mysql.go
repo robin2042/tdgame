@@ -77,3 +77,17 @@ func (groupStorage *GamesMysql) BetInfos(playid string) ([]logic.Scorelogs, erro
 
 	return score, result.Error
 }
+
+//获取所有投注人
+func (groupStorage *GamesMysql) WriteChangeScore(scores []logic.Scorelogs) error {
+
+	for _, v := range scores {
+		var user logic.User
+		user.Userid = v.Userid
+		user.Wallmoney += v.Changescore
+		groupStorage.db.Model(&logic.User{}).Where("userid = ?", v.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", v.Changescore))
+
+	}
+
+	return nil
+}
