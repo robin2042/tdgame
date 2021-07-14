@@ -139,41 +139,61 @@ func (g *GameDesk) GetBetInfos() ([]logic.Bets, error) {
 //结算信息
 func (g *GameDesk) GetSettleInfos() (*logic.Records, error) {
 	betinfo := &logic.Records{}
-	var str string
+	ac := accounting.Accounting{Symbol: "$"}
+
 	for i := 0; i < MAX_COUNT; i++ {
-
+		var str string
 		if i == INDEX_BANKER {
-			str += "🎴庄家"
+			str += "🎴庄家 "
 			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
+			str += " "
 			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-			str += "<br>"
+
 		} else if i == INDEX_PLAYER1 {
-			str += "🐲青龙"
+			str += "🐲青龙 "
 			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
 			str += " "
-			str += ""
+			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
+
 		} else if i == INDEX_PLAYER2 {
-			str += "🐯白虎"
+			str += "🐯白虎 "
 			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-
-			str += "<br>"
-		} else if i == INDEX_PLAYER3 {
-			str += "🦚朱雀"
-			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
 			str += " "
-		} else if i == INDEX_PLAYER4 {
-			str += "🐢玄武"
-			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
 			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-			str += "<br>"
+
+		} else if i == INDEX_PLAYER3 {
+			str += "🦚朱雀 "
+			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
+			str += " "
+			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
+
+		} else if i == INDEX_PLAYER4 {
+			str += "🐢玄武 "
+			str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
+			str += " "
+			str += GetCardValueEmoj(g.m_cbTableCardArray[i])
+
 		}
-
+		betinfo.Detail = append(betinfo.Detail, str)
 	}
-	betinfo.Detail = str //牌局
+	for k := range g.Players {
+		change := logic.ChangeScore{}
+		change.UserName = g.Players[k].Name
 
+		change.FmtArea = betsinfo[g.Areas[k]]
+
+		if g.m_lUserWinScore[k] > 0 { //赢钱了
+
+			str := fmt.Sprintf("*赢* \\+%s", ac.FormatMoney(g.m_lUserWinScore[k]))
+			change.FmtChangescore = str
+		} else {
+			str := fmt.Sprintf("*输* ~\\%s~", ac.FormatMoney(g.m_lUserWinScore[k]))
+			change.FmtChangescore = str
+		}
+		betinfo.Change = append(betinfo.Change, change)
+	}
+
+	betinfo.WaysCount = 5
 	return betinfo, nil
 }
 
@@ -395,7 +415,11 @@ func (g *GameDesk) GetSelectInfos() (*logic.Select, error) {
 		bet.Userid = k
 		bet.UserName = g.Players[k].Name
 
-		bet.FmtBetArea = betsinfo[g.Areas[k]]
+		if g.Areas[k] != 0 {
+			bet.FmtBetArea = "✅" + betsinfo[g.Areas[k]]
+		} else {
+			bet.FmtBetArea = betsinfo[g.Areas[k]]
+		}
 
 		bets = append(bets, bet)
 	}

@@ -290,7 +290,6 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 		fmt.Println(records)
 
 		msg := TemplateNiuniu_EndGameText(records)
-		fmt.Println(msg)
 
 		reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
 

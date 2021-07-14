@@ -514,27 +514,27 @@ func GetCardTimesEmoj(cbCardData [MAX_COUNT]byte) string {
 	var str string
 	value := GetTimes(cbCardData, MAX_COUNT, MAX_MULTIPLE)
 	if value == 0 {
-		str = "(无牛)"
+		str = "\\(无牛\\)"
 	} else if value == 1 {
-		str = "(牛一)"
+		str = "\\(牛一\\)"
 	} else if value == 2 {
-		str = "(牛二)"
+		str = "\\(牛二\\)"
 	} else if value == 3 {
-		str = "(牛三)"
+		str = "\\(牛三\\)"
 	} else if value == 4 {
-		str = "(牛四)"
+		str = "\\(牛四\\)"
 	} else if value == 5 {
-		str = "(牛五)"
+		str = "\\(牛五\\)"
 	} else if value == 6 {
-		str = "(牛六)"
+		str = "\\(牛六\\)"
 	} else if value == 7 {
-		str = "(牛七)"
+		str = "(牛七\\)"
 	} else if value == 8 {
-		str = "(牛八)"
+		str = "\\(牛八\\)"
 	} else if value == 9 {
-		str = "(牛九)"
+		str = "\\(牛九\\)"
 	} else if value == 10 {
-		str = "(牛牛)"
+		str = "\\(牛牛\\)"
 	}
 
 	return str

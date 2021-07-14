@@ -130,9 +130,10 @@ type Leaderboard struct {
 
 //开奖记录
 type Records struct {
-	Detail string //庄闲牌
-	Change []ChangeScore
-	Ways   Way		//路子
+	Detail    []string //庄闲牌
+	Change    []ChangeScore
+	Ways      Way //路子
+	WaysCount int
 }
 
 // User stores info about user
@@ -142,10 +143,15 @@ type Select struct {
 
 }
 
+// ：🐯白虎 赢 +$4,0000
 // 扣钱
 type ChangeScore struct {
-	UserName    string
-	Changescore int64
+	UserName       string //名字
+	Area           int    //下注
+	FmtArea        string //下注格式化
+	Winscore       int64
+	Returncore     int64 //退回 金币
+	FmtChangescore string
 }
 
 // 扣钱
