@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	GAME_Title map[int]string = map[int]string{100000: "一贫如洗"}
+	GAME_Title map[int]string = map[int]string{5000000: "一贫如洗", 100000000: "专业杀猪", 5000000000: "西厂总管", 10000000000: "富可敌国",100000000000: "富可敌国"}
 )
 
 const (
@@ -28,10 +28,11 @@ const (
 )
 
 type PlayInfo struct {
-	Name     string
-	UserID   int64
-	BetCount int    //可以更改三次下注
-	Title    string //头衔，富可敌国 小康之家
+	Name      string
+	UserID    int64
+	WallMoney int64
+	BetCount  int    //可以更改三次下注
+	Title     string //头衔，富可敌国 小康之家
 }
 
 type GameManage interface {
@@ -45,6 +46,7 @@ type Games interface {
 	Bet(table GameTable, userid int64, area int) (bool, error)
 	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64) ([]logic.Bets, error)
+	WriteUserScore([]logic.Scorelogs) error
 }
 
 type GameMainManage struct {
@@ -132,6 +134,11 @@ func (g *GameMainManage) BetInfos(chatid int64) ([]logic.Bets, error) {
 
 }
 
+//写分
+func (g *GameMainManage) WriteUserScore(scores []logic.Scorelogs) error {
+	return g.stg.WriteChangeScore(scores)
+}
+
 func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float64) (int64, int64, error) {
 	gamedesk := table.(*GameDesk)
 	_, v := gamedesk.Players[player.UserID]
@@ -149,10 +156,12 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 		Bet:    score,
 	}
 
-	betscore, err := g.stg.AddScore(addscore)
+	betscore, allscore, err := g.stg.AddScore(addscore)
 	if err != nil {
 		return 0, 0, err
 	}
+	player = gamedesk.Players[player.UserID]
+	player.WallMoney = allscore
 
 	gamedesk.LastBetTime = time.Now()
 

@@ -2,10 +2,10 @@
 
 玩家列表:{{range $val := .Players}}
 【[富可敌国](http://www.example.com/)】{{$val.UserName}} ：{{$val.FmtBetArea}}{{end}}
-最近0场历史：
-青龙🐲：
-白虎🐯：
-朱雀🦚：
-玄武🐢：
+最近{{$.WaysCount}}场历史：
+🐲青龙：{{$.Ways.Tian}}
+🐯白虎：{{$.Ways.Di}}
+🦚朱雀：{{$.Ways.Xuan}}
+🐢玄武：{{$.Ways.Huang}}
 
 [广告](http://www.example.com/) [爱游戏直招💞入职自拿3万💞三月免半💞半年全免 ](http://www.example.com/)

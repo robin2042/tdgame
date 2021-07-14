@@ -60,12 +60,8 @@ type GameDesk struct {
 	m_cbTableCardArray [5][5]byte         //牌
 	Players            map[int64]PlayInfo //在线用户
 
-	Bets              map[int64]int64  //下注额
-	Areas             map[int64]int    //下注区域
-	m_lUserTianScore  map[PlayInfo]int //天
-	m_lUserDiScore    map[PlayInfo]int //地
-	m_lUserXuanScore  map[PlayInfo]int //玄
-	m_lUserHuangScore map[PlayInfo]int //黄
+	Bets  map[int64]int64 //下注额
+	Areas map[int64]int   //下注区域
 
 	// Changes         map[PlayInfo]int64 //胜负
 	Historys        map[PlayInfo]int64 //历史开奖记录
@@ -73,7 +69,7 @@ type GameDesk struct {
 	m_lUserWinScore map[int64]int64    //赢钱
 
 	m_lUserReturnScore map[int64]int64 //赢钱
-	m_GameRecordArrary [100]byte       //路子
+	m_GameRecordArrary []byte          //路子
 
 }
 
@@ -86,10 +82,6 @@ func (g *GameDesk) InitTable(playid string, nameid int, chatid int64) {
 	g.Players = make(map[int64]PlayInfo) //在线用户
 	g.Bets = make(map[int64]int64)
 	g.Areas = make(map[int64]int)
-	g.m_lUserTianScore = make(map[PlayInfo]int)
-	g.m_lUserDiScore = make(map[PlayInfo]int)
-	g.m_lUserXuanScore = make(map[PlayInfo]int)
-	g.m_lUserHuangScore = make(map[PlayInfo]int)
 
 	// g.Changes = make(map[PlayInfo]int64)
 	g.m_lUserWinScore = make(map[int64]int64)
@@ -102,6 +94,9 @@ func (g *GameDesk) UnInitTable() {
 
 	for pi := range g.Areas {
 		delete(g.Areas, pi)
+	}
+	for pi := range g.Bets {
+		delete(g.Bets, pi)
 	}
 
 	for pi := range g.Players {
@@ -197,7 +192,33 @@ func (g *GameDesk) GetSettleInfos() (*logic.Records, error) {
 		betinfo.Change = append(betinfo.Change, change)
 	}
 
-	betinfo.WaysCount = 5
+	betinfo.WaysCount = len(g.m_GameRecordArrary) //路子
+
+	//天地玄黄
+	for _, v := range g.m_GameRecordArrary {
+		if (ID_TIAN_MARK & v) > 0 {
+			betinfo.Ways.Tian += "● "
+		} else {
+			betinfo.Ways.Tian += "○ "
+		}
+		if (ID_DI_MARK & v) > 0 {
+			betinfo.Ways.Di += "● "
+		} else {
+			betinfo.Ways.Di += "○ "
+		}
+		if (ID_XUAN_MARK & v) > 0 {
+			betinfo.Ways.Xuan += "● "
+		} else {
+			betinfo.Ways.Xuan += "○ "
+		}
+		if (ID_HUANG_MARK & v) > 0 {
+			betinfo.Ways.Huang += "● "
+		} else {
+			betinfo.Ways.Huang += "○ "
+		}
+
+	}
+
 	return betinfo, nil
 }
 
@@ -246,7 +267,7 @@ func (g *GameDesk) SettleGame() ([]logic.Scorelogs, error) {
 			Nameid:      g.NameID,
 			Bet:         g.Bets[k],
 			Changescore: g.m_lUserWinScore[k],
-			Score:       100,
+			Score:       g.Players[k].WallMoney,
 			Status:      2,
 		}
 		fmt.Println(k, v, score)
@@ -339,6 +360,11 @@ func (g *GameDesk) CalculateScore() {
 	for i := 0; i < MAX_COUNT; i++ {
 		g.m_cbTimers[i] = GetTimes(g.m_cbTableCardArray[i], 5, MAX_MULTIPLE)
 	}
+	if len(g.m_GameRecordArrary) > 100 {
+		g.m_GameRecordArrary = nil
+	}
+	g.m_GameRecordArrary = append(g.m_GameRecordArrary, cbWinner)
+
 	//计算积分
 	//遍历下注人员
 	for k, v := range g.Areas {
@@ -357,17 +383,20 @@ func (g *GameDesk) CalculateScore() {
 			if (ID_DI_MARK & cbWinner) > 0 {
 				g.m_lUserWinScore[k] += g.Bets[k] * int64(g.m_cbTimers[2])
 				g.m_lUserReturnScore[k] += g.Bets[k]
+
 			} else {
 				lUserLostScore[k] -= g.Bets[k] * int64(g.m_cbTimers[0])
-				// lBankerWinScore += m_lUserDiScore[i]*m_cbTimers[0] ;
+
 			}
 		}
 		if v == INDEX_PLAYER3 {
 			if (ID_XUAN_MARK & cbWinner) > 0 {
 				g.m_lUserWinScore[k] += g.Bets[k] * int64(g.m_cbTimers[3])
 				g.m_lUserReturnScore[k] += g.Bets[k]
+
 			} else {
 				lUserLostScore[k] -= g.Bets[k] * int64(g.m_cbTimers[0])
+
 			}
 
 		}
@@ -375,6 +404,7 @@ func (g *GameDesk) CalculateScore() {
 			if (ID_HUANG_MARK & cbWinner) > 0 {
 				g.m_lUserWinScore[k] += g.Bets[k] * int64(g.m_cbTimers[4])
 				g.m_lUserReturnScore[k] += g.Bets[k]
+
 			} else {
 				lUserLostScore[k] -= g.Bets[k] * int64(g.m_cbTimers[0])
 
@@ -382,7 +412,8 @@ func (g *GameDesk) CalculateScore() {
 		}
 
 		g.m_lUserWinScore[k] += lUserLostScore[k] //总成绩
-		fmt.Println(lUserLostScore)               //总输赢
+
+		fmt.Println(lUserLostScore) //总输赢
 
 	}
 
@@ -406,7 +437,30 @@ func (g *GameDesk) GetStartInfos() (*logic.Select, error) {
 	}
 	sel.Players = bets
 	sel.Countdown = 60
+	//天地玄黄
+	for _, v := range g.m_GameRecordArrary {
+		if (ID_TIAN_MARK & v) > 0 {
+			sel.Ways.Tian += "● "
+		} else {
+			sel.Ways.Tian += "○ "
+		}
+		if (ID_DI_MARK & v) > 0 {
+			sel.Ways.Di += "● "
+		} else {
+			sel.Ways.Di += "○ "
+		}
+		if (ID_XUAN_MARK & v) > 0 {
+			sel.Ways.Xuan += "● "
+		} else {
+			sel.Ways.Xuan += "○ "
+		}
+		if (ID_HUANG_MARK & v) > 0 {
+			sel.Ways.Huang += "● "
+		} else {
+			sel.Ways.Huang += "○ "
+		}
 
+	}
 	return sel, nil
 }
 
@@ -434,11 +488,4 @@ func (g *GameDesk) GetSelectInfos() (*logic.Select, error) {
 	sel.Countdown = 60
 
 	return sel, nil
-}
-
-//批量执行写分
-
-func (g *GameDesk) WriteUserScore([]logic.ChangeScore) error {
-
-	return nil
 }

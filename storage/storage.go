@@ -53,7 +53,7 @@ type Info interface {
 // Info interface definces methods for Info Storage
 type Games interface {
 	SaveGameRound(game *logic.Gamerounds) error
-	AddScore(game *logic.AddScore) (int64, error)
+	AddScore(game *logic.AddScore) (int64, int64, error)
 	BetInfos(playid string) ([]logic.Scorelogs, error)
 	WriteChangeScore([]logic.Scorelogs) error
 }

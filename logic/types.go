@@ -140,7 +140,8 @@ type Records struct {
 type Select struct {
 	Countdown int    //倒计时
 	Players   []Bets //选择区域
-
+	Ways      Way    //路子
+	WaysCount int
 }
 
 // ：🐯白虎 赢 +$4,0000

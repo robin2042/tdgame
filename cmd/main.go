@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,7 +9,7 @@ import (
 )
 
 func main() {
-	log.Println("Starting...")
+
 	bot, apicnt, duration := initialize.App()
 
 	quit := make(chan os.Signal)
@@ -19,10 +18,8 @@ func main() {
 	go bot.Bot.Start()
 	go initialize.StartPolling(apicnt, duration)
 
-	log.Println("Started")
-
 	<-quit
-	log.Println("Quit")
+
 }
 
 // package main
