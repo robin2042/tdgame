@@ -165,7 +165,8 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 
 	gamedesk.LastBetTime = time.Now()
 
-	gamedesk.Bets[player.UserID] += betscore //下注
+	gamedesk.Bets[player.UserID] += betscore              //下注
+	gamedesk.m_lUserReturnScore[player.UserID] = betscore //下注额度
 
 	return betscore, gamedesk.Bets[player.UserID], err
 

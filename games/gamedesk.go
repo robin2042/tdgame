@@ -55,6 +55,7 @@ type GameDesk struct {
 	NameID             int
 	GameStation        int       //游戏状态
 	LastBetTime        time.Time //最后一次下注时间
+	BetCountDownTime   time.Time //60秒
 	BeginTime          time.Time //开局时间
 	StartTime          time.Time //开始游戏时间
 	NextStartTime      time.Time
@@ -103,7 +104,9 @@ func (g *GameDesk) UnInitTable() {
 	for pi := range g.Players {
 		delete(g.Players, pi)
 	}
-	// g.m_cbTableCardArray[0] = (0,0,0,0,0)
+	for pi := range g.m_lUserReturnScore {
+		delete(g.m_lUserReturnScore, pi)
+	}
 
 }
 
@@ -183,14 +186,20 @@ func (g *GameDesk) GetSettleInfos() (*logic.Records, error) {
 
 		change.FmtArea = betsinfo[g.Areas[k]]
 
-		if g.m_lUserWinScore[k] > 0 { //赢钱了
+		if v, ok := g.m_lUserWinScore[k]; ok {
+			if g.m_lUserWinScore[k] > 0 { //赢钱了
 
-			str := fmt.Sprintf("*赢* \\+%s", ac.FormatMoney(g.m_lUserWinScore[k]))
-			change.FmtChangescore = str
+				str := fmt.Sprintf("*赢* \\+%s", ac.FormatMoney(v))
+				change.FmtChangescore = str
+			} else {
+				str := fmt.Sprintf("*输* ~\\%s~", ac.FormatMoney(v))
+				change.FmtChangescore = str
+			}
 		} else {
-			str := fmt.Sprintf("*输* ~\\%s~", ac.FormatMoney(g.m_lUserWinScore[k]))
+			str := fmt.Sprintf("*返回* \\+%s", ac.FormatMoney(g.m_lUserReturnScore[k]))
 			change.FmtChangescore = str
 		}
+
 		betinfo.Change = append(betinfo.Change, change)
 	}
 
@@ -247,17 +256,20 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 	g.GameStation = GS_TK_PLAYING
 
 	//发牌
-	// g.DispatchTableCard()
+	g.DispatchTableCard()
+
+	g.BetCountDownTime = time.Now().Add(time.Second * 61) //倒计时
+
 	// 	time="2021-07-15 19:28:16" level=info msg="1 比牌大于:[33 37 42 44 45],[60 4 28 8 10] "
 	// time="2021-07-15 19:28:16" level=info msg="2 比牌小于:[27 25 59 49 1],[60 4 28 8 10] "
 	// time="2021-07-15 19:28:16" level=info msg="4 比牌大于:[54 29 9 18 3],[60 4 28 8 10] "
 	// time="2021-07-15 19:28:16" level=info msg="8 比牌大于:[51 12 36 22 61],[60 4 28 8 10] "
 
-	g.m_cbTableCardArray[0] = [5]byte{42, 44, 40, 35, 56}
-	g.m_cbTableCardArray[1] = [5]byte{23, 11, 27, 12, 50}
-	g.m_cbTableCardArray[2] = [5]byte{55, 5, 59, 54, 41}
-	g.m_cbTableCardArray[3] = [5]byte{24, 13, 60, 19, 58}
-	g.m_cbTableCardArray[4] = [5]byte{56, 2, 53, 12, 20}
+	// g.m_cbTableCardArray[0] = [5]byte{42, 44, 40, 35, 56}
+	// g.m_cbTableCardArray[1] = [5]byte{23, 11, 27, 12, 50}
+	// g.m_cbTableCardArray[2] = [5]byte{55, 5, 59, 54, 41}
+	// g.m_cbTableCardArray[3] = [5]byte{24, 13, 60, 19, 58}
+	// g.m_cbTableCardArray[4] = [5]byte{56, 2, 53, 12, 20}
 
 	return true, nil
 }
@@ -374,10 +386,10 @@ func (g *GameDesk) CalculateScore() {
 			cbMarkType = ID_HUANG_MARK
 		}
 		if CompareCard(g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER], MAX_COUNT) {
-			logger.Infof("%d 比牌大于:%d,%d ", cbMarkType, g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER])
+			logger.Debugf("%d 比牌大于:%d,%d ", cbMarkType, g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER])
 			cbWinner |= cbMarkType
 		} else {
-			logger.Infof("%d 比牌小于:%d,%d ", cbMarkType, g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER])
+			logger.Debugf("%d 比牌小于:%d,%d ", cbMarkType, g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER])
 			cbWinner = (cbWinner & (^cbMarkType + 1))
 		}
 
@@ -461,7 +473,8 @@ func (g *GameDesk) GetStartInfos() (*logic.Select, error) {
 		bets = append(bets, bet)
 	}
 	sel.Players = bets
-	sel.Countdown = 60
+	ncountdown := time.Until(g.BetCountDownTime)
+	sel.Countdown = int(ncountdown.Seconds())
 	//天地玄黄
 	for _, v := range g.m_GameRecordArrary {
 		if (ID_TIAN_MARK & v) > 0 {
@@ -510,7 +523,13 @@ func (g *GameDesk) GetSelectInfos() (*logic.Select, error) {
 		bets = append(bets, bet)
 	}
 	sel.Players = bets
-	sel.Countdown = 60
+
+	ncountdown := time.Until(g.BetCountDownTime)
+	if int(ncountdown.Seconds()) < 0 {
+		sel.Countdown = 0
+	} else {
+		sel.Countdown = int(ncountdown.Seconds())
+	}
 
 	return sel, nil
 }
