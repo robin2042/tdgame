@@ -281,7 +281,12 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID)
 
 		//写分
-		betsinfo, _ := table.SettleGame()
+		betsinfo, err := table.SettleGame(int64(c.Sender.ID))
+		if err != nil {
+			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
+			tb.Bot.Respond(c, &reply)
+			return
+		}
 		tb.Games.WriteUserScore(betsinfo)
 
 		//回写数据库

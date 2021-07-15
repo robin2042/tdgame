@@ -11,7 +11,7 @@ import (
 const (
 	GAME_PLAYER      = 5
 	MAX_COUNT        = 5
-	MAX_MULTIPLE     = 4    //最高倍数
+	MAX_MULTIPLE     = 10   //最高倍数
 	LOGIC_MASK_COLOR = 0xF0 //花色掩码
 	LOGIC_MASK_VALUE = 0x0F //数值掩码
 	//扑克类型
@@ -338,6 +338,7 @@ func GetCardType(cbCardData [MAX_COUNT]byte, cbCardCount int) int {
 
 // //对比扑克
 func CompareCard(cbFirstData [MAX_COUNT]byte, cbNextData [MAX_COUNT]byte, cbCardCount int) bool {
+
 	// 	//获取点数
 	cbNextType := GetCardType(cbNextData, cbCardCount)
 	cbFirstType := GetCardType(cbFirstData, cbCardCount)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aoyako/telegram_2ch_res_bot/logger"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/leekchan/accounting"
 )
@@ -35,7 +36,7 @@ type GameTable interface {
 	SetMsgID(int)   //获取游戏状态
 	GetStatus() int //获取游戏状态
 	StartGame(int64) (bool, error)
-	SettleGame() ([]logic.Scorelogs, error)
+	SettleGame(int64) ([]logic.Scorelogs, error)
 	EndGame() error
 
 	Bet(int64, int) (bool, error)           //用户,下注区域
@@ -102,6 +103,7 @@ func (g *GameDesk) UnInitTable() {
 	for pi := range g.Players {
 		delete(g.Players, pi)
 	}
+	// g.m_cbTableCardArray[0] = (0,0,0,0,0)
 
 }
 
@@ -245,13 +247,34 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 	g.GameStation = GS_TK_PLAYING
 
 	//发牌
-	g.DispatchTableCard()
+	// g.DispatchTableCard()
+	// 	time="2021-07-15 19:28:16" level=info msg="1 比牌大于:[33 37 42 44 45],[60 4 28 8 10] "
+	// time="2021-07-15 19:28:16" level=info msg="2 比牌小于:[27 25 59 49 1],[60 4 28 8 10] "
+	// time="2021-07-15 19:28:16" level=info msg="4 比牌大于:[54 29 9 18 3],[60 4 28 8 10] "
+	// time="2021-07-15 19:28:16" level=info msg="8 比牌大于:[51 12 36 22 61],[60 4 28 8 10] "
+
+	g.m_cbTableCardArray[0] = [5]byte{42, 44, 40, 35, 56}
+	g.m_cbTableCardArray[1] = [5]byte{23, 11, 27, 12, 50}
+	g.m_cbTableCardArray[2] = [5]byte{55, 5, 59, 54, 41}
+	g.m_cbTableCardArray[3] = [5]byte{24, 13, 60, 19, 58}
+	g.m_cbTableCardArray[4] = [5]byte{56, 2, 53, 12, 20}
 
 	return true, nil
 }
 
 //回写数据库
-func (g *GameDesk) SettleGame() ([]logic.Scorelogs, error) {
+func (g *GameDesk) SettleGame(userid int64) ([]logic.Scorelogs, error) {
+
+	var bfind bool
+	for i := range g.Bets {
+		if i == userid {
+			bfind = true
+			break
+		}
+	}
+	if !bfind {
+		return nil, errors.New("您没有参与此游戏，无权更改游戏状态")
+	}
 
 	//结算
 	g.CalculateScore()
@@ -299,10 +322,12 @@ func (g *GameDesk) DispatchTableCard() {
 
 		for j := 0; j < MAX_COUNT; j++ {
 			ncard++
+			g.m_cbTableCardArray[i][j] = 0
 			g.m_cbTableCardArray[i][j] = m_cbCardListData[nums[ncard]]
 
 		}
 	}
+	logger.Infof("组:%d,发牌:%d", g.ChatID, g.m_cbTableCardArray)
 
 }
 
@@ -349,9 +374,10 @@ func (g *GameDesk) CalculateScore() {
 			cbMarkType = ID_HUANG_MARK
 		}
 		if CompareCard(g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER], MAX_COUNT) {
-
+			logger.Infof("%d 比牌大于:%d,%d ", cbMarkType, g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER])
 			cbWinner |= cbMarkType
 		} else {
+			logger.Infof("%d 比牌小于:%d,%d ", cbMarkType, g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER])
 			cbWinner = (cbWinner & (^cbMarkType + 1))
 		}
 
@@ -412,8 +438,7 @@ func (g *GameDesk) CalculateScore() {
 		}
 
 		g.m_lUserWinScore[k] += lUserLostScore[k] //总成绩
-
-		fmt.Println(lUserLostScore) //总输赢
+		logger.Info("用户:", k, "总输赢:", g.m_lUserWinScore[k])
 
 	}
 
