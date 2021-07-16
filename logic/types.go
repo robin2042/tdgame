@@ -48,7 +48,7 @@ type Gamerounds struct {
 	Chatid     int64
 	Msgid      int
 	Nameid     int
-	Createtime int `gorm:"default:now()"`
+	Createtime string `gorm:"default:now()"`
 	Status     int
 }
 

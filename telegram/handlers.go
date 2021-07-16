@@ -40,17 +40,19 @@ func start(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		start := tb.Games.GameBegin(games.GAME_NIUNIU, m.ID, m.Chat.ID)
-		if start != games.GS_TK_FREE { //已经开局
+		fmt.Println(m.MessageSig())
+
+		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
+		//
+		if !start {
 			msg := TemplateNiuniu_limit()
 			tb.SendHtmlMessage(msg, nil, m)
-		} else {
-
+		} else { //可以开启新局
 			msg := TemplateNiuniu_Text()
 			reply := TemplateNiuniu_Bet(tb)
 			message, _ := tb.SendHtmlMessage(msg, reply, m)
 
-			fmt.Println(message.ID)
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.ID, message.Chat.ID)
 
 		}
 
@@ -79,7 +81,7 @@ func OnBotAddGroups(tb *TgBot) func(m *telebot.Message) {
 func EnterGroups(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
 
-		err := tb.Controller.Register(int64(m.Chat.ID))
+		err := tb.Controller.Register(int64(m.Sender.ID))
 		if err != nil {
 			log.Println("插入用户失败: ", m.Chat.ID)
 		}
@@ -91,7 +93,7 @@ func EnterGroups(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func LeaveGroups(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		err := tb.Controller.Unregister(m.Chat.ID)
+		err := tb.Controller.Unregister(int64(m.Sender.ID))
 		if err != nil {
 
 		}

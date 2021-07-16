@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"time"
 
 	logger "github.com/aoyako/telegram_2ch_res_bot/logger"
 
@@ -111,5 +112,24 @@ func (groupStorage *GamesMysql) WriteChangeScore(scores []logic.Scorelogs) error
 		}
 	}
 
+	return nil
+}
+
+//判断是否能开局
+func (groupStorage *GamesMysql) NewGames(nameid int, chatid int64) error {
+
+	var game logic.Gamerounds
+
+	result := groupStorage.db.Model(&logic.Gamerounds{}).Where("nameid = ? and chatid =? ", nameid, chatid).Order("createtime desc").Limit(1).Find(&game)
+
+	timer, _ := time.ParseInLocation("2006-01-02 15:04:05", game.Createtime, time.Local)
+
+	if time.Since(timer).Seconds() <= 90 {
+		return errors.New("上局90s后才能开始游戏")
+	}
+
+	if result.Error != nil {
+		return nil
+	}
 	return nil
 }

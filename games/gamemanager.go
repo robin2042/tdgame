@@ -40,6 +40,7 @@ type GameManage interface {
 }
 
 type Games interface {
+	NewGames(nameid, chatid int64) bool //判断上一句时间
 	GameBegin(nameid, msgid int, chatid int64) int
 	GameEnd(nameid, chatid int64) error
 	GetTable(nameid int, chatid int64) GameTable //桌台
@@ -106,6 +107,16 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 
 	return GS_TK_FREE
 
+}
+
+//判断能否开局
+func (g *GameMainManage) NewGames(nameid, chatid int64) bool {
+
+	start := g.stg.NewGames(int(nameid), chatid)
+	if start == nil {
+		return true
+	}
+	return false
 }
 
 //游戏结束，清理用户下注信息
