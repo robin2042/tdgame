@@ -41,19 +41,19 @@ type GameManage interface {
 
 type Games interface {
 	NewGames(nameid, chatid int64) bool //判断上一句时间
-	GameBegin(nameid, msgid int, chatid int64) int
-	GameEnd(nameid, chatid int64) error
-	GetTable(nameid int, chatid int64) GameTable //桌台
+	GameBegin(nameid int, chatid int64, msgid int) int
+	GameEnd(nameid, chatid int64, msgid int) error
+	GetTable(nameid int, chatid int64, msgid int) GameTable //桌台
 	Bet(table GameTable, userid int64, area int) (bool, error)
 	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
-	BetInfos(chatid int64) ([]logic.Bets, error)
+	BetInfos(chatid int64, msgid int) ([]logic.Bets, error)
 	WriteUserScore([]logic.Scorelogs) error
 }
 
 type GameMainManage struct {
 	Games
 	stg    *storage.Storage
-	Tables map[int64]GameTable // chatid<-->table
+	Tables map[string]GameTable // chatid<-->table
 
 }
 
@@ -62,7 +62,7 @@ func NewGameManager(stg *storage.Storage) Games {
 
 	return &GameMainManage{
 		stg:    stg,
-		Tables: map[int64]GameTable{},
+		Tables: map[string]GameTable{},
 	}
 }
 
@@ -75,21 +75,23 @@ func (g *GameMainManage) LoadGames() (bool, error) {
 	return true, nil
 }
 
-func (g *GameMainManage) GetTable(nameid int, chatid int64) GameTable {
-	table := g.Tables[int64(chatid)]
+func (g *GameMainManage) GetTable(nameid int, chatid int64, msgid int) GameTable {
+	playid := fmt.Sprintf("%d%d", chatid, msgid)
+	table := g.Tables[playid]
 	if table != nil {
 		return table
 	}
 
-	table = CreateTable(nameid, chatid)
-	g.Tables[chatid] = table
+	table = CreateTable(nameid, chatid, msgid)
+	g.Tables[playid] = table
 
 	return table
 }
 
-func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
+func (g *GameMainManage) GameBegin(nameid int, chatid int64, msgid int) int {
+	playid := fmt.Sprintf("%d%d", chatid, msgid)
 
-	table := g.GetTable(GAME_NIUNIU, chatid)
+	table := g.GetTable(GAME_NIUNIU, chatid, msgid)
 	if table.GetStatus() != GS_TK_FREE { //存在就返回
 		return table.GetStatus()
 	}
@@ -97,7 +99,7 @@ func (g *GameMainManage) GameBegin(nameid, msgid int, chatid int64) int {
 	table.SetMsgID(msgid)
 
 	round := &logic.Gamerounds{
-		Playid: GenerateID(nameid, chatid),
+		Playid: playid,
 		Chatid: chatid,
 		Msgid:  msgid,
 		Nameid: nameid,
@@ -120,8 +122,9 @@ func (g *GameMainManage) NewGames(nameid, chatid int64) bool {
 }
 
 //游戏结束，清理用户下注信息
-func (g *GameMainManage) GameEnd(nameid, chatid int64) error {
-	table := g.GetTable(GAME_NIUNIU, chatid)
+func (g *GameMainManage) GameEnd(nameid, chatid int64, msgid int) error {
+
+	table := g.GetTable(GAME_NIUNIU, chatid, msgid)
 	scores := table.EndGame()
 	fmt.Println(scores) //回写数据库
 
@@ -139,8 +142,9 @@ func (g *GameMainManage) Bet(table GameTable, userid int64, area int) (bool, err
 
 }
 
-func (g *GameMainManage) BetInfos(chatid int64) ([]logic.Bets, error) {
-	table := g.Tables[int64(chatid)]
+func (g *GameMainManage) BetInfos(chatid int64, msgid int) ([]logic.Bets, error) {
+	playid := fmt.Sprintf("%d%d", chatid, msgid)
+	table := g.Tables[playid]
 	return table.GetBetInfos()
 
 }
@@ -183,8 +187,8 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 
 }
 
-func CreateTable(nameid int, chatid int64) GameTable {
-	playid := GenerateID(nameid, chatid)
+func CreateTable(nameid int, chatid int64, msgid int) GameTable {
+	playid := fmt.Sprintf("%d%d", chatid, msgid)
 
 	table := new(GameDesk)
 	table.InitTable(playid, nameid, chatid)

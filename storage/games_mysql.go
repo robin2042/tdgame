@@ -35,11 +35,13 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, int64
 	var user logic.User
 	// var score int64
 	var floatscore float64
+	tx := groupStorage.db.Begin()
+	defer tx.Commit()
 
-	groupStorage.db.Where("userid = ?", addscore.Userid).First(&user)
+	tx.Where("userid = ?", addscore.Userid).First(&user)
 
 	if user.ChatID == 0 {
-		return 0, 0, errors.New("找不到用户!")
+		return 0, 0, errors.New("找不到用户")
 	}
 	if user.Wallmoney <= 0 {
 		return 0, 0, errors.New("金额不足")
@@ -49,26 +51,35 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, int64
 	if addscore.Bet < 99.0 {
 		floatscore = float64(user.Wallmoney) * addscore.Bet
 		if user.Wallmoney < int64(floatscore) {
-			return 0, 0, errors.New("金额不足!")
+			tx.Rollback()
+			return 0, 0, errors.New("金额不足")
+
 		}
 		user.Wallmoney = user.Wallmoney - int64(floatscore)
-		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", int64(floatscore)))
+		result := tx.Model(&logic.User{}).Where("userid = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", int64(floatscore)))
 		// result := groupStorage.db.Update(&user)
 		if result.Error != nil {
-			return 0, 0, errors.New("金额不足!")
+			tx.Rollback()
+			return 0, 0, errors.New("金额不足")
 		}
 		addscore.Bet = floatscore
 	} else {
-
+		if user.Wallmoney < int64(addscore.Bet) {
+			tx.Rollback()
+			return 0, 0, errors.New("金额不足")
+		}
 		user.Wallmoney = user.Wallmoney - int64(addscore.Bet)
-		result := groupStorage.db.Save(&user)
+		result := tx.Save(&user)
+
 		if result.Error != nil {
-			return 0, 0, errors.New("金额不足!")
+			tx.Rollback()
+			return 0, 0, errors.New("金额不足")
 		}
 
 	}
 	// user := groupStorage.db.get
 	result := groupStorage.db.Create(addscore)
+
 	return int64(addscore.Bet), user.Wallmoney, result.Error
 }
 
@@ -91,7 +102,7 @@ func (groupStorage *GamesMysql) WriteChangeScore(scores []logic.Scorelogs) error
 		user.Wallmoney += v.Changescore
 		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", v.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", v.Changescore))
 		if result.Error != nil {
-			logger.Errorf("更新用户金额失败!")
+			logger.Errorf("更新用户金额失败")
 			return errors.New("更新用户金额失败")
 		}
 
@@ -107,7 +118,7 @@ func (groupStorage *GamesMysql) WriteChangeScore(scores []logic.Scorelogs) error
 		})
 
 		if result.Error != nil {
-			logger.Errorf("更新用户金额失败!")
+			logger.Errorf("更新用户金额失败")
 			return errors.New("更新用户金额失败")
 		}
 	}
