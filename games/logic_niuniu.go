@@ -317,9 +317,10 @@ func GetCardType(cbCardData [MAX_COUNT]byte, cbCardCount int) int {
 		bSum += bTemp[i]
 	}
 	var cbTempValue int
-	for i := 0; i < cbCardCount; i++ {
 
-		for j := 0; j < cbCardCount; j++ {
+	for i := 0; i < cbCardCount-1; i++ {
+
+		for j := i + 1; j < cbCardCount; j++ {
 
 			if (bSum-bTemp[i]-bTemp[j])%10 == 0 {
 

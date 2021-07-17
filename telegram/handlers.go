@@ -40,7 +40,7 @@ func start(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		fmt.Println(m.MessageSig())
+		//fmt.Println(m.MessageSig())
 
 		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
 		//
@@ -98,7 +98,7 @@ func LeaveGroups(tb *TgBot) func(m *telebot.Message) {
 // /start endpoint
 func Callback(tb *TgBot) func(c *telebot.Callback) {
 	return func(m *telebot.Callback) {
-		fmt.Println(m)
+		//fmt.Println(m)
 	}
 }
 
@@ -148,14 +148,14 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 			tb.Bot.Respond(c, &reply)
 		}
 		floatvar, _ := strconv.ParseFloat(c.Data, 64)
-		fmt.Println(floatvar)
+		//fmt.Println(floatvar)
 
 		player := games.PlayInfo{
 			Name:   fmt.Sprintf("%s %s", c.Sender.FirstName, c.Sender.LastName),
 			UserID: int64(c.Sender.ID),
 		}
 
-		score, totalscore, err := tb.Games.AddScore(table, player, floatvar)
+		_, totalscore, err := tb.Games.AddScore(table, player, floatvar)
 
 		if err != nil {
 			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
@@ -169,7 +169,7 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 		}
 
 		// tb.EditHtmlMessage(c.Message, "update text")
-		fmt.Println(score, totalscore)
+		//fmt.Println(score, totalscore)
 	}
 }
 
@@ -185,7 +185,7 @@ func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 			return
 		}
 		betsinfo, _ := table.GetStartInfos()
-		fmt.Println(betsinfo)
+		//fmt.Println(betsinfo)
 
 		msg := TemplateNiuniu_SelectText(betsinfo)
 		reply := TemplateNiuniu_Select(tb)
@@ -255,11 +255,11 @@ func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
 		data, _ := strconv.Atoi(c.Data)
 
-		success, err := tb.Games.Bet(table, int64(c.Sender.ID), data)
-		fmt.Println(success, err)
+		tb.Games.Bet(table, int64(c.Sender.ID), data)
+		//fmt.Println(success, err)
 
 		betsinfo, _ := table.GetSelectInfos()
-		fmt.Println(betsinfo)
+		//fmt.Println(betsinfo)
 
 		msg := TemplateNiuniu_SelectText(betsinfo)
 		reply := TemplateNiuniu_Select(tb)
@@ -274,6 +274,7 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
+		playid := fmt.Sprintf("%d%d", c.Message.Chat.ID, c.Message.ID)
 
 		//写分
 		betsinfo, err := table.SettleGame(int64(c.Sender.ID))
@@ -282,22 +283,25 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 			tb.Bot.Respond(c, &reply)
 			return
 		}
-		tb.Games.WriteUserScore(betsinfo)
+
+		tb.Games.WriteUserScore(playid, betsinfo)
 
 		//回写数据库
-		fmt.Println(betsinfo)
-
+		// fmt.Println(betsinfo)
 		//获取游戏记录
 		records, _ := table.GetSettleInfos()
-		fmt.Println(records)
+		way, waycount := tb.Games.GetRecords(games.GAME_NIUNIU, c.Message.Chat.ID)
+
+		records.Ways = way
+		records.WaysCount = waycount
 
 		tb.Games.GameEnd(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID) //结算游戏
 
 		msg := TemplateNiuniu_EndGameText(records)
+		// fmt.Println(msg)
+		// reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
 
-		reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
-
-		tb.EditHtmlMessage(c.Message, msg, reply)
+		tb.EditHtmlMessage(c.Message, msg, nil)
 
 	}
 }

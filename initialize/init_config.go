@@ -46,8 +46,9 @@ func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 	}
 
 	Storage := storage.NewStorage(db, &admins)
+	Rds := storage.ExampleNewClient()
 	controller := controller.NewController(Storage)
-	games := games.NewGameManager(Storage)
+	games := games.NewGameManager(Storage, Rds)
 	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), controller, downloader.NewDownloader(
 		viper.GetString("disk.path"),
 		viper.GetUint64("disk.size")),

@@ -10,6 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	GAME_END = 2
+)
+
 // UserPostgres is an implementation of storage.User
 type GamesMysql struct {
 	db *gorm.DB
@@ -50,7 +54,7 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, int64
 
 	if addscore.Bet < 99.0 {
 		floatscore = float64(user.Wallmoney) * addscore.Bet
-		if user.Wallmoney < int64(floatscore) {
+		if (user.Wallmoney / 4) < int64(floatscore) {
 			tx.Rollback()
 			return 0, 0, errors.New("金额不足")
 
@@ -64,7 +68,7 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, int64
 		}
 		addscore.Bet = floatscore
 	} else {
-		if user.Wallmoney < int64(addscore.Bet) {
+		if (user.Wallmoney / 4) < int64(addscore.Bet) {
 			tx.Rollback()
 			return 0, 0, errors.New("金额不足")
 		}
@@ -94,13 +98,16 @@ func (groupStorage *GamesMysql) BetInfos(playid string) ([]logic.Scorelogs, erro
 }
 
 //获取所有投注人
-func (groupStorage *GamesMysql) WriteChangeScore(scores []logic.Scorelogs) error {
+func (groupStorage *GamesMysql) WriteChangeScore(playid string, scores []logic.Scorelogs) error {
+
+	//更新本局结束
+	groupStorage.db.Model(&logic.Gamerounds{}).Where("playid = ?", playid).Update("status", 2)
 
 	for _, v := range scores {
 		var user logic.User
 		user.Userid = v.Userid
 		user.Wallmoney += v.Changescore
-		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", v.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", v.Changescore))
+		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", v.Userid).Update("wallmoney", gorm.Expr("wallmoney+?", v.Changescore))
 		if result.Error != nil {
 			logger.Errorf("更新用户金额失败")
 			return errors.New("更新用户金额失败")
@@ -114,6 +121,7 @@ func (groupStorage *GamesMysql) WriteChangeScore(scores []logic.Scorelogs) error
 			Bet:         v.Bet,
 			Changescore: v.Changescore,
 			Score:       v.Score,
+			Area:        v.Area, //下注区域
 			Status:      2,
 		})
 
@@ -135,12 +143,22 @@ func (groupStorage *GamesMysql) NewGames(nameid int, chatid int64) error {
 
 	timer, _ := time.ParseInLocation("2006-01-02 15:04:05", game.Createtime, time.Local)
 
+	if game.Status == GAME_END {
+		return nil
+	}
 	if time.Since(timer).Seconds() <= 90 {
 		return errors.New("上局90s后才能开始游戏")
 	}
 
 	if result.Error != nil {
-		return nil
+		return errors.New("上局90s后才能开始游戏")
 	}
 	return nil
+}
+func (groupStorage *GamesMysql) GetRecords(nameid int, chatid int64) []logic.Records {
+	var game []logic.Records
+
+	groupStorage.db.Model(&logic.Gamerounds{}).Where("nameid = ? and chatid =?  and status =2", nameid, chatid).Order("createtime desc").Limit(10).Find(&game)
+
+	return game
 }

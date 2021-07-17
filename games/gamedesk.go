@@ -7,6 +7,7 @@ import (
 
 	"github.com/aoyako/telegram_2ch_res_bot/logger"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
+	"github.com/aoyako/telegram_2ch_res_bot/storage"
 	"github.com/leekchan/accounting"
 )
 
@@ -31,6 +32,8 @@ const (
 var betsinfo map[int]string = map[int]string{0: "🕒未选择", 1: "🐲青龙", 2: "🐯白虎", 3: "🦚朱雀", 4: "🐢玄武"}
 
 type GameTable interface {
+	SetRdb(*storage.CloudStore)
+
 	GetChatID() int64
 	GetPlayID() string
 	SetMsgID(int)   //获取游戏状态
@@ -49,6 +52,7 @@ type GameTable interface {
 
 type GameDesk struct {
 	GameTable
+	Rdb                *storage.CloudStore
 	MsgID              int    //消息ID
 	PlayID             string //局号
 	ChatID             int64  //桌台号
@@ -73,6 +77,10 @@ type GameDesk struct {
 	m_lUserReturnScore map[int64]int64 //赢钱
 	m_GameRecordArrary []byte          //路子
 
+}
+
+func (g *GameDesk) SetRdb(r *storage.CloudStore) {
+	g.Rdb = r
 }
 
 func (g *GameDesk) InitTable(playid string, nameid int, chatid int64) {
@@ -104,6 +112,10 @@ func (g *GameDesk) UnInitTable() {
 	for pi := range g.Players {
 		delete(g.Players, pi)
 	}
+	for pi := range g.m_lUserWinScore {
+		delete(g.m_lUserWinScore, pi)
+	}
+
 	for pi := range g.m_lUserReturnScore {
 		delete(g.m_lUserReturnScore, pi)
 	}
@@ -203,33 +215,6 @@ func (g *GameDesk) GetSettleInfos() (*logic.Records, error) {
 		betinfo.Change = append(betinfo.Change, change)
 	}
 
-	betinfo.WaysCount = len(g.m_GameRecordArrary) //路子
-
-	//天地玄黄
-	for _, v := range g.m_GameRecordArrary {
-		if (ID_TIAN_MARK & v) > 0 {
-			betinfo.Ways.Tian += "● "
-		} else {
-			betinfo.Ways.Tian += "○ "
-		}
-		if (ID_DI_MARK & v) > 0 {
-			betinfo.Ways.Di += "● "
-		} else {
-			betinfo.Ways.Di += "○ "
-		}
-		if (ID_XUAN_MARK & v) > 0 {
-			betinfo.Ways.Xuan += "● "
-		} else {
-			betinfo.Ways.Xuan += "○ "
-		}
-		if (ID_HUANG_MARK & v) > 0 {
-			betinfo.Ways.Huang += "● "
-		} else {
-			betinfo.Ways.Huang += "○ "
-		}
-
-	}
-
 	return betinfo, nil
 }
 
@@ -260,16 +245,13 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 
 	g.BetCountDownTime = time.Now().Add(time.Second * 61) //倒计时
 
-	// 	time="2021-07-15 19:28:16" level=info msg="1 比牌大于:[33 37 42 44 45],[60 4 28 8 10] "
-	// time="2021-07-15 19:28:16" level=info msg="2 比牌小于:[27 25 59 49 1],[60 4 28 8 10] "
-	// time="2021-07-15 19:28:16" level=info msg="4 比牌大于:[54 29 9 18 3],[60 4 28 8 10] "
-	// time="2021-07-15 19:28:16" level=info msg="8 比牌大于:[51 12 36 22 61],[60 4 28 8 10] "
+	// [9 12 59 24 25] [5 53 60 13 27] [39 33 44 29 18] [10 21 4 58 52] [20 28 26 23 40]
 
-	// g.m_cbTableCardArray[0] = [5]byte{42, 44, 40, 35, 56}
-	// g.m_cbTableCardArray[1] = [5]byte{23, 11, 27, 12, 50}
-	// g.m_cbTableCardArray[2] = [5]byte{55, 5, 59, 54, 41}
-	// g.m_cbTableCardArray[3] = [5]byte{24, 13, 60, 19, 58}
-	// g.m_cbTableCardArray[4] = [5]byte{56, 2, 53, 12, 20}
+	g.m_cbTableCardArray[0] = [5]byte{9, 12, 59, 24, 25}
+	g.m_cbTableCardArray[1] = [5]byte{5, 53, 60, 13, 27}
+	g.m_cbTableCardArray[2] = [5]byte{39, 33, 44, 29, 18}
+	g.m_cbTableCardArray[3] = [5]byte{10, 21, 4, 58, 52}
+	g.m_cbTableCardArray[4] = [5]byte{20, 28, 26, 23, 40}
 
 	return true, nil
 }
@@ -390,7 +372,7 @@ func (g *GameDesk) CalculateScore() {
 			cbWinner |= cbMarkType
 		} else {
 			logger.Debugf("%d 比牌小于:%d,%d ", cbMarkType, g.m_cbTableCardArray[i], g.m_cbTableCardArray[INDEX_BANKER])
-			cbWinner = (cbWinner & (^cbMarkType + 1))
+			cbWinner = (cbWinner & (^cbMarkType))
 		}
 
 	}
@@ -408,43 +390,43 @@ func (g *GameDesk) CalculateScore() {
 	for k, v := range g.Areas {
 		if v == INDEX_PLAYER1 {
 			if (ID_TIAN_MARK & cbWinner) > 0 {
-				g.m_lUserWinScore[k] += g.Bets[k] * int64(g.m_cbTimers[1])
+				g.m_lUserWinScore[k] += (g.Bets[k] * int64(g.m_cbTimers[1])) - g.Bets[k]
 				g.m_lUserReturnScore[k] += g.Bets[k]
 
 			} else {
-				lUserLostScore[k] -= g.Bets[k] * int64(g.m_cbTimers[0])
+				lUserLostScore[k] -= (g.Bets[k] * int64(g.m_cbTimers[0])) + g.Bets[k]
 
 			}
 		}
 
 		if v == INDEX_PLAYER2 {
 			if (ID_DI_MARK & cbWinner) > 0 {
-				g.m_lUserWinScore[k] += g.Bets[k] * int64(g.m_cbTimers[2])
+				g.m_lUserWinScore[k] += (g.Bets[k] * int64(g.m_cbTimers[2])) - g.Bets[k]
 				g.m_lUserReturnScore[k] += g.Bets[k]
 
 			} else {
-				lUserLostScore[k] -= g.Bets[k] * int64(g.m_cbTimers[0])
+				lUserLostScore[k] -= (g.Bets[k] * int64(g.m_cbTimers[0])) + g.Bets[k]
 
 			}
 		}
 		if v == INDEX_PLAYER3 {
 			if (ID_XUAN_MARK & cbWinner) > 0 {
-				g.m_lUserWinScore[k] += g.Bets[k] * int64(g.m_cbTimers[3])
+				g.m_lUserWinScore[k] += (g.Bets[k] * int64(g.m_cbTimers[3])) - g.Bets[k]
 				g.m_lUserReturnScore[k] += g.Bets[k]
 
 			} else {
-				lUserLostScore[k] -= g.Bets[k] * int64(g.m_cbTimers[0])
+				lUserLostScore[k] -= (g.Bets[k] * int64(g.m_cbTimers[0])) + g.Bets[k]
 
 			}
 
 		}
 		if v == INDEX_PLAYER4 {
 			if (ID_HUANG_MARK & cbWinner) > 0 {
-				g.m_lUserWinScore[k] += g.Bets[k] * int64(g.m_cbTimers[4])
+				g.m_lUserWinScore[k] += (g.Bets[k] * int64(g.m_cbTimers[4])) - g.Bets[k]
 				g.m_lUserReturnScore[k] += g.Bets[k]
 
 			} else {
-				lUserLostScore[k] -= g.Bets[k] * int64(g.m_cbTimers[0])
+				lUserLostScore[k] -= (g.Bets[k] * int64(g.m_cbTimers[0])) + g.Bets[k]
 
 			}
 		}
@@ -453,6 +435,8 @@ func (g *GameDesk) CalculateScore() {
 		logger.Info("用户:", k, "总输赢:", g.m_lUserWinScore[k])
 
 	}
+	key := fmt.Sprintf("%d%d", g.ChatID, g.NameID)
+	g.Rdb.RPush(key, cbWinner)
 
 }
 

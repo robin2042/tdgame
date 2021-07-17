@@ -48,6 +48,7 @@ type Gamerounds struct {
 	Chatid     int64
 	Msgid      int
 	Nameid     int
+	Winarea    int
 	Createtime string `gorm:"default:now()"`
 	Status     int
 }
@@ -101,6 +102,7 @@ type Scorelogs struct {
 	Bet         int64
 	Changescore int64
 	Score       int64
+	Area        int
 	Status      int
 	Createtime  string `gorm:"default:now()"`
 	Endtime     string `gorm:"default:now()"`
@@ -132,7 +134,7 @@ type Leaderboard struct {
 type Records struct {
 	Detail    []string //庄闲牌
 	Change    []ChangeScore
-	Ways      Way //路子
+	Ways      *Way //路子
 	WaysCount int
 }
 
@@ -161,4 +163,13 @@ type Way struct {
 	Di    string
 	Xuan  string
 	Huang string
+}
+
+//开奖记录
+type History struct {
+	Win []int
+}
+
+func (History) TableName() string {
+	return "gamerounds"
 }

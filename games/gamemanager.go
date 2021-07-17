@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/aoyako/telegram_2ch_res_bot/logger"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
 )
@@ -47,21 +48,25 @@ type Games interface {
 	Bet(table GameTable, userid int64, area int) (bool, error)
 	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64, msgid int) ([]logic.Bets, error)
-	WriteUserScore([]logic.Scorelogs) error
+	WriteGameRounds(string, int) error
+	WriteUserScore(string, []logic.Scorelogs) error
+	GetRecords(nameid, chatid int64) (*logic.Way, int)
 }
 
 type GameMainManage struct {
 	Games
 	stg    *storage.Storage
+	rdb    *storage.CloudStore
 	Tables map[string]GameTable // chatid<-->table
 
 }
 
 // NewController constructor of Controller
-func NewGameManager(stg *storage.Storage) Games {
+func NewGameManager(stg *storage.Storage, rds *storage.CloudStore) Games {
 
 	return &GameMainManage{
 		stg:    stg,
+		rdb:    rds,
 		Tables: map[string]GameTable{},
 	}
 }
@@ -84,6 +89,7 @@ func (g *GameMainManage) GetTable(nameid int, chatid int64, msgid int) GameTable
 
 	table = CreateTable(nameid, chatid, msgid)
 	g.Tables[playid] = table
+	table.SetRdb(g.rdb)
 
 	return table
 }
@@ -126,7 +132,8 @@ func (g *GameMainManage) GameEnd(nameid, chatid int64, msgid int) error {
 
 	table := g.GetTable(GAME_NIUNIU, chatid, msgid)
 	scores := table.EndGame()
-	fmt.Println(scores) //回写数据库
+	logger.Info("回写数据库:", scores) //回写数据库
+	delete(g.Tables, table.GetPlayID())
 
 	return nil
 }
@@ -150,8 +157,13 @@ func (g *GameMainManage) BetInfos(chatid int64, msgid int) ([]logic.Bets, error)
 }
 
 //写分
-func (g *GameMainManage) WriteUserScore(scores []logic.Scorelogs) error {
-	return g.stg.WriteChangeScore(scores)
+func (g *GameMainManage) WriteUserScore(playid string, scores []logic.Scorelogs) error {
+	return g.stg.WriteChangeScore(playid, scores)
+}
+
+func (g *GameMainManage) GetRecords(nameid, chatid int64) (*logic.Way,int) {
+	return GetNiuniu_Record(g.rdb, nameid, chatid)
+
 }
 
 func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float64) (int64, int64, error) {

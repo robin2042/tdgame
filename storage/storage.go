@@ -56,7 +56,8 @@ type Games interface {
 	SaveGameRound(game *logic.Gamerounds) error
 	AddScore(game *logic.AddScore) (int64, int64, error)
 	BetInfos(playid string) ([]logic.Scorelogs, error)
-	WriteChangeScore([]logic.Scorelogs) error
+	WriteChangeScore(string, []logic.Scorelogs) error
+	GetRecords(nameid int, chatid int64) []logic.Records
 }
 
 // Storage struct is used to access database

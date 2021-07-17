@@ -38,9 +38,8 @@ func TemplateNiuniu_SelectText(plays *logic.Select) string {
 		return "无效"
 	}
 
-	a := tmpl.Execute(&b, plays)
-	fmt.Println(a)
-	fmt.Println(b.String())
+	tmpl.Execute(&b, plays)
+
 	return b.String()
 }
 
@@ -53,9 +52,8 @@ func TemplateNiuniu_EndGameText(plays *logic.Records) string {
 		return "无效"
 	}
 
-	a := tmpl.Execute(&b, plays)
-	fmt.Println(a)
-	fmt.Println(b.String())
+	tmpl.Execute(&b, plays)
+
 	return b.String()
 }
 
@@ -69,7 +67,7 @@ func TemplateNiuniu_Select(tb *TgBot) *telebot.ReplyMarkup {
 	viper.SetConfigName("config")
 
 	viper.ReadInConfig()
-	fmt.Println(viper.AllKeys())
+
 	btnarray := make([][]telebot.InlineButton, 0)
 	jettons := TemplateNiuniu_SelectJetton(tb, viper.GetViper())
 
@@ -95,9 +93,7 @@ func TemplateNiuniu_BetText(score []logic.Bets) string {
 		return "无效"
 	}
 
-	err = tmpl.Execute(&b, score)
-	fmt.Println(err)
-	fmt.Println(b.String())
+	tmpl.Execute(&b, score)
 
 	return b.String()
 }
