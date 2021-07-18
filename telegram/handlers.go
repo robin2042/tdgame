@@ -274,17 +274,15 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
 		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
-		playid := fmt.Sprintf("%d%d", c.Message.Chat.ID, c.Message.ID)
+		// playid := fmt.Sprintf("%d%d", c.Message.Chat.ID, c.Message.ID)
 
 		//写分
-		betsinfo, err := table.SettleGame(int64(c.Sender.ID))
+		_, err := table.SettleGame(int64(c.Sender.ID))
 		if err != nil {
 			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
 			tb.Bot.Respond(c, &reply)
 			return
 		}
-
-		tb.Games.WriteUserScore(playid, betsinfo)
 
 		//回写数据库
 		// fmt.Println(betsinfo)
@@ -299,9 +297,9 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 
 		msg := TemplateNiuniu_EndGameText(records)
 		// fmt.Println(msg)
-		// reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
+		reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
 
-		tb.EditHtmlMessage(c.Message, msg, nil)
+		tb.EditHtmlMessage(c.Message, msg, reply)
 
 	}
 }

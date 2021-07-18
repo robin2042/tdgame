@@ -76,20 +76,9 @@ func (groupStorage *GamesMysql) BetInfos(playid string) ([]logic.Scorelogs, erro
 //获取所有投注人
 func (groupStorage *GamesMysql) WriteUserRecords(playid string, scores []logic.Scorelogs) error {
 
-	//更新本局结束
-	groupStorage.db.Model(&logic.Gamerounds{}).Where("playid = ?", playid).Update("status", 2)
-
 	for _, v := range scores {
-		var user logic.User
-		user.Userid = v.Userid
-		user.Wallmoney += v.Changescore
-		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", v.Userid).Update("wallmoney", gorm.Expr("wallmoney+?", v.Changescore))
-		if result.Error != nil {
-			logger.Errorf("更新用户金额失败")
-			return errors.New("更新用户金额失败")
-		}
 
-		result = groupStorage.db.Model(&logic.Scorelogs{}).Where("userid = ? and playid =?", v.Userid, v.Playid).Updates(logic.Scorelogs{
+		result := groupStorage.db.Model(&logic.Scorelogs{}).Where("userid = ? and playid =?", v.Userid, v.Playid).Updates(logic.Scorelogs{
 			Userid:      v.Userid,
 			Playid:      v.Playid,
 			Chatid:      v.Chatid,

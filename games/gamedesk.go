@@ -256,13 +256,12 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 
 	g.BetCountDownTime = time.Now().Add(time.Second * 61) //倒计时
 
-	// [51 26 40 13 38] [3 41 44 55 25] [50 53 12 22 60] [2 4 52 21 20] [34 27 17 5 54
-
-	g.m_cbTableCardArray[0] = [5]byte{51, 26, 40, 13, 38}
-	g.m_cbTableCardArray[1] = [5]byte{3, 41, 44, 55, 25}
-	g.m_cbTableCardArray[2] = [5]byte{50, 53, 12, 22, 60}
-	g.m_cbTableCardArray[3] = [5]byte{2, 4, 52, 21, 20}
-	g.m_cbTableCardArray[4] = [5]byte{34, 27, 17, 5, 54}
+	// [7 13 19 17 61] [29 60 44 41 33] [57 50 35 54 9] [4 5 40 58 45] [39 23 37 8 1]
+	// g.m_cbTableCardArray[0] = [5]byte{7, 13, 19, 17, 61}
+	// g.m_cbTableCardArray[1] = [5]byte{29, 60, 44, 41, 33}
+	// g.m_cbTableCardArray[2] = [5]byte{57, 50, 35, 54, 9}
+	// g.m_cbTableCardArray[3] = [5]byte{4, 5, 40, 58, 45}
+	// g.m_cbTableCardArray[4] = [5]byte{39, 23, 37, 8, 1}
 
 	return true, nil
 }
@@ -339,6 +338,8 @@ func (g *GameDesk) SettleGame(userid int64) ([]logic.Scorelogs, error) {
 		fmt.Println(k, v, score)
 		scores = append(scores, score)
 	}
+
+	g.db.WriteUserRecords(g.PlayID, scores)
 
 	return scores, nil
 }
