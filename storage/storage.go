@@ -54,9 +54,10 @@ type Info interface {
 type Games interface {
 	NewGames(nameid int, chatid int64) error
 	SaveGameRound(game *logic.Gamerounds) error
-	AddScore(game *logic.AddScore) (int64, int64, error)
+	AddScore(game *logic.AddScore) (int64, error)
 	BetInfos(playid string) ([]logic.Scorelogs, error)
-	WriteChangeScore(string, []logic.Scorelogs) error
+	WriteChangeScore(string, map[int64]int64) error
+	WriteUserRecords(string, []logic.Scorelogs) error
 	GetRecords(nameid int, chatid int64) []logic.Records
 }
 

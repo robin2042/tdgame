@@ -14,6 +14,7 @@ var (
 type Oper interface {
 	RPush(key string, argv ...interface{}) error
 	LRange(key string, start, stop int64) ([]string, error)
+	Del(key string)
 }
 
 // Storage struct is used to access database
@@ -45,4 +46,8 @@ func (c *CloudStore) RPush(key string, argv ...interface{}) error {
 
 func (c *CloudStore) LRange(key string, start, stop int64) ([]string, error) {
 	return c.rds.LRange(ctx, key, start, stop).Result()
+}
+
+func (c *CloudStore) Del(key string) {
+	c.rds.Del(ctx, key)
 }

@@ -33,58 +33,34 @@ func (groupStorage *GamesMysql) SaveGameRound(game *logic.Gamerounds) error {
 	return result.Error
 }
 
-//下注金额，携带金额，错误
-func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, int64, error) {
+//下注金额，错误
+func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error) {
 
 	var user logic.User
-	// var score int64
-	var floatscore float64
+
 	tx := groupStorage.db.Begin()
 	defer tx.Commit()
 
 	tx.Where("userid = ?", addscore.Userid).First(&user)
 
 	if user.ChatID == 0 {
-		return 0, 0, errors.New("找不到用户")
+		return 0, errors.New("找不到用户")
 	}
 	if user.Wallmoney <= 0 {
-		return 0, 0, errors.New("金额不足")
+		return 0, errors.New("金额不足")
 	}
 	addscore.Score = user.Wallmoney
 
-	if addscore.Bet < 99.0 {
-		floatscore = float64(user.Wallmoney) * addscore.Bet
-		if (user.Wallmoney / 4) < int64(floatscore) {
-			tx.Rollback()
-			return 0, 0, errors.New("金额不足")
-
-		}
-		user.Wallmoney = user.Wallmoney - int64(floatscore)
-		result := tx.Model(&logic.User{}).Where("userid = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", int64(floatscore)))
-		// result := groupStorage.db.Update(&user)
-		if result.Error != nil {
-			tx.Rollback()
-			return 0, 0, errors.New("金额不足")
-		}
-		addscore.Bet = floatscore
-	} else {
-		if (user.Wallmoney / 4) < int64(addscore.Bet) {
-			tx.Rollback()
-			return 0, 0, errors.New("金额不足")
-		}
-		user.Wallmoney = user.Wallmoney - int64(addscore.Bet)
-		result := tx.Save(&user)
-
-		if result.Error != nil {
-			tx.Rollback()
-			return 0, 0, errors.New("金额不足")
-		}
-
+	result := tx.Model(&logic.User{}).Where("userid = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", addscore.Bet))
+	// result := groupStorage.db.Update(&user)
+	if result.Error != nil {
+		tx.Rollback()
+		return 0, errors.New("金额不足")
 	}
-	// user := groupStorage.db.get
-	result := groupStorage.db.Create(addscore)
 
-	return int64(addscore.Bet), user.Wallmoney, result.Error
+	groupStorage.db.Create(addscore)
+
+	return int64(addscore.Bet), result.Error
 }
 
 //获取所有投注人
@@ -98,7 +74,7 @@ func (groupStorage *GamesMysql) BetInfos(playid string) ([]logic.Scorelogs, erro
 }
 
 //获取所有投注人
-func (groupStorage *GamesMysql) WriteChangeScore(playid string, scores []logic.Scorelogs) error {
+func (groupStorage *GamesMysql) WriteUserRecords(playid string, scores []logic.Scorelogs) error {
 
 	//更新本局结束
 	groupStorage.db.Model(&logic.Gamerounds{}).Where("playid = ?", playid).Update("status", 2)
@@ -124,6 +100,31 @@ func (groupStorage *GamesMysql) WriteChangeScore(playid string, scores []logic.S
 			Area:        v.Area, //下注区域
 			Status:      2,
 		})
+
+		if result.Error != nil {
+			logger.Errorf("更新用户金额失败")
+			return errors.New("更新用户金额失败")
+		}
+	}
+
+	return nil
+}
+
+//获取所有投注人
+func (groupStorage *GamesMysql) WriteChangeScore(playid string, users map[int64]int64) error {
+
+	//更新本局结束
+	groupStorage.db.Model(&logic.Gamerounds{}).Where("playid = ?", playid).Update("status", 2)
+
+	for k, v := range users {
+		var user logic.User
+		user.Userid = k
+		user.Wallmoney += v
+		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", k).Update("wallmoney", gorm.Expr("wallmoney+?", v))
+		if result.Error != nil {
+			logger.Errorf("更新用户金额失败")
+			return errors.New("更新用户金额失败")
+		}
 
 		if result.Error != nil {
 			logger.Errorf("更新用户金额失败")

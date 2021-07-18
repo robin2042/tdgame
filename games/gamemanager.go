@@ -46,10 +46,11 @@ type Games interface {
 	GameEnd(nameid, chatid int64, msgid int) error
 	GetTable(nameid int, chatid int64, msgid int) GameTable //桌台
 	Bet(table GameTable, userid int64, area int) (bool, error)
-	AddScore(GameTable, PlayInfo, float64) (int64, int64, error) //下注额 下注总额 错误
+	AddScore(GameTable, PlayInfo, float64) (int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64, msgid int) ([]logic.Bets, error)
 	WriteGameRounds(string, int) error
 	WriteUserScore(string, []logic.Scorelogs) error
+	WriteUserRecords(string, []logic.Scorelogs) error
 	GetRecords(nameid, chatid int64) (*logic.Way, int)
 }
 
@@ -90,6 +91,7 @@ func (g *GameMainManage) GetTable(nameid int, chatid int64, msgid int) GameTable
 	table = CreateTable(nameid, chatid, msgid)
 	g.Tables[playid] = table
 	table.SetRdb(g.rdb)
+	table.SetDB(g.stg)
 
 	return table
 }
@@ -158,45 +160,39 @@ func (g *GameMainManage) BetInfos(chatid int64, msgid int) ([]logic.Bets, error)
 
 //写分
 func (g *GameMainManage) WriteUserScore(playid string, scores []logic.Scorelogs) error {
-	return g.stg.WriteChangeScore(playid, scores)
+	return nil
 }
 
-func (g *GameMainManage) GetRecords(nameid, chatid int64) (*logic.Way,int) {
+//写分
+func (g *GameMainManage) WriteUserRecords(playid string, scores []logic.Scorelogs) error {
+	return g.stg.WriteUserRecords(playid, scores)
+}
+
+func (g *GameMainManage) GetRecords(nameid, chatid int64) (*logic.Way, int) {
 	return GetNiuniu_Record(g.rdb, nameid, chatid)
 
 }
 
-func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float64) (int64, int64, error) {
-	gamedesk := table.(*GameDesk)
-	_, v := gamedesk.Players[player.UserID]
+func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float64) (int64, error) {
 
-	//第一次增加
-	if !v {
-		gamedesk.Players[player.UserID] = player
-	}
+	board, _ := g.stg.Balance(player.UserID)
+	player.WallMoney = board.Score //拿到钱
 
-	addscore := &logic.AddScore{
-		Playid: gamedesk.PlayID,
-		Chatid: gamedesk.ChatID,
-		Userid: player.UserID,
-		Nameid: gamedesk.NameID,
-		Bet:    score,
-	}
-
-	betscore, allscore, err := g.stg.AddScore(addscore)
+	ebet, err := table.AddScore(player, score)
 	if err != nil {
-		return 0, 0, err
+		return 0, err
+	} else {
+		addscore := &logic.AddScore{
+			Playid: table.GetPlayID(),
+			Chatid: table.GetChatID(),
+			Userid: player.UserID,
+			Nameid: table.GetNameID(),
+			Bet:    float64(ebet),
+			Score:  player.WallMoney,
+		}
+		g.stg.AddScore(addscore)
 	}
-	player = gamedesk.Players[player.UserID]
-	player.WallMoney = allscore
-
-	gamedesk.LastBetTime = time.Now()
-
-	gamedesk.Bets[player.UserID] += betscore              //下注
-	gamedesk.m_lUserReturnScore[player.UserID] = betscore //下注额度
-
-	return betscore, gamedesk.Bets[player.UserID], err
-
+	return ebet, nil
 }
 
 func CreateTable(nameid int, chatid int64, msgid int) GameTable {

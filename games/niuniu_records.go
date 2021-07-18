@@ -16,6 +16,11 @@ func GetNiuniu_Record(s *storage.CloudStore, nameid, chatid int64) (*logic.Way, 
 	if err != nil {
 		return nil, 0
 	}
+
+	if len(scores) >= 10 {
+		s.Del(key)
+	}
+
 	betinfo := &logic.Way{}
 	// //天地玄黄
 	for _, v := range scores {
