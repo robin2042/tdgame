@@ -192,6 +192,9 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 		}
 		g.stg.AddScore(addscore)
 	}
+
+	logger.Info("下注：", player.UserID, ebet)
+
 	return ebet, nil
 }
 

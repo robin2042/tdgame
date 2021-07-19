@@ -83,7 +83,21 @@ func SetupHandlers(tb *TgBot) {
 	tb.Bot.Handle(telebot.OnCallback, Callback(tb))
 
 	//games
-	tb.Bot.Handle("/huanleniuniu", NiuniuBet(tb))
+	// 	hl -【欢乐牛牛🎴】
+	// zz -【转账💰】
+	// hb -【红包🧧】
+	// rank -【富豪榜🏆】
+	// sheng -【胜场榜🚩】
+	// ck -【存款💵】
+	// qk -【取款💴】
+	tb.Bot.Handle("/hl", NiuniuBet(tb))
+
+	tb.Bot.Handle("/zz", GamesZZ(tb))
+	tb.Bot.Handle("/hb", GamesHB(tb))
+	tb.Bot.Handle("/rank", GamesRank(tb))
+	tb.Bot.Handle("/sheng", GamesWins(tb))
+	tb.Bot.Handle("/ck", GamesDeposit(tb))
+	tb.Bot.Handle("/qk", GamesWithdraw(tb))
 
 	tb.Bot.Handle("/relief", LeaveGroups(tb))
 

@@ -63,3 +63,10 @@ Run: `docker-compose up`
 
 
 
+hl -【欢乐牛牛🎴】
+zz -【转账💰】
+hb -【红包🧧】
+rank -【富豪榜🏆】
+sheng -【胜场榜🚩】
+ck -【存款💵】
+qk -【取款💴】

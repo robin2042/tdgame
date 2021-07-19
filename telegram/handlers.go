@@ -37,6 +37,138 @@ func start(tb *TgBot) func(m *telebot.Message) {
 	}
 }
 
+// 转账
+func GamesZZ(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		//fmt.Println(m.MessageSig())
+
+		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
+		//
+		if !start {
+			msg := TemplateNiuniu_limit()
+			tb.SendHtmlMessage(msg, nil, m)
+		} else { //可以开启新局
+			msg := TemplateNiuniu_Text()
+			reply := TemplateNiuniu_Bet(tb)
+			message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+
+		}
+
+	}
+}
+
+// 红包
+func GamesHB(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		//fmt.Println(m.MessageSig())
+
+		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
+		//
+		if !start {
+			msg := TemplateNiuniu_limit()
+			tb.SendHtmlMessage(msg, nil, m)
+		} else { //可以开启新局
+			msg := TemplateNiuniu_Text()
+			reply := TemplateNiuniu_Bet(tb)
+			message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+
+		}
+
+	}
+}
+
+// 红包
+func GamesRank(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		//fmt.Println(m.MessageSig())
+
+		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
+		//
+		if !start {
+			msg := TemplateNiuniu_limit()
+			tb.SendHtmlMessage(msg, nil, m)
+		} else { //可以开启新局
+			msg := TemplateNiuniu_Text()
+			reply := TemplateNiuniu_Bet(tb)
+			message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+
+		}
+
+	}
+}
+
+// 胜场
+func GamesWins(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		//fmt.Println(m.MessageSig())
+
+		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
+		//
+		if !start {
+			msg := TemplateNiuniu_limit()
+			tb.SendHtmlMessage(msg, nil, m)
+		} else { //可以开启新局
+			msg := TemplateNiuniu_Text()
+			reply := TemplateNiuniu_Bet(tb)
+			message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+
+		}
+
+	}
+}
+
+// 存款
+func GamesDeposit(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		//fmt.Println(m.MessageSig())
+
+		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
+		//
+		if !start {
+			msg := TemplateNiuniu_limit()
+			tb.SendHtmlMessage(msg, nil, m)
+		} else { //可以开启新局
+			msg := TemplateNiuniu_Text()
+			reply := TemplateNiuniu_Bet(tb)
+			message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+
+		}
+
+	}
+}
+
+// 取钱
+func GamesWithdraw(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		//fmt.Println(m.MessageSig())
+
+		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
+		//
+		if !start {
+			msg := TemplateNiuniu_limit()
+			tb.SendHtmlMessage(msg, nil, m)
+		} else { //可以开启新局
+			msg := TemplateNiuniu_Text()
+			reply := TemplateNiuniu_Bet(tb)
+			message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+
+		}
+
+	}
+}
+
 // /start endpoint
 func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
