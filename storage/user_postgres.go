@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
@@ -167,7 +168,26 @@ func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload 
 		tx.Rollback()
 		return errors.New("发生错误")
 	}
-	
+	cashlog := logic.Cashlogs{
+		Orderid:     OrderID(),
+		Userid:      int(userID),
+		Targetid:    int(targetid),
+		Changescore: payload,
+		Score:       sourceuser.Wallmoney,
+		Btype:       1,
+	}
+	userStorage.db.Create(&cashlog)
+
+	targetcashlog := logic.Cashlogs{
+		Orderid:     OrderID(),
+		Userid:      int(targetid),
+		Targetid:    int(userID),
+		Changescore: payload,
+		Score:       targetuser.Wallmoney,
+		Btype:       2,
+	}
+	userStorage.db.Create(&targetcashlog)
+
 	return nil
 
 }
@@ -217,4 +237,9 @@ func (userStorage *UserPostgres) Sign(userID int, chatid int64, sign int) (int64
 	}
 
 	return user.Wallmoney, true
+}
+func OrderID() string {
+	orderid := fmt.Sprintf("%d", time.Now().Nanosecond())
+
+	return orderid
 }
