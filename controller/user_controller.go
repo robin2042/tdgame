@@ -50,3 +50,10 @@ func (ucon *UserController) Balance(chatID int64) (*logic.Leaderboard, error) {
 	return ucon.stg.Balance(chatID)
 
 }
+
+// 转账
+func (ucon *UserController) Transfer(userID int64, targetid int64, payload int64) error {
+
+	return nil
+
+}

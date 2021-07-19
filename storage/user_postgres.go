@@ -132,6 +132,46 @@ func (userStorage *UserPostgres) Balance(userID int64) (*logic.Leaderboard, erro
 
 }
 
+func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload int64) error {
+
+	var sourceuser logic.User
+	var targetuser logic.User
+	// var scorelog logic.Signlogs
+	var ncount int64
+	var rax float64 = 0.08
+
+	tx := userStorage.db.Begin()
+	defer tx.Commit()
+
+	userStorage.db.Where("userid = ?", userID).First(&sourceuser).Count(&ncount)
+	if ncount == 0 {
+		return errors.New("用户不存在")
+	}
+	userStorage.db.Where("userid = ?", userID).First(&targetuser).Count(&ncount)
+	if ncount == 0 {
+		return errors.New("用户不存在")
+	}
+	if sourceuser.Wallmoney < payload {
+		return errors.New("金额不足")
+	}
+	score := sourceuser.Wallmoney * int64(rax)
+
+	result := userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Update("wallmoney", gorm.Expr("wallmoney-?", score))
+	if result.Error != nil {
+		tx.Rollback()
+		return errors.New("发生错误")
+	}
+
+	result = userStorage.db.Model(&logic.User{}).Where("userid = ?", targetid).Update("wallmoney", gorm.Expr("wallmoney+?", score))
+	if result.Error != nil {
+		tx.Rollback()
+		return errors.New("发生错误")
+	}
+	
+	return nil
+
+}
+
 // IsUserAdmin checks if user has administrator privileges
 func (userStorage *UserPostgres) Sign(userID int, chatid int64, sign int) (int64, bool) {
 	var user logic.User

@@ -364,3 +364,15 @@ func TemplateNiuniu_BuildJetton(tb *TgBot) [][]telebot.InlineButton {
 	btnarray := make([][]telebot.InlineButton, 0)
 	return btnarray
 }
+
+func TemplateNiuniu_transerror() string {
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/niuniu/transerror.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, nil)
+	return b.String()
+}

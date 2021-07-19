@@ -16,9 +16,9 @@ type User interface {
 	Register(chatID int64) error                                        // Performs user registration
 	Unregister(chatID int64) error                                      // Performs user deregistration
 	GetUsersByPublication(pub *logic.Publication) ([]logic.User, error) // Returns owner of publication
-	Sign(chatID int, chatid int64, sign int) (int64, bool)                  // 签到
+	Sign(chatID int, chatid int64, sign int) (int64, bool)              // 签到
 	Balance(chatID int64) (*logic.Leaderboard, error)                   // 余额
-
+	Transfer(userID int64, targetid int64, payload int64) error         //转账
 }
 
 // Subscription interface defines methods for Publication Controller

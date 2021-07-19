@@ -173,3 +173,15 @@ type History struct {
 func (History) TableName() string {
 	return "gamerounds"
 }
+
+type Cashlogs struct {
+	Orderid     string
+	Userid      int
+	Targetid    int
+	Changescore int64
+	Score       int64
+	Btype       int
+	Delete      int	
+	Createtime  string `gorm:"default:now()"`
+	Modifytime  string `gorm:"default:now()"`
+}
