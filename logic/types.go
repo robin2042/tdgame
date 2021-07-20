@@ -86,6 +86,7 @@ func (AddScore) TableName() string {
 type Bets struct {
 	Userid     int64
 	UserName   string
+	Title      string
 	Bet        int64
 	FmtBet     string //下注额格式化
 	BetArea    int
@@ -150,6 +151,7 @@ type Select struct {
 // 扣钱
 type ChangeScore struct {
 	UserName       string //名字
+	Title          string //头衔
 	Area           int    //下注
 	FmtArea        string //下注格式化
 	Winscore       int64
@@ -181,7 +183,7 @@ type Cashlogs struct {
 	Changescore int64
 	Score       int64
 	Btype       int
-	Delete      int	
+	Delete      int
 	Createtime  string `gorm:"default:now()"`
 	Modifytime  string `gorm:"default:now()"`
 }

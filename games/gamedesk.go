@@ -60,7 +60,8 @@ type GameDesk struct {
 	ChatID             int64  //桌台号
 	NameID             int
 	GameStation        int       //游戏状态
-	LastBetTime        time.Time //最后一次下注时间
+	LastBetTime        time.Time //最后一次选择时间
+	LastAddTime        time.Time //最后一次下注时间
 	BetCountDownTime   time.Time //60秒
 	BeginTime          time.Time //开局时间
 	StartTime          time.Time //开始游戏时间
@@ -156,6 +157,7 @@ func (g *GameDesk) GetBetInfos() ([]logic.Bets, error) {
 		var bet logic.Bets
 		bet.Userid = k
 		bet.UserName = g.Players[k].Name
+		bet.Title = g.Players[k].Title
 		bet.Bet = v
 		bet.FmtBet = ac.FormatMoney(v)
 		s = append(s, bet)
@@ -206,7 +208,7 @@ func (g *GameDesk) GetSettleInfos() (*logic.Records, error) {
 	for k := range g.Players {
 		change := logic.ChangeScore{}
 		change.UserName = g.Players[k].Name
-
+		change.Title = g.Players[k].Title
 		change.FmtArea = betsinfo[g.Areas[k]]
 
 		if v, ok := g.m_lUserWinScore[k]; ok {
@@ -219,7 +221,7 @@ func (g *GameDesk) GetSettleInfos() (*logic.Records, error) {
 				change.FmtChangescore = str
 			}
 		} else {
-			str := fmt.Sprintf("*返回* \\+%s", ac.FormatMoney(g.m_lUserReturnScore[k]))
+			str := fmt.Sprintf("*返回* \\+%s", ac.FormatMoney(g.Bets[k]))
 			change.FmtChangescore = str
 		}
 
@@ -234,7 +236,7 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 	if g.GameStation != GS_TK_FREE {
 		return false, errors.New("已经开局请等待本局结束！")
 	}
-	if time.Now().Before(g.LastBetTime.Add(time.Second * 6)) {
+	if time.Now().Before(g.LastAddTime.Add(time.Second * 6)) {
 		return false, errors.New("所有用户无操作6s后才能开始游戏")
 	}
 
@@ -294,7 +296,7 @@ func (g *GameDesk) AddScore(player PlayInfo, score float64) (int64, error) {
 
 	}
 
-	g.LastBetTime = time.Now()
+	g.LastAddTime = time.Now()
 
 	g.Bets[player.UserID] += int64(floatscore) //下注
 
@@ -313,6 +315,9 @@ func (g *GameDesk) SettleGame(userid int64) ([]logic.Scorelogs, error) {
 	}
 	if !bfind {
 		return nil, errors.New("您没有参与此游戏，无权更改游戏状态")
+	}
+	if time.Now().Before(g.LastBetTime.Add(time.Second * 6)) {
+		return nil, errors.New("所有用户无操作6s后才能开始游戏")
 	}
 
 	//结算
@@ -393,6 +398,8 @@ func (g *GameDesk) Bet(userid int64, area int) (bool, error) {
 	if user.BetCount >= 3 {
 		return false, errors.New("您已选择无法更改")
 	}
+	g.LastBetTime = time.Now()
+
 	g.Areas[userid] = area
 	user.BetCount++
 
@@ -492,6 +499,12 @@ func (g *GameDesk) CalculateScore() {
 		g.m_lUserWinScore[k] += lUserLostScore[k] //总成绩
 		logger.Info("用户:", k, "总输赢:", g.m_lUserWinScore[k])
 
+	}
+	for k := range g.Players {
+		//没有下注
+		if _, ok := g.m_lUserWinScore[k]; !ok {
+			g.m_lUserReturnScore[k] = g.Bets[k]
+		}
 	}
 	key := fmt.Sprintf("%d%d", g.ChatID, g.NameID)
 	g.Rdb.RPush(key, cbWinner)

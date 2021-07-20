@@ -133,7 +133,7 @@ func (userStorage *UserPostgres) Balance(userID int64) (*logic.Leaderboard, erro
 
 }
 
-func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload int64) error {
+func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload int64) (int64, error) {
 
 	var sourceuser logic.User
 	var targetuser logic.User
@@ -146,27 +146,34 @@ func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload 
 
 	userStorage.db.Where("userid = ?", userID).First(&sourceuser).Count(&ncount)
 	if ncount == 0 {
-		return errors.New("用户不存在")
+		return 0, errors.New("用户不存在")
 	}
-	userStorage.db.Where("userid = ?", userID).First(&targetuser).Count(&ncount)
+	userStorage.db.Where("userid = ?", targetid).First(&targetuser).Count(&ncount)
 	if ncount == 0 {
-		return errors.New("用户不存在")
+		return 0, errors.New("用户不存在")
 	}
 	if sourceuser.Wallmoney < payload {
-		return errors.New("金额不足")
+		return 0, errors.New("金额不足")
 	}
-	score := sourceuser.Wallmoney * int64(rax)
+	//游戏中不能转账
+	userStorage.db.Model(&logic.Gamerounds{}).Where("chatid = ? and status=1", userID).Count(&ncount)
+	if ncount > 0 {
+		return 0, errors.New("游戏中无法转账")
+	}
 
-	result := userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Update("wallmoney", gorm.Expr("wallmoney-?", score))
+	raxscore := float64(payload) * rax //税率
+	score := (float64(payload) - raxscore)
+
+	result := userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Update("wallmoney", gorm.Expr("wallmoney-?", payload))
 	if result.Error != nil {
 		tx.Rollback()
-		return errors.New("发生错误")
+		return 0, errors.New("发生错误")
 	}
 
 	result = userStorage.db.Model(&logic.User{}).Where("userid = ?", targetid).Update("wallmoney", gorm.Expr("wallmoney+?", score))
 	if result.Error != nil {
 		tx.Rollback()
-		return errors.New("发生错误")
+		return 0, errors.New("发生错误")
 	}
 	cashlog := logic.Cashlogs{
 		Orderid:     OrderID(),
@@ -188,7 +195,7 @@ func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload 
 	}
 	userStorage.db.Create(&targetcashlog)
 
-	return nil
+	return int64(raxscore), nil
 
 }
 

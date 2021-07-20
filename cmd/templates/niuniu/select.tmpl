@@ -1,7 +1,7 @@
 *欢乐牛牛* 选择中\({{$.Countdown}}\)
 
 玩家列表:{{range $val := .Players}}
-【[富可敌国](http://www.example.com/)】{{$val.UserName}} ：{{$val.FmtBetArea}}{{end}}
+【[{{$val.Title}}](http://www.example.com/)】{{$val.UserName}} ：{{$val.FmtBetArea}}{{end}}
 
 最近{{$.WaysCount}}场历史：
 🐲青龙：{{$.Ways.Tian}}

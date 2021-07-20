@@ -43,34 +43,24 @@ func GamesZZ(tb *TgBot) func(m *telebot.Message) {
 		if len(m.Payload) == 0 || m.ReplyTo == nil {
 			msg := TemplateNiuniu_transerror()
 			tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyTo: m, ParseMode: telebot.ModeMarkdownV2})
-
+			return
 		}
 
 		payload, err := strconv.ParseInt(m.Payload, 10, 64)
 		if err != nil {
 			msg := TemplateNiuniu_transerror()
 			tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyTo: m, ParseMode: telebot.ModeMarkdownV2})
-
+			return
 		}
 
-		result := tb.Controller.Transfer(int64(m.Sender.ID), int64(m.ReplyTo.ID), payload)
+		rax, result := tb.Controller.Transfer(int64(m.Sender.ID), int64(m.ReplyTo.Sender.ID), payload)
 		if result != nil {
-			tb.Bot.Send(m.Chat, "转账失败！", &telebot.SendOptions{ReplyTo: m, ParseMode: telebot.ModeMarkdownV2})
-
+			tb.Bot.Send(m.Chat, "金额不足，转账失败！", &telebot.SendOptions{ReplyTo: m, ParseMode: telebot.ModeMarkdownV2})
+			return
 		}
-
-		// //
-		// if !start {
-		// 	msg := TemplateNiuniu_limit()
-		// 	tb.SendHtmlMessage(msg, nil, m)
-		// } else { //可以开启新局
-		// 	msg := TemplateNiuniu_Text()
-		// 	reply := TemplateNiuniu_Bet(tb)
-		// 	message, _ := tb.SendHtmlMessage(msg, reply, m)
-
-		// 	tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
-
-		// }
+		//
+		fmtmsg := fmt.Sprintf("转账成功，实际到账：%d，手续费：%d", payload-rax, rax)
+		tb.Bot.Send(m.Chat, fmtmsg, &telebot.SendOptions{ReplyTo: m, ParseMode: telebot.ModeMarkdownV2})
 
 	}
 }
@@ -347,7 +337,7 @@ func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Niuniu_BalanceCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 		ac := accounting.Accounting{Symbol: "$"}
-		name := c.Sender.FirstName
+		name := c.Sender.FirstName + " " + c.Sender.LastName
 
 		board, _ := tb.Controller.Balance(int64(c.Sender.ID))
 		str := fmt.Sprintf("%s\n\t\t当前余额:%s", name, ac.FormatMoney(board.Score))
@@ -455,7 +445,7 @@ func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 func SendBetMessage(tb *TgBot, c *telebot.Callback, score int64) {
 	ac := accounting.Accounting{Symbol: "$"}
 
-	str := fmt.Sprintf("下注成功\n您当前下注总额:%s\n请在无人跟注6s后点击开始游戏！", ac.FormatMoney(score))
+	str := fmt.Sprintf("下注成功\n您当前下注总额:%s\n请在无人跟注后点击开始游戏！", ac.FormatMoney(score))
 	reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
 	tb.Bot.Respond(c, &reply)
 

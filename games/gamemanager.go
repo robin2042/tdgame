@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	GAME_Title map[int]string = map[int]string{5000000: "一贫如洗", 100000000: "专业杀猪", 5000000000: "西厂总管", 10000000000: "富可敌国", 100000000000: "宇宙首富"}
+	GAME_SCORE []int64  = []int64{500000, 5000000, 100000000, 3000000000, 5000000000, 10000000000, 100000000000}
+	GAME_Title []string = []string{"一贫如洗", "专业杀猪", "小康之家", "腰缠万贯", "西厂总管", "富可敌国", "宇宙首富"}
 )
 
 const (
@@ -177,6 +178,7 @@ func (g *GameMainManage) AddScore(table GameTable, player PlayInfo, score float6
 
 	board, _ := g.stg.Balance(player.UserID)
 	player.WallMoney = board.Score //拿到钱
+	player.Title = GetTitle(board.Score)
 
 	ebet, err := table.AddScore(player, score)
 	if err != nil {
@@ -212,4 +214,14 @@ func GenerateID(nameid int, chatid int64) string {
 	playid := fmt.Sprintf("%s%d", strchatid, timeUnix)
 
 	return playid
+}
+
+func GetTitle(score int64) string {
+	for i := 0; i < len(GAME_SCORE); i++ {
+		if GAME_SCORE[i] <= score {
+			return GAME_Title[i]
+		}
+	}
+
+	return GAME_Title[0]
 }
