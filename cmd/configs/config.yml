@@ -160,7 +160,160 @@ niuniu_start_button:
       unique: "niuniu_select_3"
       url: "http://www.sohu.com"
   settle:
-    - text: 🐮 结算 🐮
+    - text: 结算游戏
       data: 0
       unique: "niuniu_endame"
+      url: "http://www.sohu.com"
+
+
+
+baccarat_jetton_button:
+ bet:
+    - 
+      - text: 5%
+        data: 0.05
+        unique: "baccarat_bet_5"
+        url: "http://www.sohu.com"
+      - text: 10%
+        data: 0.10
+        unique: "baccarat_bet_10"
+        url: "http://www.nab.com"
+      - text: 30%
+        data: 0.30
+        unique: "baccarat_bet_30"
+        url: "http://www.nab.com"
+      - text: 50%
+        data: 0.50
+        unique: "baccarat_bet_50"
+        url: "http://www.nab.com"
+      - text: 80%
+        data: 0.80
+        unique: "baccarat_bet_80"
+        url: "http://www.nab.com"
+      - text: 梭哈
+        data: 1.0
+        unique: "baccarat_bet_stub"
+        url: "http://www.nab.com"
+    -
+      - text: 1W
+        data: 10000
+        unique: "baccarat_bet_10000"
+        url: "http://www.sohu.com"
+      - text: 5W
+        data: 50000
+        unique: "baccarat_bet_50000"
+        url: "http://www.nab.com"
+      - text: 10W
+        data: 100000
+        unique: "baccarat_bet_100000"
+        url: "http://www.nab.com"
+      - text: 50W
+        data: 500000
+        unique: "baccarat_bet_100w"
+        url: "http://www.nab.com"
+      - text: 200W
+        data: 2000000
+        unique: "baccarat_bet_200w"
+        url: "http://www.nab.com"
+      - text: 500W
+        data: 5000000
+        unique: "baccarat_bet_500w"
+        url: "http://www.nab.com"
+    -
+      - text: 2KW
+        data: 20000000
+        unique: "baccarat_bet_2kw"
+        url: "http://www.sohu.com"
+      - text: 5KW
+        data: 50000000
+        unique: "baccarat_bet_5kw"
+        url: "http://www.nab.com"
+      - text: 2E
+        data: 200000000
+        unique: "baccarat_bet_2e"
+        url: "http://www.nab.com"
+      - text: 5E
+        data: 500000000
+        unique: "baccarat_bet_5e"
+        url: "http://www.nab.com"
+      - text: 20E
+        data: 2000000000
+        unique: "baccarat_bet_20e"
+        url: "http://www.nab.com"
+      - text: 50E
+        data: 5000000000
+        unique: "baccarat_bet_50e"
+        url: "http://www.nab.com"
+    -
+      - text: 200E
+        data: 20000000000
+        unique: "baccarat_bet_200e"
+        url: "http://www.sohu.com"
+      - text: 500E
+        data: 50000000000
+        unique: "baccarat_bet_500e"
+        url: "http://www.nab.com"
+      - text: 2KE
+        data: 200000000000
+        unique: "baccarat_bet_2ke"
+        url: "http://www.nab.com"
+      - text: 5KE
+        data: 50000000000
+        unique: "baccarat_bet_5ke"
+        url: "http://www.nab.com"
+      - text: 1WE
+        data: 1000000000000
+        unique: "baccarat_bet_1we"
+        url: "http://www.nab.com"
+      - text: 5WE
+        data: 5000000000000
+        unique: "baccarat_bet_5we"
+        url: "http://www.nab.com"
+
+ start:  
+    - text: ▶️开始游戏
+      data: .5
+      unique: "baccarat_start"
+      url: "http://www.sohu.com"
+        
+ balance:
+    - text: 💰️查看余额
+      data: .5
+      unique: "baccarat_balance"
+      url: "http://www.sohu.com"
+ sign:
+    - text: ✅️签到领钱
+      data: .5
+      unique: "baccarat_sign"
+      url: "http://www.sohu.com"
+
+
+baccarat_start_button:
+  select:
+    -
+      - text: 🔴 庄
+        data: 2
+        unique: "baccarat_select_2"
+        url: "http://www.sohu.com"
+      - text: 🟢 和
+        data: 1
+        unique: "baccarat_select_1"
+        url: "http://www.sohu.com"
+      - text: 🔵 闲
+        data: 0
+        unique: "baccarat_select_0"
+        url: "http://www.sohu.com"
+    -
+      - text: 🟠 庄对
+        data: 7
+        unique: "baccarat_select_7"
+        url: "http://www.sohu.com"
+      - text: 🟣 闲对
+        data: 6
+        unique: "baccarat_select_6"
+        url: "http://www.sohu.com"
+  settle:
+    - text: 结算游戏 
+      data: 0
+      unique: "baccarat_endame"
       url: "http://www.sohu.com"

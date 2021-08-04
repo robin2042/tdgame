@@ -9,14 +9,14 @@ type Group struct {
 
 // User stores info about user
 type User struct {
-	ID        int
+	Uid       string
 	Userid    int64
 	ChatID    int64 `gorm:"uniqueIndex"` // Telegram's chat id
 	Wallmoney int64
 	Bank      int64
-	SubsCount uint          // Amount of current subscribtions
-	Subs      []Publication `gorm:"many2many:user_subscribtion;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // User's subscriptions
-	Admin     Admin         `gorm:"foreignKey:UserID"`
+	SubsCount uint // Amount of current subscribtions
+	// Subs      []Publication `gorm:"many2many:user_subscribtion;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // User's subscriptions
+	// Admin     Admin         `gorm:"foreignKey:UserID"`
 }
 
 // Admin stores info about admins
@@ -45,7 +45,7 @@ type Info struct {
 // User stores info about user
 type Gamerounds struct {
 	Playid     string
-	Chatid     int64
+	Chatid     int64 //用户ID
 	Msgid      int
 	Nameid     int
 	Winarea    int
@@ -67,6 +67,7 @@ type Bet struct {
 
 // User stores info about user
 type AddScore struct {
+	Uid    string //用户id
 	Playid string
 	Nameid int
 	Chatid int64
@@ -130,20 +131,45 @@ type Leaderboard struct {
 	Win    int64
 	Grades int //名次
 }
+type Records interface {
+}
+
+// User stores info about user
+type Selects interface {
+}
+
+// // //开奖记录
+// type Records struct {
+// 	Detail    []string //庄闲牌
+// 	Change    []ChangeScore
+// 	Ways      *Way //路子
+// 	WaysCount int
+// }
 
 //开奖记录
-type Records struct {
+type BaccaratRecords struct {
+	Records
 	Detail    []string //庄闲牌
 	Change    []ChangeScore
-	Ways      *Way //路子
+	Ways      string //路子
 	WaysCount int
 }
 
 // User stores info about user
 type Select struct {
+	Selects
 	Countdown int    //倒计时
 	Players   []Bets //选择区域
 	Ways      Way    //路子
+	WaysCount int
+}
+
+// User stores info about user
+type BaccaratSelect struct {
+	Selects
+	Countdown int    //倒计时
+	Players   []Bets //选择区域
+	Ways      string //路子
 	WaysCount int
 }
 
@@ -178,8 +204,8 @@ func (History) TableName() string {
 
 type Cashlogs struct {
 	Orderid     string
-	Userid      int
-	Targetid    int
+	Userid      string
+	Targetid    string
 	Changescore int64
 	Score       int64
 	Btype       int

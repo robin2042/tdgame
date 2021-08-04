@@ -27,9 +27,11 @@ type User interface {
 	GetUsersByPublication(pub *logic.Publication) ([]logic.User, error) // Returns owner of publication
 	IsUserAdmin(user *logic.User) bool
 	IsChatAdmin(userID int64) bool
-	Sign(userID int, chatid int64, sign int) (int64, bool)               //签到
-	Balance(userID int64) (*logic.Leaderboard, error)                    //余额
-	Transfer(userID int64, targetid int64, payload int64) (int64, error) //转账
+	Sign(userID int, chatid int64, sign int) (int64, bool)                 //签到
+	Balance(userID, chatid int64) (*logic.Leaderboard, error)              //余额
+	Transfer(userID string, targetid string, payload int64) (int64, error) //转账
+	Deposit(userID int, payload int64) (int64, error)                      // 存钱
+	DrawMoney(userID int, payload int64) (int64, error)                    //取款
 }
 
 // Subscription interface defines methods for Publicaiton Storage
@@ -57,7 +59,7 @@ type Games interface {
 	SaveGameRound(game *logic.Gamerounds) error
 	AddScore(game *logic.AddScore) (int64, error)
 	BetInfos(playid string) ([]logic.Scorelogs, error)
-	WriteChangeScore(string, map[int64]int64) error
+	WriteChangeScore(string, int64, map[int64]int64) error
 	WriteUserRecords(string, []logic.Scorelogs) error
 	GetRecords(nameid int, chatid int64) []logic.Records
 }

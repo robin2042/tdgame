@@ -9,7 +9,8 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/controller"
 	"github.com/aoyako/telegram_2ch_res_bot/downloader"
 	"github.com/aoyako/telegram_2ch_res_bot/dvach"
-	"github.com/aoyako/telegram_2ch_res_bot/games"
+	"github.com/aoyako/telegram_2ch_res_bot/gamemanage"
+
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
 	"github.com/aoyako/telegram_2ch_res_bot/telegram"
 	"github.com/spf13/viper"
@@ -48,7 +49,7 @@ func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 	Storage := storage.NewStorage(db, &admins)
 	Rds := storage.ExampleNewClient()
 	controller := controller.NewController(Storage)
-	games := games.NewGameManager(Storage, Rds)
+	games := gamemanage.NewGameManager(Storage, Rds)
 	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), controller, downloader.NewDownloader(
 		viper.GetString("disk.path"),
 		viper.GetUint64("disk.size")),
@@ -59,6 +60,7 @@ func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 
 	telegram.SetupHandlers(bot)
 	// storage.MigrateDatabase(db)
+	fmt.Println("链接bot成功!")
 
 	return bot, apicnt, viper.GetUint64("polling.time")
 }

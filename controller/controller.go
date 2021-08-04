@@ -13,12 +13,14 @@ type Group interface {
 
 // User interface defines methods for User Controller
 type User interface {
-	Register(chatID int64) error                                         // Performs user registration
-	Unregister(chatID int64) error                                       // Performs user deregistration
-	GetUsersByPublication(pub *logic.Publication) ([]logic.User, error)  // Returns owner of publication
-	Sign(chatID int, chatid int64, sign int) (int64, bool)               // 签到
-	Balance(chatID int64) (*logic.Leaderboard, error)                    // 余额
-	Transfer(userID int64, targetid int64, payload int64) (int64, error) //税率 转账
+	Register(userid int64, chatID int64) error                             // Performs user registration
+	Unregister(chatID int64) error                                         // Performs user deregistration
+	GetUsersByPublication(pub *logic.Publication) ([]logic.User, error)    // Returns owner of publication
+	Sign(chatID int, chatid int64, sign int) (int64, bool)                 // 签到
+	Balance(userid, chatID int64) (*logic.Leaderboard, error)              // 余额
+	Transfer(userID string, targetid string, payload int64) (int64, error) //税率 转账
+	Deposit(userID int, payload int64) (int64, error)                      //存钱													//存款
+	DrawMoney(userID int, payload int64) (int64, error)                    //取款
 }
 
 // Subscription interface defines methods for Publication Controller

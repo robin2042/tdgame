@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/aoyako/telegram_2ch_res_bot/controller"
 	"github.com/aoyako/telegram_2ch_res_bot/downloader"
+
 	"github.com/aoyako/telegram_2ch_res_bot/games"
 
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
@@ -62,6 +64,7 @@ func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Down
 
 	if err != nil {
 		log.Fatal(err)
+		fmt.Println(err)
 		return nil
 	}
 
@@ -90,8 +93,16 @@ func SetupHandlers(tb *TgBot) {
 	// sheng -【胜场榜🚩】
 	// ck -【存款💵】
 	// qk -【取款💴】
-	tb.Bot.Handle("/hl", NiuniuBet(tb))
+	tb.Bot.Handle("/hl", NiuniuBet(tb))   //百人牛牛
+	tb.Bot.Handle("/bj", BaccaratBet(tb)) //百家乐
+	tb.Bot.Handle("/hh", BaccaratBet(tb)) //红黑
+	tb.Bot.Handle("/lh", BaccaratBet(tb)) //龙虎
+	tb.Bot.Handle("/bc", BaccaratBet(tb)) //奔驰宝马
+	tb.Bot.Handle("/sl", BaccaratBet(tb)) //森林舞会
+	tb.Bot.Handle("/sl", FruitBet(tb))    //水果机
+	tb.Bot.Handle("/lp", RouletteBet(tb)) //轮盘
 
+	//功能
 	tb.Bot.Handle("/zz", GamesZZ(tb))
 	tb.Bot.Handle("/hb", GamesHB(tb))
 	tb.Bot.Handle("/rank", GamesRank(tb))

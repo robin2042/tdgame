@@ -26,7 +26,7 @@ func NewUserPostgres(db *gorm.DB, cfg *InitDatabase) *UserPostgres {
 // Register adds user in databse
 func (userStorage *UserPostgres) Register(user *logic.User) error {
 	var count int64
-	userStorage.db.Model(&logic.User{}).Where("userid = ?", user.ChatID).Count(&count)
+	userStorage.db.Model(&logic.User{}).Where("userid = ?", user.Userid).Count(&count)
 	if count == 0 {
 		result := userStorage.db.Create(user)
 
@@ -34,16 +34,6 @@ func (userStorage *UserPostgres) Register(user *logic.User) error {
 			return result.Error
 		}
 
-		// Adds admin record, if admin added
-		if _, contains := contains(userStorage.cfg.Admin, user.ChatID); contains {
-			result := userStorage.db.Create(&logic.Admin{
-				UserID: uint64(user.ID),
-			})
-
-			if result.Error != nil {
-				return result.Error
-			}
-		}
 		return nil
 	}
 
@@ -97,9 +87,9 @@ func (userStorage *UserPostgres) GetUsersByPublication(pub *logic.Publication) (
 
 // IsUserAdmin checks if user has administrator privileges
 func (userStorage *UserPostgres) IsUserAdmin(user *logic.User) bool {
-	var count int64
-	userStorage.db.Model(&logic.Admin{}).Where("user_id = ?", user.ID).Count(&count)
-	return count != 0
+	// var count int64
+	// userStorage.db.Model(&logic.Admin{}).Where("user_id = ?", user.ID).Count(&count)
+	return false
 }
 
 // IsChatAdmin checks if user has administrator privileges by chatID
@@ -120,10 +110,10 @@ func contains(slice []int64, val int64) (int, bool) {
 	return -1, false
 }
 
-func (userStorage *UserPostgres) Balance(userID int64) (*logic.Leaderboard, error) {
+func (userStorage *UserPostgres) Balance(userID, chatid int64) (*logic.Leaderboard, error) {
 	var user logic.User
 	var board logic.Leaderboard
-
+	// uid := fmt.Sprintf("%d%d", userID, chatid)
 	userStorage.db.Where("userid = ?", userID).First(&user)
 	board.Userid = user.ChatID
 	board.Score = user.Wallmoney
@@ -133,7 +123,8 @@ func (userStorage *UserPostgres) Balance(userID int64) (*logic.Leaderboard, erro
 
 }
 
-func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload int64) (int64, error) {
+//转账
+func (userStorage *UserPostgres) Transfer(userID string, targetid string, payload int64) (int64, error) {
 
 	var sourceuser logic.User
 	var targetuser logic.User
@@ -177,8 +168,8 @@ func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload 
 	}
 	cashlog := logic.Cashlogs{
 		Orderid:     OrderID(),
-		Userid:      int(userID),
-		Targetid:    int(targetid),
+		Userid:      userID,
+		Targetid:    targetid,
 		Changescore: payload,
 		Score:       sourceuser.Wallmoney,
 		Btype:       1,
@@ -187,8 +178,8 @@ func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload 
 
 	targetcashlog := logic.Cashlogs{
 		Orderid:     OrderID(),
-		Userid:      int(targetid),
-		Targetid:    int(userID),
+		Userid:      targetid,
+		Targetid:    userID,
 		Changescore: payload,
 		Score:       targetuser.Wallmoney,
 		Btype:       2,
@@ -202,17 +193,22 @@ func (userStorage *UserPostgres) Transfer(userID int64, targetid int64, payload 
 // IsUserAdmin checks if user has administrator privileges
 func (userStorage *UserPostgres) Sign(userID int, chatid int64, sign int) (int64, bool) {
 	var user logic.User
-	var scorelog logic.Signlogs
+	scorelog := logic.Signlogs{
+		Userid: int64(userID),
+		Chatid: chatid,
+	}
 	var ncount int64
-	userStorage.db.Where("userid = ?", userID).First(&user).Count(&ncount)
+	uid := fmt.Sprintf("%d%d", userID, chatid)
+	userStorage.db.Where("uid = ?", uid).First(&user).Count(&ncount)
 	if ncount == 0 {
+		user.Uid = uid
 		user.Userid = int64(userID)
 		user.ChatID = chatid
 		userStorage.Register(&user)
 	}
 
 	//没有签到过
-	if err := userStorage.db.Where("userid  = ? order by createtime desc ", userID).Find(&scorelog).RowsAffected; err == 0 {
+	if err := userStorage.db.Where("userid  = ? order by createtime desc ", userID, chatid).Find(&scorelog).RowsAffected; err == 0 {
 
 		result := userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Update("wallmoney", gorm.Expr("wallmoney+?", sign))
 		if result.Error != nil {
@@ -221,7 +217,6 @@ func (userStorage *UserPostgres) Sign(userID int, chatid int64, sign int) (int64
 
 		scorelog.Score = user.Wallmoney
 		scorelog.Sign = sign
-		scorelog.Userid = int64(userID)
 
 		// 处理错误...
 		userStorage.db.Create(scorelog)
@@ -238,6 +233,7 @@ func (userStorage *UserPostgres) Sign(userID int, chatid int64, sign int) (int64
 		scorelog.Score = user.Wallmoney
 		scorelog.Sign = sign
 		scorelog.Userid = int64(userID)
+		scorelog.Chatid = chatid
 
 		// 处理错误...
 		userStorage.db.Create(scorelog)
@@ -245,6 +241,69 @@ func (userStorage *UserPostgres) Sign(userID int, chatid int64, sign int) (int64
 
 	return user.Wallmoney, true
 }
+
+// 存钱
+func (userStorage *UserPostgres) Deposit(userID int, payload int64) (int64, error) {
+
+	tx := userStorage.db.Begin()
+	defer tx.Commit()
+
+	//游戏不能存钱
+	var user logic.User
+	var ncount int64
+	result := userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).First(&user)
+	if result.RowsAffected <= 0 {
+		return 0, errors.New("not found")
+	}
+	if user.Wallmoney < payload {
+		return user.Wallmoney, errors.New("钱不够")
+	}
+
+	//游戏中不能转账
+	userStorage.db.Model(&logic.Gamerounds{}).Where("chatid = ? and status=1", userID).Count(&ncount)
+	if ncount > 0 {
+		return 0, errors.New("游戏中无法转账")
+	}
+
+	// logic.User{wallmoney: gorm.Expr("wallmoney-?", payload), Bank:gorm.Expr("bank+?", payload)}
+
+	result = userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Updates(map[string]interface{}{"wallmoney": gorm.Expr("wallmoney-?", payload), "Bank": gorm.Expr("bank+?", payload)})
+	if result.Error != nil {
+		tx.Rollback()
+		return 0, errors.New("发生错误")
+	}
+
+	return user.Wallmoney - payload, nil
+}
+
+//取款
+func (userStorage *UserPostgres) DrawMoney(userID int, payload int64) (int64, error) {
+
+	tx := userStorage.db.Begin()
+	defer tx.Commit()
+
+	//游戏不能存钱
+	var user logic.User
+
+	result := userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).First(&user)
+	if result.RowsAffected <= 0 {
+		return 0, errors.New("not found")
+	}
+	if user.Bank < payload {
+		return user.Bank, errors.New("钱不够")
+	}
+
+	// logic.User{wallmoney: gorm.Expr("wallmoney-?", payload), Bank:gorm.Expr("bank+?", payload)}
+
+	result = userStorage.db.Model(&logic.User{}).Where("userid = ?", userID).Updates(map[string]interface{}{"wallmoney": gorm.Expr("wallmoney+?", payload), "Bank": gorm.Expr("bank-?", payload)})
+	if result.Error != nil {
+		tx.Rollback()
+		return 0, errors.New("发生错误")
+	}
+
+	return user.Wallmoney + payload, nil
+}
+
 func OrderID() string {
 	orderid := fmt.Sprintf("%d", time.Now().Nanosecond())
 

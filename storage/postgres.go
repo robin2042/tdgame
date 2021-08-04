@@ -14,6 +14,7 @@ import (
 // NewPostgresDB constructor of gorm.DB databse with postgresql database
 func NewPostgresDB(cfg Config) (*gorm.DB, error) {
 	connStr := formatPostgresConfig(cfg)
+	log.Println(connStr)
 	return gorm.Open(mysql.Open(connStr), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})

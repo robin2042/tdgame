@@ -64,6 +64,7 @@ Run: `docker-compose up`
 
 
 hl -【欢乐牛牛🎴】
+bj -【百家乐🎴】
 zz -【转账💰】
 hb -【红包🧧】
 rank -【富豪榜🏆】

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	logger "github.com/aoyako/telegram_2ch_res_bot/logger"
@@ -37,11 +38,12 @@ func (groupStorage *GamesMysql) SaveGameRound(game *logic.Gamerounds) error {
 func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error) {
 
 	var user logic.User
+	uid := fmt.Sprintf("%d%d", addscore.Userid, addscore.Chatid)
 
 	tx := groupStorage.db.Begin()
 	defer tx.Commit()
 
-	tx.Where("userid = ?", addscore.Userid).First(&user)
+	tx.Where("uid=?", uid).First(&user)
 
 	if user.ChatID == 0 {
 		return 0, errors.New("找不到用户")
@@ -49,6 +51,7 @@ func (groupStorage *GamesMysql) AddScore(addscore *logic.AddScore) (int64, error
 	if user.Wallmoney <= 0 {
 		return 0, errors.New("金额不足")
 	}
+	addscore.Uid = uid //用户ID
 	addscore.Score = user.Wallmoney
 
 	result := tx.Model(&logic.User{}).Where("userid = ?", addscore.Userid).Update("wallmoney", gorm.Expr("wallmoney-?", addscore.Bet))
@@ -100,7 +103,7 @@ func (groupStorage *GamesMysql) WriteUserRecords(playid string, scores []logic.S
 }
 
 //获取所有投注人
-func (groupStorage *GamesMysql) WriteChangeScore(playid string, users map[int64]int64) error {
+func (groupStorage *GamesMysql) WriteChangeScore(playid string, chatid int64, users map[int64]int64) error {
 
 	//更新本局结束
 	groupStorage.db.Model(&logic.Gamerounds{}).Where("playid = ?", playid).Update("status", 2)
@@ -109,7 +112,7 @@ func (groupStorage *GamesMysql) WriteChangeScore(playid string, users map[int64]
 		var user logic.User
 		user.Userid = k
 		user.Wallmoney += v
-		result := groupStorage.db.Model(&logic.User{}).Where("userid = ?", k).Update("wallmoney", gorm.Expr("wallmoney+?", v))
+		result := groupStorage.db.Model(&logic.User{}).Where("userid = ? ", k).Update("wallmoney", gorm.Expr("wallmoney+?", v))
 		if result.Error != nil {
 			logger.Errorf("更新用户金额失败")
 			return errors.New("更新用户金额失败")

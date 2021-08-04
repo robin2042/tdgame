@@ -44,28 +44,6 @@ func NewAPIWorkerDvach(cnt *controller.Controller, snd telegram.Sender, req Requ
 func (dw *APIWorkerDvach) InitiateSending() {
 	log.Println("started sending")
 
-	boardSubs := make(map[string][]logic.Publication)
-	subs := dw.cnt.GetAllSubs()
-
-	for i := range subs {
-		boardSubs[subs[i].Board] = append(boardSubs[subs[i].Board], subs[i])
-	}
-
-	boardWaiter := make(chan uint64, len(boardSubs))
-
-	lastTimestamp := dw.cnt.GetLastTimestamp()
-	for key := range boardSubs {
-		go dw.processBoard(boardSubs[key], key, lastTimestamp, boardWaiter)
-	}
-
-	var lastReceivedTimestamp uint64
-	for i := 0; i < len(boardSubs); i++ {
-		tmp := <-boardWaiter
-		if tmp > lastReceivedTimestamp {
-			lastReceivedTimestamp = tmp
-		}
-	}
-	dw.cnt.SetLastTimestamp(lastReceivedTimestamp)
 }
 
 // Process request from board
