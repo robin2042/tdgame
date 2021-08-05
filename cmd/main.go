@@ -59,7 +59,7 @@ func main() {
 
 // 	// Inline buttons.
 // 	//
-// 	// Pressing it will cause the client to
+// 	// Pressing it will cause the client to                                                                                                                               
 // 	// send the bot a callback.
 // 	//
 // 	// Make sure Unique stays unique as per button kind,
