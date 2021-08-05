@@ -42,7 +42,7 @@ func TemplateNiuniu_Text() string {
 }
 
 //百家乐选择按钮
-func TemplateBaccarat_SelectText(plays *logic.Select) string {
+func TemplateBaccarat_SelectText(plays *logic.BaccaratSelect) string {
 	var b bytes.Buffer
 	tmpl, err := template.ParseFiles("./templates/Baccarat/select.tmpl")
 	if err != nil {
@@ -56,7 +56,7 @@ func TemplateBaccarat_SelectText(plays *logic.Select) string {
 }
 
 //选择按钮
-func TemplateNiuniu_SelectText(plays *logic.Select) string {
+func TemplateNiuniu_SelectText(plays *logic.NiuNiuSelect) string {
 	var b bytes.Buffer
 	tmpl, err := template.ParseFiles("./templates/niuniu/select.tmpl")
 	if err != nil {

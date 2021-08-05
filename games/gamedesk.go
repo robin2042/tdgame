@@ -521,7 +521,7 @@ func (g *GameDesk) GetStartInfos() (logic.Selects, error) {
 }
 
 //获取下注列表,还么有选择,只能获取下注筹码的人
-func (g *GameDesk) GetSelectInfos() (*logic.Select, error) {
+func (g *GameDesk) GetSelectInfos() (logic.Selects, error) {
 
 	sel := &logic.Select{}
 

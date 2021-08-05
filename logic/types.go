@@ -165,6 +165,15 @@ type Select struct {
 }
 
 // User stores info about user
+type NiuNiuSelect struct {
+	Selects
+	Countdown int    //倒计时
+	Players   []Bets //选择区域
+	Ways      string //路子
+	WaysCount int
+}
+
+// User stores info about user
 type BaccaratSelect struct {
 	Selects
 	Countdown int    //倒计时

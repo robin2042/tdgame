@@ -148,9 +148,9 @@ func (g *Baccarat) GetSettleInfos() (logic.Records, error) {
 
 //下注信息
 //获取下注列表,还么有选择,只能获取下注筹码的人
-func (g *Baccarat) GetSelectInfos() (*logic.Select, error) {
+func (g *Baccarat) GetSelectInfos() (logic.Selects, error) {
 
-	sel := &logic.Select{}
+	sel := &logic.BaccaratSelect{}
 
 	bets := make([]logic.Bets, 0)
 
@@ -176,6 +176,10 @@ func (g *Baccarat) GetSelectInfos() (*logic.Select, error) {
 	} else {
 		sel.Countdown = int(ncountdown.Seconds())
 	}
+
+	ways, count := g.GetRecords()
+	sel.Ways = ways
+	sel.WaysCount = count
 
 	return sel, nil
 }
@@ -215,8 +219,9 @@ func (g *Baccarat) DispatchTableCard() {
 	// 		[1]	24 '\x18'	unsigned char
 	// 		[2]	7 '\a'	unsigned char
 
-	// g.m_cbTableCardArray[INDEX_PLAYER] = [3]byte{61, 18, 40}
-	// g.m_cbTableCardArray[INDEX_BANKER] = [3]byte{25, 24, 7}
+	g.m_cbTableCardArray[INDEX_PLAYER] = [3]byte{61, 18, 40}
+	g.m_cbTableCardArray[INDEX_BANKER] = [3]byte{61, 18, 40}
+	// g.m_cbTableCardArray[INDEX_PLAYER] = [3]byte{25, 24, 7}
 
 	//首次发牌
 	g.m_cbCardCount[INDEX_PLAYER] = 2
@@ -329,7 +334,10 @@ func (g *Baccarat) CalculateScore() int64 {
 			g.M_lUserReturnScore[k] += (g.Bets[k] * int64((cbMultiple[area]-100)/100.00)) + g.Bets[k] //赢钱
 			g.M_lUserWinScore[k] += (g.Bets[k] * int64((cbMultiple[area]-100)/100.00))
 
+		} else if !cbWinArea[area] { //投注区域输钱
+			g.M_lUserWinScore[k] = -g.Bets[k]
 		}
+
 		//总的分数
 		for k := range g.Players {
 			//没有下注
@@ -359,7 +367,11 @@ func (g *Baccarat) GetStartInfos() (logic.Selects, error) {
 		bet.Userid = k
 		bet.UserName = g.Players[k].Name
 		bet.Title = g.Players[k].Title
-		bet.FmtBetArea = betsinfo[g.Areas[k]]
+		if g.Areas[k] != 0 {
+			bet.FmtBetArea = "✅" + betsinfo[g.Areas[k]]
+		} else {
+			bet.FmtBetArea = betsinfo[-1]
+		}
 
 		bets = append(bets, bet)
 	}
@@ -427,7 +439,7 @@ func GetBaccarat_Record(s *storage.CloudStore, nameid, chatid int64) (string, in
 
 	key := fmt.Sprintf("%d%d", chatid, nameid)
 	var way string //路子
-	scores, err := s.LRange(key, 0, 10)
+	scores, err := s.LRange(key, 0, 15)
 	if err != nil {
 		return "", 0
 	}

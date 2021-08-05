@@ -386,7 +386,7 @@ func Baccarat_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 		betsinfo, _ := table.GetStartInfos()
 		//fmt.Println(betsinfo)
 
-		msg := TemplateBaccarat_SelectText(betsinfo.(*logic.Select))
+		msg := TemplateBaccarat_SelectText(betsinfo.(*logic.BaccaratSelect))
 		reply := TemplateBaccarat_Select(tb)
 
 		tb.EditHtmlMessage(c.Message, msg, reply)
@@ -408,7 +408,7 @@ func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 		betsinfo, _ := table.GetStartInfos()
 		//fmt.Println(betsinfo)
 
-		msg := TemplateNiuniu_SelectText(betsinfo.(*logic.Select))
+		msg := TemplateNiuniu_SelectText(betsinfo.(*logic.NiuNiuSelect))
 		reply := TemplateNiuniu_Select(tb)
 
 		tb.EditHtmlMessage(c.Message, msg, reply)
@@ -490,7 +490,7 @@ func Baccarat_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 		betsinfo, _ := table.GetSelectInfos()
 		//fmt.Println(betsinfo)
 
-		msg := TemplateBaccarat_SelectText(betsinfo)
+		msg := TemplateBaccarat_SelectText(betsinfo.(*logic.BaccaratSelect))
 		reply := TemplateBaccarat_Select(tb)
 
 		tb.EditHtmlMessage(c.Message, msg, reply)
@@ -516,7 +516,7 @@ func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 		betsinfo, _ := table.GetSelectInfos()
 		//fmt.Println(betsinfo)
 
-		msg := TemplateNiuniu_SelectText(betsinfo)
+		msg := TemplateNiuniu_SelectText(betsinfo.(*logic.NiuNiuSelect))
 		reply := TemplateNiuniu_Select(tb)
 
 		tb.EditHtmlMessage(c.Message, msg, reply)
