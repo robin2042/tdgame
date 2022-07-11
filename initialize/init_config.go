@@ -23,7 +23,7 @@ func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 	}
 	fmt.Print(viper.Get("niuniu_start"))
 
-	db, err := storage.NewPostgresDB(storage.Config{
+	db, err := storage.NewMysqlDB(storage.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     os.Getenv("DB_PORT"),
 		Username: viper.GetString("db.username"),
