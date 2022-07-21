@@ -319,7 +319,7 @@ func Baccarat_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 			UserID: int64(c.Sender.ID),
 		}
 
-		totalscore, err := tb.Games.AddScore(table, player, floatvar)
+		totalscore, err := tb.Games.AddScore(c.ID, table, player, floatvar)
 
 		if err != nil {
 			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
@@ -354,7 +354,7 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 			UserID: int64(c.Sender.ID),
 		}
 
-		totalscore, err := tb.Games.AddScore(table, player, floatvar)
+		totalscore, err := tb.Games.AddScore(c.ID, table, player, floatvar)
 
 		if err != nil {
 			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}

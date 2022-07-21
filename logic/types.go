@@ -67,13 +67,14 @@ type Bet struct {
 
 // User stores info about user
 type AddScore struct {
-	Uid    string //用户id
-	Playid string
-	Nameid int
-	Chatid int64
-	Userid int64 //用户
-	Bet    float64
-	Score  int64
+	Messageid string //唯一性ID
+	Uid       string //用户id
+	Playid    string
+	Nameid    int
+	Chatid    int64
+	Userid    int64 //用户
+	Bet       float64
+	Score     int64
 
 	Createtime int `gorm:"default:now()"`
 	Status     int `gorm:"default:1"` //下注

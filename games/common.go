@@ -44,7 +44,7 @@ type Games interface {
 	GameEnd(nameid, chatid int64, msgid int) error
 	GetTable(nameid int, chatid int64, msgid int) GameTable //桌台
 	Bet(table GameTable, userid int64, area int) (bool, error)
-	AddScore(GameTable, PlayInfo, float64) (int64, error) //下注额 下注总额 错误
+	AddScore(string, GameTable, PlayInfo, float64) (int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64, msgid int) ([]logic.Bets, error)
 	WriteGameRounds(string, int) error
 	WriteUserScore(string, []logic.Scorelogs) error

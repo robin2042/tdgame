@@ -1,3 +1,5 @@
+groups:
+  id:"-729420422"
 db:
   username: "games"
   host: "127.0.0.1"
@@ -22,108 +24,126 @@ niuniu_start_text:
   username: "postgres"
 
 niuniu_jetton_button:
- bet:
+  bet:
     - 
-      - text: 5%
+      - text: 大:10
         data: 0.05
         unique: "niuniu_bet_5"
         url: "http://www.sohu.com"
-      - text: 10%
+      - text: 小:10
         data: 0.10
         unique: "niuniu_bet_10"
         url: "http://www.nab.com"
-      - text: 30%
-        data: 0.30
-        unique: "niuniu_bet_30"
-        url: "http://www.nab.com"
-      - text: 50%
+      - text: 单:10
         data: 0.50
         unique: "niuniu_bet_50"
         url: "http://www.nab.com"
-      - text: 80%
+      - text: 双:10
         data: 0.80
         unique: "niuniu_bet_80"
         url: "http://www.nab.com"
-      - text: 梭哈
-        data: 1.0
-        unique: "niuniu_bet_stub"
-        url: "http://www.nab.com"
     -
-      - text: 1W
+      - text: 大:20
         data: 10000
         unique: "niuniu_bet_10000"
         url: "http://www.sohu.com"
-      - text: 5W
+      - text: 小:20
         data: 50000
         unique: "niuniu_bet_50000"
         url: "http://www.nab.com"
-      - text: 10W
+      - text: 单:20
         data: 100000
         unique: "niuniu_bet_100000"
         url: "http://www.nab.com"
-      - text: 50W
+      - text: 双:20
         data: 500000
         unique: "niuniu_bet_100w"
         url: "http://www.nab.com"
-      - text: 200W
-        data: 2000000
-        unique: "niuniu_bet_200w"
-        url: "http://www.nab.com"
-      - text: 500W
-        data: 5000000
-        unique: "niuniu_bet_500w"
-        url: "http://www.nab.com"
     -
-      - text: 2KW
+      - text: 大:50
         data: 20000000
         unique: "niuniu_bet_2kw"
         url: "http://www.sohu.com"
-      - text: 5KW
+      - text: 小:50
         data: 50000000
         unique: "niuniu_bet_5kw"
         url: "http://www.nab.com"
-      - text: 2E
+      - text: 单:50
         data: 200000000
         unique: "niuniu_bet_2e"
         url: "http://www.nab.com"
-      - text: 5E
+      - text: 双:50
         data: 500000000
         unique: "niuniu_bet_5e"
         url: "http://www.nab.com"
-      - text: 20E
-        data: 2000000000
-        unique: "niuniu_bet_20e"
-        url: "http://www.nab.com"
-      - text: 50E
-        data: 5000000000
-        unique: "niuniu_bet_50e"
-        url: "http://www.nab.com"
     -
-      - text: 200E
+      - text: 大:100
         data: 20000000000
         unique: "niuniu_bet_200e"
         url: "http://www.sohu.com"
-      - text: 500E
+      - text: 小:100
         data: 50000000000
         unique: "niuniu_bet_500e"
         url: "http://www.nab.com"
-      - text: 2KE
+      - text: 单:100
         data: 200000000000
         unique: "niuniu_bet_2ke"
         url: "http://www.nab.com"
-      - text: 5KE
+      - text: 双:100
         data: 50000000000
         unique: "niuniu_bet_5ke"
         url: "http://www.nab.com"
-      - text: 1WE
-        data: 1000000000000
-        unique: "niuniu_bet_1we"
+    -
+      - text: 大:200
+        data: 20000000000
+        unique: "niuniu_bet_200e"
+        url: "http://www.sohu.com"
+      - text: 小:200
+        data: 50000000000
+        unique: "niuniu_bet_500e"
         url: "http://www.nab.com"
-      - text: 5WE
-        data: 5000000000000
-        unique: "niuniu_bet_5we"
+      - text: 单:200
+        data: 200000000000
+        unique: "niuniu_bet_2ke"
         url: "http://www.nab.com"
-
+      - text: 双:200
+        data: 50000000000
+        unique: "niuniu_bet_5ke"
+        url: "http://www.nab.com"
+    -
+      - text: 大:500
+        data: 20000000000
+        unique: "niuniu_bet_200e"
+        url: "http://www.sohu.com"
+      - text: 小:500
+        data: 50000000000
+        unique: "niuniu_bet_500e"
+        url: "http://www.nab.com"
+      - text: 单:500
+        data: 200000000000
+        unique: "niuniu_bet_2ke"
+        url: "http://www.nab.com"
+      - text: 双:500
+        data: 50000000000
+        unique: "niuniu_bet_5ke"
+        url: "http://www.nab.com"
+    -
+      - text: 大:1000
+        data: 20000000000
+        unique: "niuniu_bet_200e"
+        url: "http://www.sohu.com"
+      - text: 小:1000
+        data: 50000000000
+        unique: "niuniu_bet_500e"
+        url: "http://www.nab.com"
+      - text: 单:1000
+        data: 200000000000
+        unique: "niuniu_bet_2ke"
+        url: "http://www.nab.com"
+      - text: 双:1000
+        data: 50000000000
+        unique: "niuniu_bet_5ke"
+        url: "http://www.nab.com"
  start:  
     - text: ▶️开始游戏
       data: .5

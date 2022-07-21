@@ -134,7 +134,7 @@ func (g *GameMainManage) GetRecords(nameid, chatid int64) (*logic.Way, int) {
 	return nil, 0
 }
 
-func (g *GameMainManage) AddScore(table games.GameTable, player games.PlayInfo, score float64) (int64, error) {
+func (g *GameMainManage) AddScore(messageid string, table games.GameTable, player games.PlayInfo, score float64) (int64, error) {
 
 	board, _ := g.stg.Balance(player.UserID, table.GetChatID())
 	player.WallMoney = board.Score //拿到钱
@@ -145,12 +145,13 @@ func (g *GameMainManage) AddScore(table games.GameTable, player games.PlayInfo, 
 		return 0, err
 	} else {
 		addscore := &logic.AddScore{
-			Playid: table.GetPlayID(),
-			Chatid: table.GetChatID(),
-			Userid: player.UserID,
-			Nameid: table.GetNameID(),
-			Bet:    float64(ebet),
-			Score:  player.WallMoney,
+			Messageid: messageid,
+			Playid:    table.GetPlayID(),
+			Chatid:    table.GetChatID(),
+			Userid:    player.UserID,
+			Nameid:    table.GetNameID(),
+			Bet:       float64(ebet),
+			Score:     player.WallMoney,
 		}
 		g.stg.AddScore(addscore)
 	}
