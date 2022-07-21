@@ -1,5 +1,5 @@
 db:
-  username: "root"
+  username: "games"
   host: "127.0.0.1"
   dbname: "tdgames"
 
