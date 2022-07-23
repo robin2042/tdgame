@@ -127,6 +127,26 @@ func (g *GameDesk) GetNameID() int {
 	return g.NameID
 }
 
+//获取期号
+func (g *GameDesk) GetPeriodInfo() (string, error) {
+	t1 := time.Now().Year()
+	t2 := time.Now().Month()
+	t3 := time.Now().Day()
+	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
+	fmt.Println(date)
+	values, isexist, err := g.Rdb.GetValue(date)
+	if !isexist {
+		g.Rdb.Incr(date)
+	}
+	if err != nil {
+		return "", err
+	}
+	Period := fmt.Sprintf("%s%03s", date, values)
+	fmt.Println(Period, values, isexist, err)
+
+	return Period, nil
+}
+
 //下注信息
 func (g *GameDesk) GetBetInfos() ([]logic.Bets, error) {
 	s := make([]logic.Bets, 0)

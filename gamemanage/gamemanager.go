@@ -8,10 +8,14 @@ import (
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
 	"github.com/aoyako/telegram_2ch_res_bot/games/baccarat"
+	"github.com/aoyako/telegram_2ch_res_bot/games/dice"
 	"github.com/aoyako/telegram_2ch_res_bot/games/niuniu"
 	"github.com/aoyako/telegram_2ch_res_bot/logger"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"github.com/aoyako/telegram_2ch_res_bot/telegram"
+	"github.com/spf13/viper"
+	"gopkg.in/tucnak/telebot.v2"
 )
 
 var (
@@ -24,6 +28,106 @@ type GameMainManage struct {
 	stg    *storage.Storage
 	rdb    *storage.CloudStore
 	Tables map[string]games.GameTable // chatid<-->table
+
+}
+
+//获取分钟
+func GetFormatHourMinute(minute, second int) string {
+	t4 := time.Now().Hour() //小时
+
+	t5 := fmt.Sprintf("%02d:%02d:%02d", t4, minute, second)
+
+	return t5
+}
+
+//获取分钟
+func GetMinute() int {
+	t5 := time.Now().Minute() //分钟
+	return t5
+}
+
+//获取秒
+func GetSecond() int {
+	t5 := time.Now().Second() //秒
+	return t5
+}
+
+//启动游戏
+func InitStart(tb *telegram.TgBot) {
+
+	groupid := viper.GetInt64("tg.groupid")
+	m := &telebot.Chat{
+		ID: int64(groupid),
+	}
+	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
+	fmt.Println(table)
+	periond, _ := table.GetPeriodInfo()
+	fmt.Println(periond)
+
+	if table.GetStatus() > games.GS_TK_BET {
+		// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
+		// tb.Bot.Respond(c, &reply)
+		tb.SendChatMessage("已经开局，请等待结束\\!", nil, m)
+	}
+	start := tb.Games.NewGames(games.GAME_DICE, m.ID)
+	fmt.Println(start)
+
+	durationsec := 1
+	//开盘时间\封盘时间
+	var turnontime, closetime string
+
+	if GetMinute()%2 == 0 {
+		durationsec = 2*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+2, 0)
+		closetime = GetFormatHourMinute(GetMinute()+3, 50)
+	} else {
+		durationsec = 1*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
+		closetime = GetFormatHourMinute(GetMinute()+2, 50)
+	}
+	fmt.Println(turnontime, closetime)
+
+	timer := time.NewTimer(time.Duration(durationsec-1) * time.Second)
+
+	periondInfo := logic.PeriodInfo{
+		PeriodID:   periond,
+		Turnontime: turnontime,
+		Closetime:  closetime,
+	}
+	go func() {
+		fmt.Println("当前时间为:", time.Now())
+		fmt.Println(timer)
+		// t := <-timer.C
+
+		// fmt.Println("当前时间为:", t)
+
+		msg := telegram.TemplateDice_Text(periondInfo)
+
+		// reply := telegram.TemplateDice_Bet(tb)
+		message := telebot.Message{Chat: m}
+
+		ok, err := tb.SendHtmlMessage(msg, nil, &message)
+
+		// message, err := tb.SendChatMessage(msg, nil, m)
+		fmt.Println(ok, err)
+
+		start := tb.Games.NewGames(games.GAME_DICE, m.ID)
+		fmt.Println(start)
+
+		//
+		// if !start {
+		// 	msg := TemplateNiuniu_limit()
+		// 	tb.SendHtmlMessage(msg, nil, m)
+		// } else { //可以开启新局
+		// 	msg := TemplateNiuniu_Text()
+		// 	reply := TemplateNiuniu_Bet(tb)
+		// 	message, _ := tb.SendHtmlMessage(msg, reply, m)
+
+		// 	tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+
+		// }
+	}()
+	return
 
 }
 
@@ -168,6 +272,8 @@ func CreateTable(nameid int, chatid int64, msgid int) games.GameTable {
 		table = new(niuniu.Niuniu)
 	} else if nameid == games.GAME_BACCARAT {
 		table = new(baccarat.Baccarat)
+	} else if nameid == games.GAME_DICE {
+		table = new(dice.Dice)
 	}
 
 	table.InitTable(playid, nameid, chatid)

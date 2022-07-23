@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
@@ -14,9 +15,20 @@ import (
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
+var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
+
 const (
 	CK_MONEY = 1000000
 )
+
+func (tb *TgBot) SendChatMessage(msg string, menu *telebot.ReplyMarkup, m *telebot.Chat) (*telebot.Message, error) {
+	if menu == nil {
+		return tb.Bot.Send(m, msg, &telebot.SendOptions{ParseMode: telebot.ModeMarkdownV2})
+	} else {
+		return tb.Bot.Send(m, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeMarkdownV2})
+	}
+
+}
 
 func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *telebot.Message) (*telebot.Message, error) {
 	if menu == nil {
@@ -287,6 +299,29 @@ func LeaveGroups(tb *TgBot) func(m *telebot.Message) {
 func Callback(tb *TgBot) func(c *telebot.Callback) {
 	return func(m *telebot.Callback) {
 		//fmt.Println(m)
+	}
+}
+
+func SplitBet(str []string) {
+	for i := 0; i < len(str); i++ {
+		for i := 0; i < len(strjetton); i++ {
+			x := strings.Index(str[0], strjetton[i])
+			if x >= 0 { //找到了
+				fmt.Println(str[0])
+				str = str[1:]
+				fmt.Println(str)
+			}
+
+		}
+	}
+}
+
+// 判断文本消息
+func Ontext(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		str := strings.Split(m.Text, " ")
+		SplitBet(str)
+		// tb.SendHtmlMessage("hello", nil, m)
 	}
 }
 

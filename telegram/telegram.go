@@ -84,7 +84,7 @@ func SetupHandlers(tb *TgBot) {
 	tb.Bot.Handle(telebot.OnUserJoined, EnterGroups(tb))
 	tb.Bot.Handle(telebot.OnUserLeft, LeaveGroups(tb))
 	tb.Bot.Handle(telebot.OnCallback, Callback(tb))
-
+	tb.Bot.Handle(telebot.OnText, Ontext(tb))
 	//games
 	// 	hl -【欢乐牛牛🎴】
 	// zz -【转账💰】
@@ -195,50 +195,4 @@ func convertWebmToMp4(d *downloader.Downloader, path string) (string, error) {
 	}
 
 	return newVidPath, nil
-}
-
-//获取分钟
-func GetMinute() int {
-	t5 := time.Now().Minute() //分钟
-	return t5
-}
-
-//获取秒
-func GetSecond() int {
-	t5 := time.Now().Second() //秒
-	return t5
-}
-
-//启动游戏
-func InitStart(tb *TgBot) {
-	durationsec := 1
-
-	if GetMinute()%2 == 0 {
-		durationsec = 2*60 - GetSecond()
-	} else {
-		durationsec = 1*60 - GetSecond()
-	}
-	timer := time.NewTimer(time.Duration(durationsec) * time.Second)
-
-	go func() {
-		fmt.Println("当前时间为:", time.Now())
-
-		t := <-timer.C
-
-		fmt.Println("当前时间为:", t)
-		start := tb.Games.NewGames(games.GAME_NIUNIU, m.Chat.ID)
-		//
-		if !start {
-			msg := TemplateNiuniu_limit()
-			tb.SendHtmlMessage(msg, nil, m)
-		} else { //可以开启新局
-			msg := TemplateNiuniu_Text()
-			reply := TemplateNiuniu_Bet(tb)
-			message, _ := tb.SendHtmlMessage(msg, reply, m)
-
-			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
-
-		}
-	}()
-
 }

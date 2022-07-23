@@ -51,3 +51,18 @@ func (c *CloudStore) LRange(key string, start, stop int64) ([]string, error) {
 func (c *CloudStore) Del(key string) {
 	c.rds.Del(ctx, key)
 }
+
+//获取值
+func (c *CloudStore) GetValue(key string) (string, bool, error) {
+	val, err := c.rds.Get(ctx, key).Result()
+
+	if err == redis.Nil {
+		return "", false, nil
+	}
+	return val, true, nil
+}
+
+//incr 自增
+func (c *CloudStore) Incr(key string) {
+	c.rds.Incr(ctx, key)
+}

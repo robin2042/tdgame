@@ -35,6 +35,7 @@ type GameTable interface {
 	GetBetInfos() ([]logic.Bets, error)     //下注信息
 	GetSelectInfos() (logic.Selects, error) //显示下注人员
 	GetSettleInfos() (logic.Records, error)
+	GetPeriodInfo() (string, error) //开局信息
 	// WriteUserScore([]logic.ChangeScore) error //批量执行写分
 }
 
@@ -60,6 +61,7 @@ const (
 	GAME_BENZIN   = 40026000 //奔驰宝马
 	GAME_FRUIT    = 40027000 //水果机
 	GAME_ROULE    = 40028000 //轮盘
+	GAME_DICE     = 40029000
 )
 
 // Controller struct is used to access database

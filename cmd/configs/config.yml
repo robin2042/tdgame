@@ -12,6 +12,9 @@ dapi:
 
 tg:
   admin_id: ["232469683"]
+  #groupid:  -729420422
+  groupid:  -730612582
+
 
 disk:
   path: "src"
@@ -23,7 +26,7 @@ polling:
 niuniu_start_text:
   username: "postgres"
 
-niuniu_jetton_button:
+dice_jetton_button:
   bet:
     - 
       - text: 大:10
@@ -144,18 +147,18 @@ niuniu_jetton_button:
         data: 50000000000
         unique: "niuniu_bet_5ke"
         url: "http://www.nab.com"
- start:  
+  start:  
     - text: ▶️开始游戏
       data: .5
       unique: "niuniu_start"
       url: "http://www.sohu.com"
         
- balance:
+  balance:
     - text: 💰️查看余额
       data: .5
       unique: "niuniu_balance"
       url: "http://www.sohu.com"
- sign:
+  sign:
     - text: ✅️签到领钱
       data: .5
       unique: "niuniu_sign"
@@ -188,7 +191,7 @@ niuniu_start_button:
 
 
 baccarat_jetton_button:
- bet:
+  bet:
     - 
       - text: 5%
         data: 0.05
@@ -290,18 +293,18 @@ baccarat_jetton_button:
         unique: "baccarat_bet_5we"
         url: "http://www.nab.com"
 
- start:  
+  start:  
     - text: ▶️开始游戏
       data: .5
       unique: "baccarat_start"
       url: "http://www.sohu.com"
         
- balance:
+  balance:
     - text: 💰️查看余额
       data: .5
       unique: "baccarat_balance"
       url: "http://www.sohu.com"
- sign:
+  sign:
     - text: ✅️签到领钱
       data: .5
       unique: "baccarat_sign"

@@ -223,3 +223,24 @@ type Cashlogs struct {
 	Createtime  string `gorm:"default:now()"`
 	Modifytime  string `gorm:"default:now()"`
 }
+
+//开局信息
+type StartInfo struct {
+	Per         string
+	Userid      string
+	Targetid    string
+	Changescore int64
+	Score       int64
+	Btype       int
+	Delete      int
+	Createtime  string `gorm:"default:now()"`
+	Modifytime  string `gorm:"default:now()"`
+}
+
+//开局信息
+type PeriodInfo struct {
+	PeriodID    string
+	Turnontime  string
+	Closetime   string
+	Lotterytime string
+}

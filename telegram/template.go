@@ -239,6 +239,7 @@ func TemplateBaccarat_Bet(tb *TgBot) *telebot.ReplyMarkup {
 	return &menu
 }
 
+//牛牛下注
 func TemplateNiuniu_Bet(tb *TgBot) *telebot.ReplyMarkup {
 	menu := telebot.ReplyMarkup{}
 	menu.ResizeReplyKeyboard = true
@@ -656,4 +657,80 @@ func TemplateNiuniu_transerror() string {
 
 	tmpl.Execute(&b, nil)
 	return b.String()
+}
+
+//骰子按钮
+func TemplateDice_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButton {
+	jetton := viper.Get("dice_jetton_button.bet")
+
+	arr := jetton.([]interface{})
+	btnarray := make([][]telebot.InlineButton, 0)
+	for _, row := range arr {
+		keys := make([]telebot.InlineButton, 0, len(row.([]interface{})))
+		for _, v := range row.([]interface{}) {
+			var btn telebot.InlineButton
+
+			restlt := v.(map[interface{}]interface{})
+			btn.Text = restlt["text"].(string)
+			switch restlt["data"].(type) {
+			case float64:
+				btn.Data = fmt.Sprintf("%f", restlt["data"].(float64))
+			case int:
+				btn.Data = fmt.Sprintf("%d", restlt["data"].(int))
+			}
+
+			btn.Unique = restlt["unique"].(string)
+			tb.Bot.Handle(&btn, Niuniu_BetCallBack(tb))
+			keys = append(keys, btn)
+		}
+		btnarray = append(btnarray, keys)
+	}
+	return btnarray
+}
+
+func TemplateDice_Text(period logic.PeriodInfo) string {
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/dice/start.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, period)
+	return b.String()
+}
+
+//骰子下注按钮
+func TemplateDice_Bet(tb *TgBot) *telebot.ReplyMarkup {
+	menu := telebot.ReplyMarkup{}
+	menu.ResizeReplyKeyboard = true
+	menu.Selective = true
+
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config")
+
+	viper.ReadInConfig()
+	fmt.Println(viper.AllKeys())
+	btnarray := make([][]telebot.InlineButton, 0)
+	jettons := TemplateDice_Jetton(tb, viper.GetViper())
+
+	btnarray = append(btnarray, jettons...)
+
+	starts := make([][]telebot.InlineButton, 0)
+
+	// buttons := make([]telebot.InlineButton, 0)
+	// start := TemplateNiuniu_Start(tb, viper.GetViper()) //开始
+	// buttons = append(buttons, start)
+	// balance := TemplateNiuniu_Balance(tb, viper.GetViper()) //余额
+	// buttons = append(buttons, balance)
+	// sign := TemplateNiuniu_Sign(tb, viper.GetViper()) //签到
+	// buttons = append(buttons, sign)
+	// // starts = append(starts, balance...)
+
+	// starts = append(starts, buttons)
+
+	btnarray = append(btnarray, starts...)
+
+	menu.InlineKeyboard = btnarray
+	return &menu
 }
