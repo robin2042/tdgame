@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
+	"github.com/aoyako/telegram_2ch_res_bot/games/dice"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/leekchan/accounting"
 
@@ -16,6 +18,13 @@ import (
 )
 
 var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
+var jetmark = []int{dice.ID_DADAN_MARK, dice.ID_XIAOSHUANG_MARK,
+	dice.ID_DASHUANG_MARK,
+	dice.ID_XIAODAN_MARK,
+	dice.ID_XIAO_MARK,
+	dice.ID_DA_MARK,
+	dice.ID_DAN_MARK,
+	dice.ID_SHUANG_MARK}
 
 const (
 	CK_MONEY = 1000000
@@ -302,26 +311,79 @@ func Callback(tb *TgBot) func(c *telebot.Callback) {
 	}
 }
 
-func SplitBet(str []string) {
-	for i := 0; i < len(str); i++ {
-		for i := 0; i < len(strjetton); i++ {
-			x := strings.Index(str[0], strjetton[i])
-			if x >= 0 { //找到了
+func SplitBet(str []string) []logic.DiceBetInfo {
+	fmt.Println(len(str))
+	var arbet []logic.DiceBetInfo = make([]logic.DiceBetInfo, 0) //最大同时20格下注
+	for len(str) > 0 {
+		for x := 0; x < len(strjetton); x++ {
+			find := strings.Index(str[0], strjetton[x])
+			if find >= 0 { //找到了
+				re := regexp.MustCompile("[0-9]+")
+				strbet := re.FindString(str[0])
+				if strbet == "" {
+					break
+				}
+				score, err := strconv.Atoi(strbet)
+				if err != nil {
+					break
+				}
+				var bet logic.DiceBetInfo
+				bet.Bet = x
+				bet.Score = score
+				arbet = append(arbet, bet)
 				fmt.Println(str[0])
 				str = str[1:]
-				fmt.Println(str)
+				if len(str) == 0 {
+					break
+				}
+				fmt.Println(len(str))
+				break
 			}
 
 		}
 	}
+	return arbet
 }
 
 // 判断文本消息
 func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
+
 		str := strings.Split(m.Text, " ")
-		SplitBet(str)
-		// tb.SendHtmlMessage("hello", nil, m)
+
+		arrbet := SplitBet(str)
+		if len(arrbet) <= 0 {
+			return
+		}
+		table := tb.Games.GetTable(games.GAME_DICE, m.Chat.ID, 0)
+		if table.GetStatus() > games.GS_TK_BET {
+			// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
+			// tb.Bot.Respond(c, &reply)
+		}
+		for i := 0; i < len(arrbet); i++ {
+			intvar := arrbet[i].Score
+			//fmt.Println(floatvar)
+
+			player := games.PlayInfo{
+				Name:   fmt.Sprintf("%s %s", m.Sender.FirstName, m.Sender.LastName),
+				UserID: int64(m.Sender.ID),
+			}
+			fmt.Println(intvar, player)
+			// totalscore, err := tb.Games.AddScore(c.ID, table, player, intvar)
+
+			// if err != nil {
+			// 	// reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
+			// 	// tb.Bot.Respond(c, &reply)
+			// } else {
+			// 	// bets, _ := tb.Games.BetInfos(m.Message.Chat.ID, c.Message.ID)
+			// 	// //下注成功
+			// 	// SendBetMessage(tb, c, totalscore)
+			// 	// players := TemplateBaccarat_BetText(bets)
+			// 	// tb.EditHtmlMessage(c.Message, players, nil)
+			// }
+			fmt.Println(arrbet)
+		}
+
 	}
 }
 

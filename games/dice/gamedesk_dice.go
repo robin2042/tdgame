@@ -8,16 +8,18 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 )
 
+// 大单", "小双", "大双", "小单", "小", "大", "单", "双"
+
 // "大","小","单","双","大单","大双","小单","小双"
 var (
-	ID_DA_MARK        byte = 0x01
-	ID_XIAO_MARK      byte = 0x02
-	ID_DAN_MARK       byte = 0x04
-	ID_SHUANG_MARK    byte = 0x08
-	ID_DADAN_SHU      byte = 0x10
-	ID_DASHUANG_SHU   byte = 0x11
-	ID_XIAODAN_SHU    byte = 0x12
-	ID_XIAOSHUANG_SHU byte = 0x13
+	ID_DADAN_MARK      int = 0x10
+	ID_XIAOSHUANG_MARK int = 0x13
+	ID_DASHUANG_MARK   int = 0x11
+	ID_XIAODAN_MARK    int = 0x12
+	ID_XIAO_MARK       int = 0x01
+	ID_DA_MARK         int = 0x02
+	ID_DAN_MARK        int = 0x04
+	ID_SHUANG_MARK     int = 0x08
 )
 
 //骰子

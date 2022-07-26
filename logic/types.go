@@ -244,3 +244,9 @@ type PeriodInfo struct {
 	Closetime   string
 	Lotterytime string
 }
+
+//开局信息
+type DiceBetInfo struct {
+	Bet   int
+	Score int
+}

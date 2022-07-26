@@ -222,16 +222,16 @@ func TemplateBaccarat_Bet(tb *TgBot) *telebot.ReplyMarkup {
 
 	starts := make([][]telebot.InlineButton, 0)
 
-	buttons := make([]telebot.InlineButton, 0)
-	start := TemplateBaccarat_Start(tb, viper.GetViper()) //开始
-	buttons = append(buttons, start)
-	balance := TemplateNiuniu_Balance(tb, viper.GetViper()) //余额
-	buttons = append(buttons, balance)
-	sign := TemplateNiuniu_Sign(tb, viper.GetViper()) //签到
-	buttons = append(buttons, sign)
+	// buttons := make([]telebot.InlineButton, 0)
+	// start := TemplateBaccarat_Start(tb, viper.GetViper()) //开始
+	// buttons = append(buttons, start)
+	// balance := TemplateNiuniu_Balance(tb, viper.GetViper()) //余额
+	// buttons = append(buttons, balance)
+	// sign := TemplateNiuniu_Sign(tb, viper.GetViper()) //签到
+	// buttons = append(buttons, sign)
 	// starts = append(starts, balance...)
 
-	starts = append(starts, buttons)
+	// starts = append(starts, buttons)
 
 	btnarray = append(btnarray, starts...)
 
