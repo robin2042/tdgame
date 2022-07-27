@@ -7,9 +7,7 @@ import (
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
-	"github.com/aoyako/telegram_2ch_res_bot/games/baccarat"
 	"github.com/aoyako/telegram_2ch_res_bot/games/dice"
-	"github.com/aoyako/telegram_2ch_res_bot/games/niuniu"
 	"github.com/aoyako/telegram_2ch_res_bot/logger"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/aoyako/telegram_2ch_res_bot/storage"
@@ -238,13 +236,13 @@ func (g *GameMainManage) GetRecords(nameid, chatid int64) (*logic.Way, int) {
 	return nil, 0
 }
 
-func (g *GameMainManage) AddScore(messageid string, table games.GameTable, player games.PlayInfo, score float64) (int64, error) {
+func (g *GameMainManage) AddScore(messageid string, table games.GameTable, player games.PlayInfo, area, score int) (int64, error) {
 
 	board, _ := g.stg.Balance(player.UserID, table.GetChatID())
 	player.WallMoney = board.Score //拿到钱
 	player.Title = GetTitle(board.Score)
 
-	ebet, err := table.AddScore(player, score)
+	ebet, err := table.AddScore(player, area, score)
 	if err != nil {
 		return 0, err
 	} else {
@@ -268,11 +266,12 @@ func (g *GameMainManage) AddScore(messageid string, table games.GameTable, playe
 func CreateTable(nameid int, chatid int64, msgid int) games.GameTable {
 	playid := fmt.Sprintf("%d%d", chatid, msgid)
 	var table games.GameTable
-	if nameid == games.GAME_NIUNIU {
-		table = new(niuniu.Niuniu)
-	} else if nameid == games.GAME_BACCARAT {
-		table = new(baccarat.Baccarat)
-	} else if nameid == games.GAME_DICE {
+	// if nameid == games.GAME_NIUNIU {
+	// 	table = new(niuniu.Niuniu)
+	// } else if nameid == games.GAME_BACCARAT {
+	// 	table = new(baccarat.Baccarat)
+	// } else
+	if nameid == games.GAME_DICE {
 		table = new(dice.Dice)
 	}
 

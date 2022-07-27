@@ -29,14 +29,16 @@ type GameTable interface {
 	StartGame(int64) (bool, error)
 	SettleGame(int64) ([]logic.Scorelogs, error)
 	EndGame() error
-	AddScore(player PlayInfo, score float64) (int64, error)
+	AddScore(player PlayInfo, area, score int) (int64, error)
 	Bet(int64, int) (bool, error)           //用户,下注区域
 	GetStartInfos() (logic.Selects, error)  //显示下注人员
 	GetBetInfos() ([]logic.Bets, error)     //下注信息
+	GetBetInfo(int64) ([]logic.Bets, error) //下注信息
 	GetSelectInfos() (logic.Selects, error) //显示下注人员
 	GetSettleInfos() (logic.Records, error)
 	GetPeriodInfo() (string, error) //开局信息
-	// WriteUserScore([]logic.ChangeScore) error //批量执行写分
+	GetTitlesInfo() (string, error) //获取标题信息
+
 }
 
 type Games interface {
@@ -45,7 +47,7 @@ type Games interface {
 	GameEnd(nameid, chatid int64, msgid int) error
 	GetTable(nameid int, chatid int64, msgid int) GameTable //桌台
 	Bet(table GameTable, userid int64, area int) (bool, error)
-	AddScore(string, GameTable, PlayInfo, float64) (int64, error) //下注额 下注总额 错误
+	AddScore(string, GameTable, PlayInfo, int, int) (int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64, msgid int) ([]logic.Bets, error)
 	WriteGameRounds(string, int) error
 	WriteUserScore(string, []logic.Scorelogs) error

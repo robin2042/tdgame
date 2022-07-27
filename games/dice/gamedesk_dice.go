@@ -27,8 +27,9 @@ type Dice struct {
 	games.GameDesk
 }
 
-func (g *Dice) AddScore(player games.PlayInfo, score float64) (int64, error) {
-	return g.GameDesk.AddScore(player, score)
+func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
+	// return g.GameDesk.AddScore(player, score)
+	return 0, nil
 
 }
 func (g *Dice) Bet(userid int64, area int) (bool, error) {
@@ -47,6 +48,11 @@ func (g *Dice) EndGame() error {
 func (g *Dice) GetBetInfos() (bets []logic.Bets, err error) {
 	return g.GameDesk.GetBetInfos()
 
+}
+
+//获取个人的下注信息
+func (g *Dice) GetBetInfo(int64) ([]logic.Bets, error) {
+	return g.GameDesk.GetBetInfos()
 }
 
 //获取ID

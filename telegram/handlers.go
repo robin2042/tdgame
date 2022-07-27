@@ -348,6 +348,7 @@ func SplitBet(str []string) []logic.DiceBetInfo {
 // 判断文本消息
 func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
+		messageid := fmt.Sprintf("%d%d", m.Unixtime, m.ID)
 
 		str := strings.Split(m.Text, " ")
 
@@ -362,6 +363,7 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 		}
 		for i := 0; i < len(arrbet); i++ {
 			intvar := arrbet[i].Score
+			area := arrbet[i].Bet
 			//fmt.Println(floatvar)
 
 			player := games.PlayInfo{
@@ -369,20 +371,22 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 				UserID: int64(m.Sender.ID),
 			}
 			fmt.Println(intvar, player)
-			// totalscore, err := tb.Games.AddScore(c.ID, table, player, intvar)
-
-			// if err != nil {
-			// 	// reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
-			// 	// tb.Bot.Respond(c, &reply)
-			// } else {
-			// 	// bets, _ := tb.Games.BetInfos(m.Message.Chat.ID, c.Message.ID)
-			// 	// //下注成功
-			// 	// SendBetMessage(tb, c, totalscore)
-			// 	// players := TemplateBaccarat_BetText(bets)
-			// 	// tb.EditHtmlMessage(c.Message, players, nil)
-			// }
-			fmt.Println(arrbet)
+			totalscore, err := tb.Games.AddScore(messageid, table, player, area, intvar)
+			fmt.Println(totalscore, err)
 		}
+
+		// 	// if err != nil {
+		// 	// 	// reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
+		// 	// 	// tb.Bot.Respond(c, &reply)
+		// 	// } else {
+		// 	// 	// bets, _ := tb.Games.BetInfos(m.Message.Chat.ID, c.Message.ID)
+		// 	// 	// //下注成功
+		// 	// 	// SendBetMessage(tb, c, totalscore)
+		// 	// 	// players := TemplateBaccarat_BetText(bets)
+		// 	// 	// tb.EditHtmlMessage(c.Message, players, nil)
+		// 	// }
+		// 	fmt.Println(arrbet)
+		// }
 
 	}
 }
@@ -408,26 +412,27 @@ func Baccarat_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 			reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
 			tb.Bot.Respond(c, &reply)
 		}
-		floatvar, _ := strconv.ParseFloat(c.Data, 64)
-		//fmt.Println(floatvar)
+		// floatvar, _ := strconv.ParseFloat(c.Data, 64)
+		// //fmt.Println(floatvar)
 
-		player := games.PlayInfo{
-			Name:   fmt.Sprintf("%s %s", c.Sender.FirstName, c.Sender.LastName),
-			UserID: int64(c.Sender.ID),
-		}
+		// player := games.PlayInfo{
+		// 	Name:   fmt.Sprintf("%s %s", c.Sender.FirstName, c.Sender.LastName),
+		// 	UserID: int64(c.Sender.ID),
+		// }
 
-		totalscore, err := tb.Games.AddScore(c.ID, table, player, floatvar)
+		// totalscore, err := tb.Games.AddScore(c.ID, table, player, floatvar)
+		// totalscore, err := 0, 0
 
-		if err != nil {
-			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
-			tb.Bot.Respond(c, &reply)
-		} else {
-			bets, _ := tb.Games.BetInfos(c.Message.Chat.ID, c.Message.ID)
-			//下注成功
-			SendBetMessage(tb, c, totalscore)
-			players := TemplateBaccarat_BetText(bets)
-			tb.EditHtmlMessage(c.Message, players, nil)
-		}
+		// if err != nil {
+		// 	reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
+		// 	tb.Bot.Respond(c, &reply)
+		// } else {
+		// 	bets, _ := tb.Games.BetInfos(c.Message.Chat.ID, c.Message.ID)
+		// 	//下注成功
+		// 	SendBetMessage(tb, c, totalscore)
+		// 	players := TemplateBaccarat_BetText(bets)
+		// 	tb.EditHtmlMessage(c.Message, players, nil)
+		// }
 
 		// tb.EditHtmlMessage(c.Message, "update text")
 		//fmt.Println(score, totalscore)
@@ -443,26 +448,26 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 			reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
 			tb.Bot.Respond(c, &reply)
 		}
-		floatvar, _ := strconv.ParseFloat(c.Data, 64)
+		// floatvar, _ := strconv.ParseFloat(c.Data, 64)
 		//fmt.Println(floatvar)
 
-		player := games.PlayInfo{
-			Name:   fmt.Sprintf("%s %s", c.Sender.FirstName, c.Sender.LastName),
-			UserID: int64(c.Sender.ID),
-		}
+		// player := games.PlayInfo{
+		// 	Name:   fmt.Sprintf("%s %s", c.Sender.FirstName, c.Sender.LastName),
+		// 	UserID: int64(c.Sender.ID),
+		// }
 
-		totalscore, err := tb.Games.AddScore(c.ID, table, player, floatvar)
+		// totalscore, err := tb.Games.AddScore(c.ID, table, player, floatvar)
 
-		if err != nil {
-			reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
-			tb.Bot.Respond(c, &reply)
-		} else {
-			bets, _ := tb.Games.BetInfos(c.Message.Chat.ID, c.Message.ID)
-			//下注成功
-			SendBetMessage(tb, c, totalscore)
-			players := TemplateNiuniu_BetText(bets)
-			tb.EditHtmlMessage(c.Message, players, nil)
-		}
+		// if err != nil {
+		// 	reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
+		// 	tb.Bot.Respond(c, &reply)
+		// } else {
+		// 	bets, _ := tb.Games.BetInfos(c.Message.Chat.ID, c.Message.ID)
+		// 	//下注成功
+		// 	SendBetMessage(tb, c, totalscore)
+		// 	players := TemplateNiuniu_BetText(bets)
+		// 	tb.EditHtmlMessage(c.Message, players, nil)
+		// }
 
 		// tb.EditHtmlMessage(c.Message, "update text")
 		//fmt.Println(score, totalscore)

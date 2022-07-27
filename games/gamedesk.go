@@ -147,6 +147,11 @@ func (g *GameDesk) GetPeriodInfo() (string, error) {
 	return Period, nil
 }
 
+//获取标题信息
+func (g *GameDesk) GetTitlesInfo() (string, error) {
+	return "", nil
+}
+
 //下注信息
 func (g *GameDesk) GetBetInfos() ([]logic.Bets, error) {
 	s := make([]logic.Bets, 0)
