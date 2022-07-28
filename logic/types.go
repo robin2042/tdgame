@@ -250,3 +250,9 @@ type DiceBetInfo struct {
 	Bet   int
 	Score int
 }
+
+//开局信息
+type DiceJettonInfo struct {
+	Info  PeriodInfo
+	Score int
+}

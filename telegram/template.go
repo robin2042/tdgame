@@ -734,3 +734,18 @@ func TemplateDice_Bet(tb *TgBot) *telebot.ReplyMarkup {
 	menu.InlineKeyboard = btnarray
 	return &menu
 }
+
+//骰子下注信息
+func TemplateDice_BetText(score logic.DiceJettonInfo) string {
+
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/dice/bet.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, score)
+
+	return b.String()
+}

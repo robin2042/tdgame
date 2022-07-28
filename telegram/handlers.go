@@ -372,6 +372,10 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			}
 			fmt.Println(intvar, player)
 			totalscore, err := tb.Games.AddScore(messageid, table, player, area, intvar)
+			if err != nil {
+				table.GetBetInfo(int64(m.Sender.ID))
+				// TemplateDice_BetText()
+			}
 			fmt.Println(totalscore, err)
 		}
 

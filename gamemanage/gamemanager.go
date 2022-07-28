@@ -111,6 +111,10 @@ func InitStart(tb *telegram.TgBot) {
 
 		start := tb.Games.NewGames(games.GAME_DICE, m.ID)
 		fmt.Println(start)
+		tb.Games.GameBegin(games.GAME_DICE, message.Chat.ID, message.ID)
+		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, message.ID)
+		table.SetPeriodInfo(periondInfo)
+		fmt.Println(table)
 
 		//
 		// if !start {

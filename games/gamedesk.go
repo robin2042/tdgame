@@ -58,7 +58,7 @@ type GameDesk struct {
 
 	M_lUserReturnScore map[int64]int64 //显示的钱
 	m_GameRecordArrary []byte          //路子
-
+	periodinfo         logic.PeriodInfo
 }
 
 func (g *GameDesk) SetRdb(r *storage.CloudStore) {
@@ -145,6 +145,10 @@ func (g *GameDesk) GetPeriodInfo() (string, error) {
 	fmt.Println(Period, values, isexist, err)
 
 	return Period, nil
+}
+
+func (g *GameDesk) SetPeriodInfo(info logic.PeriodInfo) {
+	g.periodinfo = info
 }
 
 //获取标题信息
