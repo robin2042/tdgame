@@ -373,24 +373,12 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			fmt.Println(intvar, player)
 			totalscore, err := tb.Games.AddScore(messageid, table, player, area, intvar)
 			if err != nil {
-				table.GetBetInfo(int64(m.Sender.ID))
+				return
 				// TemplateDice_BetText()
 			}
+			table.GetBetInfo(int64(m.Sender.ID))
 			fmt.Println(totalscore, err)
 		}
-
-		// 	// if err != nil {
-		// 	// 	// reply := telebot.CallbackResponse{Text: "余额不足，请通过签到获取资金后下注", ShowAlert: true}
-		// 	// 	// tb.Bot.Respond(c, &reply)
-		// 	// } else {
-		// 	// 	// bets, _ := tb.Games.BetInfos(m.Message.Chat.ID, c.Message.ID)
-		// 	// 	// //下注成功
-		// 	// 	// SendBetMessage(tb, c, totalscore)
-		// 	// 	// players := TemplateBaccarat_BetText(bets)
-		// 	// 	// tb.EditHtmlMessage(c.Message, players, nil)
-		// 	// }
-		// 	fmt.Println(arrbet)
-		// }
 
 	}
 }
