@@ -73,7 +73,7 @@ type AddScore struct {
 	Nameid    int
 	Chatid    int64
 	Userid    int64 //用户
-	Bet       float64
+	Bet       int64
 	Score     int64
 
 	Createtime int `gorm:"default:now()"`

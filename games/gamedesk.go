@@ -3,6 +3,7 @@ package games
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
@@ -59,6 +60,7 @@ type GameDesk struct {
 	M_lUserReturnScore map[int64]int64 //显示的钱
 	m_GameRecordArrary []byte          //路子
 	periodinfo         logic.PeriodInfo
+	BetMux             sync.Mutex //锁
 }
 
 func (g *GameDesk) SetRdb(r *storage.CloudStore) {
@@ -274,37 +276,26 @@ func (g *GameDesk) StartGame(userid int64) (bool, error) {
 }
 
 //下注
-func (g *GameDesk) AddScore(player PlayInfo, score float64) (int64, error) {
+func (g *GameDesk) AddScore(player PlayInfo, area, score int) (int64, error) {
 
 	_, v := g.Players[player.UserID]
+	g.BetMux.Lock()
+	defer g.BetMux.Unlock()
 
-	var floatscore float64
+	var floatscore int64
 	//第一次增加
 	if !v {
 		g.Players[player.UserID] = &player
 	}
-
-	if score < 99.0 {
-		floatscore = float64(player.WallMoney) * score
-		if (player.WallMoney / 4) < int64(floatscore) {
-			return 0, errors.New("金额不足")
-
-		}
-		player.WallMoney -= int64(floatscore)
-		return int64(floatscore), nil
-	} else {
-		floatscore = score
-		if (player.WallMoney / 4) < int64(score) {
-			return 0, errors.New("金额不足")
-		}
-		player.WallMoney -= int64(score)
-
+	if player.WallMoney < int64(score) {
+		return 0, errors.New("余额不足")
 	}
+	player.WallMoney -= int64(score)
 
 	g.LastAddTime = time.Now()
 
-	g.Bets[player.UserID] += int64(floatscore) //下注
-
+	g.Bets[player.UserID] += int64(score) //下注金额
+	g.Areas[player.UserID] += area        //下注区域
 	return int64(floatscore), nil
 }
 

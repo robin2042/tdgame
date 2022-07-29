@@ -28,8 +28,7 @@ type Dice struct {
 }
 
 func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
-	// return g.GameDesk.AddScore(player, score)
-	return 0, nil
+	return g.GameDesk.AddScore(player, area, score)
 
 }
 func (g *Dice) Bet(userid int64, area int) (bool, error) {

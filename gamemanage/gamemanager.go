@@ -244,7 +244,7 @@ func (g *GameMainManage) AddScore(messageid string, table games.GameTable, playe
 
 	board, _ := g.stg.Balance(player.UserID, table.GetChatID())
 	player.WallMoney = board.Score //拿到钱
-	player.Title = GetTitle(board.Score)
+	// player.Title = GetTitle(area, score)
 
 	ebet, err := table.AddScore(player, area, score)
 	if err != nil {
@@ -256,7 +256,7 @@ func (g *GameMainManage) AddScore(messageid string, table games.GameTable, playe
 			Chatid:    table.GetChatID(),
 			Userid:    player.UserID,
 			Nameid:    table.GetNameID(),
-			Bet:       float64(ebet),
+			Bet:       int64(score),
 			Score:     player.WallMoney,
 		}
 		g.stg.AddScore(addscore)
@@ -291,11 +291,11 @@ func GenerateID(nameid int, chatid int64) string {
 	return playid
 }
 
-func GetTitle(score int64) string {
+func GetTitle(area, score int) string {
 	for i := 0; i < len(GAME_SCORE); i++ {
-		if GAME_SCORE[i] <= score {
-			return GAME_Title[i]
-		}
+		// if GAME_SCORE[i] <= score {
+		// 	return GAME_Title[i]
+		// }
 	}
 
 	return GAME_Title[0]
