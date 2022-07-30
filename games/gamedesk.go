@@ -29,33 +29,50 @@ const (
 
 )
 
-var betsinfo map[int]string = map[int]string{0: "🕒未选择", 1: "🐲青龙", 2: "🐯白虎", 3: "🦚朱雀", 4: "🐢玄武"}
+// var betsinfo map[int]string = map[int]string{0: "🕒未选择", 1: "🐲青龙", 2: "🐯白虎", 3: "🦚朱雀", 4: "🐢玄武"}
+
+// var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
+// var jetmark = []int{dice.ID_DADAN_MARK, dice.ID_XIAOSHUANG_MARK,
+// 	dice.ID_DASHUANG_MARK,
+// 	dice.ID_XIAODAN_MARK,
+// 	dice.ID_XIAO_MARK,
+// 	dice.ID_DA_MARK,
+// 	dice.ID_DAN_MARK,
+// 	dice.ID_SHUANG_MARK}
+
+var override = []string{"（赔率3.4倍）", "（赔率4.4倍）",
+	"（赔率4.4倍）",
+	"（赔率4.4倍）",
+	"（赔率1.99倍）",
+	"（赔率1.99倍）",
+	"（赔率1.99倍）",
+	"（赔率1.99倍）"}
 
 type GameDesk struct {
 	GameTable
-	Rdb                *storage.CloudStore
-	db                 *storage.Storage
-	MsgID              int    //消息ID
-	PlayID             string //局号
-	ChatID             int64  //桌台号
-	NameID             int
-	GameStation        int       //游戏状态
-	LastBetTime        time.Time //最后一次选择时间
-	LastAddTime        time.Time //最后一次下注时间
-	BetCountDownTime   time.Time //60秒
-	BeginTime          time.Time //开局时间
-	StartTime          time.Time //开始游戏时间
-	NextStartTime      time.Time
-	m_cbTableCardArray [5][5]byte          //牌
-	Players            map[int64]*PlayInfo //在线用户
+	Rdb              *storage.CloudStore
+	db               *storage.Storage
+	MsgID            int    //消息ID
+	PlayID           string //局号
+	ChatID           int64  //桌台号
+	NameID           int
+	GameStation      int       //游戏状态
+	LastBetTime      time.Time //最后一次选择时间
+	LastAddTime      time.Time //最后一次下注时间
+	BetCountDownTime time.Time //60秒
+	BeginTime        time.Time //开局时间
+	StartTime        time.Time //开始游戏时间
+	NextStartTime    time.Time
 
-	Bets  map[int64]int64 //下注额
-	Areas map[int64]int   //下注区域
+	Players map[int64]*PlayInfo //在线用户
+
+	Bets map[int64]([8]int64) //下注金额
+	// Areas map[int64]int   //下注区域
 
 	// Changes         map[PlayInfo]int64 //胜负
-	Historys        map[PlayInfo]int64 //历史开奖记录
-	m_cbTimers      [5]int             //牛几倍率
-	M_lUserWinScore map[int64]int64    //回写数据库
+	Historys map[PlayInfo]int64 //历史开奖记录
+
+	M_lUserWinScore map[int64]int64 //回写数据库
 
 	M_lUserReturnScore map[int64]int64 //显示的钱
 	m_GameRecordArrary []byte          //路子
@@ -78,8 +95,7 @@ func (g *GameDesk) InitTable(playid string, nameid int, chatid int64) {
 	g.ChatID = chatid
 
 	g.Players = make(map[int64]*PlayInfo) //在线用户
-	g.Bets = make(map[int64]int64)
-	g.Areas = make(map[int64]int)
+	g.Bets = make(map[int64][8]int64)
 
 	// g.Changes = make(map[PlayInfo]int64)
 	g.M_lUserWinScore = make(map[int64]int64)
@@ -90,9 +106,6 @@ func (g *GameDesk) InitTable(playid string, nameid int, chatid int64) {
 //清理表
 func (g *GameDesk) UnInitTable() {
 
-	for pi := range g.Areas {
-		delete(g.Areas, pi)
-	}
 	for pi := range g.Bets {
 		delete(g.Bets, pi)
 	}
@@ -159,6 +172,19 @@ func (g *GameDesk) GetTitlesInfo() (string, error) {
 }
 
 //下注信息
+func (g *GameDesk) GetBetInfo(userid int64) (string, int) {
+	bets := g.Bets[userid]
+
+	for k, v := range bets {
+
+		fmt.Println(k, v)
+		// bet.FmtBet = ac.FormatMoney(v)
+		// s = append(s, bet)
+	}
+	return "", 0
+}
+
+//下注信息
 func (g *GameDesk) GetBetInfos() ([]logic.Bets, error) {
 	s := make([]logic.Bets, 0)
 	ac := accounting.Accounting{Symbol: "$"}
@@ -168,7 +194,7 @@ func (g *GameDesk) GetBetInfos() ([]logic.Bets, error) {
 		bet.Userid = k
 		bet.UserName = g.Players[k].Name
 		bet.Title = g.Players[k].Title
-		bet.Bet = v
+
 		bet.FmtBet = ac.FormatMoney(v)
 		s = append(s, bet)
 	}
@@ -282,7 +308,6 @@ func (g *GameDesk) AddScore(player PlayInfo, area, score int) (int64, error) {
 	g.BetMux.Lock()
 	defer g.BetMux.Unlock()
 
-	var floatscore int64
 	//第一次增加
 	if !v {
 		g.Players[player.UserID] = &player
@@ -294,9 +319,11 @@ func (g *GameDesk) AddScore(player PlayInfo, area, score int) (int64, error) {
 
 	g.LastAddTime = time.Now()
 
-	g.Bets[player.UserID] += int64(score) //下注金额
-	g.Areas[player.UserID] += area        //下注区域
-	return int64(floatscore), nil
+	betarea := g.Bets[player.UserID]
+	betarea[area] += int64(score)
+	// a[1] += 12
+
+	return int64(score), nil
 }
 
 //回写数据库
@@ -318,9 +345,7 @@ func (g *GameDesk) SettleGame(userid int64) ([]logic.Scorelogs, error) {
 
 	ncountdown := time.Until(g.BetCountDownTime)
 	if int(ncountdown.Seconds()) > 0 {
-		if len(g.Areas) == 0 {
-			return nil, errors.New("当前没有用户做出选择，请等待用户选择或者选择阶段结束后结束游戏")
-		}
+
 	}
 
 	return nil, nil
@@ -383,7 +408,6 @@ func (g *GameDesk) Bet(userid int64, area int) (bool, error) {
 
 	g.LastBetTime = time.Now()
 
-	g.Areas[userid] = area
 	user.BetCount++
 
 	return true, nil
@@ -506,7 +530,6 @@ func (g *GameDesk) GetStartInfos() (logic.Selects, error) {
 		bet.Userid = k
 		bet.UserName = g.Players[k].Name
 		bet.Title = g.Players[k].Title
-		bet.FmtBetArea = betsinfo[g.Areas[k]]
 
 		bets = append(bets, bet)
 	}
@@ -552,11 +575,11 @@ func (g *GameDesk) GetSelectInfos() (logic.Selects, error) {
 		bet.Userid = k
 		bet.UserName = g.Players[k].Name
 
-		if g.Areas[k] != 0 {
-			bet.FmtBetArea = "✅" + betsinfo[g.Areas[k]]
-		} else {
-			bet.FmtBetArea = betsinfo[g.Areas[k]]
-		}
+		// if g.Areas[k] != 0 {
+		// 	bet.FmtBetArea = "✅" + betsinfo[g.Areas[k]]
+		// } else {
+		// 	bet.FmtBetArea = betsinfo[g.Areas[k]]
+		// }
 
 		bets = append(bets, bet)
 	}
@@ -582,11 +605,11 @@ func (g *GameDesk) WriteChangeScore(playid string, chatid int64, users map[int64
 
 	for k, v := range g.M_lUserWinScore {
 		score := logic.Scorelogs{
-			Userid:      k,
-			Playid:      g.PlayID,
-			Chatid:      g.ChatID,
-			Nameid:      g.NameID,
-			Bet:         g.Bets[k],
+			Userid: k,
+			Playid: g.PlayID,
+			Chatid: g.ChatID,
+			Nameid: g.NameID,
+
 			Changescore: g.M_lUserWinScore[k],
 			Score:       g.Players[k].WallMoney,
 			Status:      2,

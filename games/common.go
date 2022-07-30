@@ -33,7 +33,7 @@ type GameTable interface {
 	Bet(int64, int) (bool, error)           //用户,下注区域
 	GetStartInfos() (logic.Selects, error)  //显示下注人员
 	GetBetInfos() ([]logic.Bets, error)     //下注信息
-	GetBetInfo(int64) ([]logic.Bets, error) //下注信息
+	GetBetInfo(int64) (string, int)         //下注信息
 	GetSelectInfos() (logic.Selects, error) //显示下注人员
 	GetSettleInfos() (logic.Records, error)
 	GetPeriodInfo() (string, error) //开局信息

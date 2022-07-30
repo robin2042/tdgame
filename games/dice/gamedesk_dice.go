@@ -8,9 +8,6 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 )
 
-// 大单", "小双", "大双", "小单", "小", "大", "单", "双"
-
-// "大","小","单","双","大单","大双","小单","小双"
 var (
 	ID_DADAN_MARK      int = 0x10
 	ID_XIAOSHUANG_MARK int = 0x13
@@ -21,6 +18,19 @@ var (
 	ID_DAN_MARK        int = 0x04
 	ID_SHUANG_MARK     int = 0x08
 )
+
+var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
+var jetmark = []int{ID_DADAN_MARK, ID_XIAOSHUANG_MARK,
+	ID_DASHUANG_MARK,
+	ID_XIAODAN_MARK,
+	ID_XIAO_MARK,
+	ID_DA_MARK,
+	ID_DAN_MARK,
+	ID_SHUANG_MARK}
+
+// 大单", "小双", "大双", "小单", "小", "大", "单", "双"
+
+// "大","小","单","双","大单","大双","小单","小双"
 
 //骰子
 type Dice struct {
@@ -50,8 +60,8 @@ func (g *Dice) GetBetInfos() (bets []logic.Bets, err error) {
 }
 
 //获取个人的下注信息
-func (g *Dice) GetBetInfo(int64) ([]logic.Bets, error) {
-	return g.GameDesk.GetBetInfos()
+func (g *Dice) GetBetInfo(userid int64) (string, int) {
+	return g.GameDesk.GetBetInfo(userid)
 }
 
 //获取ID

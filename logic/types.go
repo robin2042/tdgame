@@ -1,5 +1,25 @@
 package logic
 
+var (
+	ID_DADAN_MARK      int = 0x10
+	ID_XIAOSHUANG_MARK int = 0x13
+	ID_DASHUANG_MARK   int = 0x11
+	ID_XIAODAN_MARK    int = 0x12
+	ID_XIAO_MARK       int = 0x01
+	ID_DA_MARK         int = 0x02
+	ID_DAN_MARK        int = 0x04
+	ID_SHUANG_MARK     int = 0x08
+)
+
+var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
+var jetmark = []int{ID_DADAN_MARK, ID_XIAOSHUANG_MARK,
+	ID_DASHUANG_MARK,
+	ID_XIAODAN_MARK,
+	ID_XIAO_MARK,
+	ID_DA_MARK,
+	ID_DAN_MARK,
+	ID_SHUANG_MARK}
+
 // User stores info about user
 type Group struct {
 	// ID     int
