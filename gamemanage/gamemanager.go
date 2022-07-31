@@ -38,7 +38,7 @@ func InitStart(tb *telegram.TgBot) {
 	}
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
 	fmt.Println(table)
-	periond, lasttime, _ := table.GetPeriodInfo()
+	periond, lasttime, _ := table.InitPeriodInfo()
 	fmt.Println(periond)
 
 	timer := time.NewTimer(time.Duration(lasttime) * time.Second)

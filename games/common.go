@@ -36,10 +36,10 @@ type GameTable interface {
 	GetBetInfo(int64) ([]string, int)       //下注信息
 	GetSelectInfos() (logic.Selects, error) //显示下注人员
 	GetSettleInfos() (logic.Records, error)
-	GetPeriodInfo() (logic.PeriodInfo, int, error) //开局信息
-	InitPeriodInfo(logic.PeriodInfo)               //设置开局信息
-	GetTitlesInfo() (string, error)                //获取标题信息
-	GetBalance(uid int64) int64                    //获取用户余额
+	GetPeriodInfo() logic.PeriodInfo                //开局信息
+	InitPeriodInfo() (logic.PeriodInfo, int, error) //设置开局信息
+	GetTitlesInfo() (string, error)                 //获取标题信息
+	GetBalance(uid int64) int64                     //获取用户余额
 
 }
 

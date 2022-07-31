@@ -152,7 +152,7 @@ func TemplateNiuniu_Select(tb *TgBot) *telebot.ReplyMarkup {
 }
 
 //百家乐下注文本
-func TemplateBaccarat_BetText(score []logic.Bets) string {
+func TemplateBaccarat_BetText(diceinfo logic.DiceJettonInfo) string {
 
 	var b bytes.Buffer
 	tmpl, err := template.ParseFiles("./templates/Baccarat/bet.tmpl")
@@ -161,7 +161,7 @@ func TemplateBaccarat_BetText(score []logic.Bets) string {
 		return "无效"
 	}
 
-	tmpl.Execute(&b, score)
+	tmpl.Execute(&b, diceinfo)
 
 	return b.String()
 }

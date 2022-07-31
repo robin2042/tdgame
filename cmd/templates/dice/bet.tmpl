@@ -1,4 +1,4 @@
-第{{$.PeriodID}}期 
+第{{$.Info.PeriodID}}期 
  
 开奖时间：{{$.Turnontime}}
  
@@ -6,6 +6,8 @@
  
 下注内容 
 ------------ 
-{{$.Bets}}
+玩家列表:{{range $val := .Bets}}
+{{$val}}
+{{end}}
 ------------ 
 余额：{{$.Balance}}

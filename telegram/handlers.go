@@ -37,6 +37,12 @@ func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *teleb
 
 }
 
+func (tb *TgBot) ReplyToMessage(msg string, m *telebot.Message) (*telebot.Message, error) {
+
+	return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyTo: m, ParseMode: telebot.ModeMarkdownV2})
+
+}
+
 func (tb *TgBot) EditHtmlMessage(m *telebot.Message, msg string, menu *telebot.ReplyMarkup) (*telebot.Message, error) {
 	replay := &telebot.ReplyMarkup{InlineKeyboard: m.ReplyMarkup.InlineKeyboard}
 	if menu != nil {
@@ -303,6 +309,7 @@ func Callback(tb *TgBot) func(c *telebot.Callback) {
 // 判断文本消息
 func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
+
 		messageid := fmt.Sprintf("%d%d", m.Unixtime, m.ID)
 
 		str := strings.Split(m.Text, " ")
@@ -327,16 +334,24 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 				UserID: int64(m.Sender.ID),
 			}
 			fmt.Println(intvar, player)
-			totalscore, err := tb.Games.AddScore(messageid, table, player, area, intvar)
+			_, err := tb.Games.AddScore(messageid, table, player, area, intvar)
 			if err != nil {
 				return
 				// TemplateDice_BetText()
 			}
 			strbets, _ := table.GetBetInfo(int64(m.Sender.ID))
+			period := table.GetPeriodInfo()
 			// table.GetPeriodInfo()
-			a := table.GetBalance(int64(m.Sender.ID))
+			balance := table.GetBalance(int64(m.Sender.ID))
+			diceinfo := logic.DiceJettonInfo{
+				Info:    period,
+				Bets:    strbets,
+				Balance: balance,
+			}
+			fmt.Println(diceinfo)
+			abc := TemplateDice_BetText(diceinfo)
 
-			fmt.Println(totalscore, err, strbets, a)
+			fmt.Println(abc)
 		}
 
 	}

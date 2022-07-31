@@ -253,6 +253,7 @@ type DiceBetInfo struct {
 
 //开局信息
 type DiceJettonInfo struct {
-	Info  PeriodInfo
-	Score int
+	Info    PeriodInfo //开局信息
+	Bets    []string   //下注
+	Balance int64      //余额
 }
