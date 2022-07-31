@@ -29,27 +29,6 @@ type GameMainManage struct {
 
 }
 
-//获取分钟
-func GetFormatHourMinute(minute, second int) string {
-	t4 := time.Now().Hour() //小时
-
-	t5 := fmt.Sprintf("%02d:%02d:%02d", t4, minute, second)
-
-	return t5
-}
-
-//获取分钟
-func GetMinute() int {
-	t5 := time.Now().Minute() //分钟
-	return t5
-}
-
-//获取秒
-func GetSecond() int {
-	t5 := time.Now().Second() //秒
-	return t5
-}
-
 //启动游戏
 func InitStart(tb *telegram.TgBot) {
 
@@ -59,8 +38,10 @@ func InitStart(tb *telegram.TgBot) {
 	}
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
 	fmt.Println(table)
-	periond, _ := table.GetPeriodInfo()
+	periond, lasttime, _ := table.GetPeriodInfo()
 	fmt.Println(periond)
+
+	timer := time.NewTimer(time.Duration(lasttime) * time.Second)
 
 	if table.GetStatus() > games.GS_TK_BET {
 		// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
@@ -70,28 +51,6 @@ func InitStart(tb *telegram.TgBot) {
 	start := tb.Games.NewGames(games.GAME_DICE, m.ID)
 	fmt.Println(start)
 
-	durationsec := 1
-	//开盘时间\封盘时间
-	var turnontime, closetime string
-
-	if GetMinute()%2 == 0 {
-		durationsec = 2*60 - GetSecond()
-		turnontime = GetFormatHourMinute(GetMinute()+2, 0)
-		closetime = GetFormatHourMinute(GetMinute()+3, 50)
-	} else {
-		durationsec = 1*60 - GetSecond()
-		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
-		closetime = GetFormatHourMinute(GetMinute()+2, 50)
-	}
-	fmt.Println(turnontime, closetime)
-
-	timer := time.NewTimer(time.Duration(durationsec-1) * time.Second)
-
-	periondInfo := logic.PeriodInfo{
-		PeriodID:   periond,
-		Turnontime: turnontime,
-		Closetime:  closetime,
-	}
 	go func() {
 		fmt.Println("当前时间为:", time.Now())
 		fmt.Println(timer)
@@ -99,7 +58,7 @@ func InitStart(tb *telegram.TgBot) {
 
 		// fmt.Println("当前时间为:", t)
 
-		msg := telegram.TemplateDice_Text(periondInfo)
+		msg := telegram.TemplateDice_Text(periond)
 
 		// reply := telegram.TemplateDice_Bet(tb)
 		message := telebot.Message{Chat: m}
@@ -113,7 +72,7 @@ func InitStart(tb *telegram.TgBot) {
 		fmt.Println(start)
 		tb.Games.GameBegin(games.GAME_DICE, message.Chat.ID, message.ID)
 		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, message.ID)
-		table.SetPeriodInfo(periondInfo)
+		// table.SetPeriodInfo(periond)
 		fmt.Println(table)
 
 		//

@@ -29,24 +29,26 @@ const (
 
 )
 
-// var betsinfo map[int]string = map[int]string{0: "🕒未选择", 1: "🐲青龙", 2: "🐯白虎", 3: "🦚朱雀", 4: "🐢玄武"}
+//获取分钟
+func GetFormatHourMinute(minute, second int) string {
+	t4 := time.Now().Hour() //小时
 
-// var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
-// var jetmark = []int{dice.ID_DADAN_MARK, dice.ID_XIAOSHUANG_MARK,
-// 	dice.ID_DASHUANG_MARK,
-// 	dice.ID_XIAODAN_MARK,
-// 	dice.ID_XIAO_MARK,
-// 	dice.ID_DA_MARK,
-// 	dice.ID_DAN_MARK,
-// 	dice.ID_SHUANG_MARK}
+	t5 := fmt.Sprintf("%02d:%02d:%02d", t4, minute, second)
 
-var override = []string{"（赔率3.4倍）", "（赔率4.4倍）",
-	"（赔率4.4倍）",
-	"（赔率4.4倍）",
-	"（赔率1.99倍）",
-	"（赔率1.99倍）",
-	"（赔率1.99倍）",
-	"（赔率1.99倍）"}
+	return t5
+}
+
+//获取分钟
+func GetMinute() int {
+	t5 := time.Now().Minute() //分钟
+	return t5
+}
+
+//获取秒
+func GetSecond() int {
+	t5 := time.Now().Second() //秒
+	return t5
+}
 
 type GameDesk struct {
 	GameTable
@@ -57,6 +59,7 @@ type GameDesk struct {
 	ChatID           int64  //桌台号
 	NameID           int
 	GameStation      int       //游戏状态
+	LastOpentime     int       //开局倒计时
 	LastBetTime      time.Time //最后一次选择时间
 	LastAddTime      time.Time //最后一次下注时间
 	BetCountDownTime time.Time //60秒
@@ -66,7 +69,7 @@ type GameDesk struct {
 
 	Players map[int64]*PlayInfo //在线用户
 
-	Bets map[int64]([8]int64) //下注金额
+	Bets map[int64]([]int64) //下注金额
 	// Areas map[int64]int   //下注区域
 
 	// Changes         map[PlayInfo]int64 //胜负
@@ -95,7 +98,7 @@ func (g *GameDesk) InitTable(playid string, nameid int, chatid int64) {
 	g.ChatID = chatid
 
 	g.Players = make(map[int64]*PlayInfo) //在线用户
-	g.Bets = make(map[int64][8]int64)
+	g.Bets = make(map[int64][]int64)
 
 	// g.Changes = make(map[PlayInfo]int64)
 	g.M_lUserWinScore = make(map[int64]int64)
@@ -142,8 +145,52 @@ func (g *GameDesk) GetNameID() int {
 	return g.NameID
 }
 
+//设置开局信息
+func (g *GameDesk) InitPeriodInfo(logic.PeriodInfo) {
+
+	g.BetMux.Lock()
+	defer g.BetMux.Unlock()
+
+	t1 := time.Now().Year()
+	t2 := time.Now().Month()
+	t3 := time.Now().Day()
+	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
+	fmt.Println(date)
+	values, isexist, err := g.Rdb.GetValue(date)
+	if !isexist {
+		g.Rdb.Incr(date)
+	}
+
+	Period := fmt.Sprintf("%s%03s", date, values)
+	fmt.Println(Period, values, isexist, err)
+
+	durationsec := 1
+	//开盘时间\封盘时间
+	var turnontime, closetime string
+
+	if GetMinute()%2 == 0 {
+		durationsec = 2*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+2, 0)
+		closetime = GetFormatHourMinute(GetMinute()+3, 50)
+	} else {
+		durationsec = 1*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
+		closetime = GetFormatHourMinute(GetMinute()+2, 50)
+	}
+	fmt.Println(turnontime, closetime)
+
+	periondInfo := logic.PeriodInfo{
+		PeriodID:   Period,
+		Turnontime: turnontime,
+		Closetime:  closetime,
+	}
+	g.periodinfo = periondInfo
+	g.LastOpentime = durationsec
+}
+
 //获取期号
-func (g *GameDesk) GetPeriodInfo() (string, error) {
+func (g *GameDesk) GetPeriodInfo() (logic.PeriodInfo, int, error) {
+	info := logic.PeriodInfo{}
 	t1 := time.Now().Year()
 	t2 := time.Now().Month()
 	t3 := time.Now().Day()
@@ -154,12 +201,33 @@ func (g *GameDesk) GetPeriodInfo() (string, error) {
 		g.Rdb.Incr(date)
 	}
 	if err != nil {
-		return "", err
+		return info, 0, err
 	}
 	Period := fmt.Sprintf("%s%03s", date, values)
 	fmt.Println(Period, values, isexist, err)
 
-	return Period, nil
+	durationsec := 1
+	//开盘时间\封盘时间
+	var turnontime, closetime string
+
+	if GetMinute()%2 == 0 {
+		durationsec = 2*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+2, 0)
+		closetime = GetFormatHourMinute(GetMinute()+3, 50)
+	} else {
+		durationsec = 1*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
+		closetime = GetFormatHourMinute(GetMinute()+2, 50)
+	}
+	fmt.Println(turnontime, closetime)
+
+	periondInfo := logic.PeriodInfo{
+		PeriodID:   Period,
+		Turnontime: turnontime,
+		Closetime:  closetime,
+	}
+
+	return periondInfo, durationsec - 1, nil
 }
 
 func (g *GameDesk) SetPeriodInfo(info logic.PeriodInfo) {
@@ -171,17 +239,36 @@ func (g *GameDesk) GetTitlesInfo() (string, error) {
 	return "", nil
 }
 
+//获取用户余额
+func (g *GameDesk) GetBalance(uid int64) int64 {
+	values, v := g.Players[uid]
+	g.BetMux.Lock()
+	defer g.BetMux.Unlock()
+	if v {
+		bet := values.WallMoney
+		return bet
+	}
+
+	return 0
+}
+
 //下注信息
-func (g *GameDesk) GetBetInfo(userid int64) (string, int) {
+func (g *GameDesk) GetBetInfo(userid int64) ([]string, int) {
 	bets := g.Bets[userid]
+	var strbets []string = make([]string, 0)
 
 	for k, v := range bets {
+		if v <= 0 {
+			continue
+		}
+		jetton := strjetton[k]
+		area := override[k]
+		score := v
+		strbet := fmt.Sprintf("%s%d%s", jetton, score, area)
+		strbets = append(strbets, strbet)
 
-		fmt.Println(k, v)
-		// bet.FmtBet = ac.FormatMoney(v)
-		// s = append(s, bet)
 	}
-	return "", 0
+	return strbets, len(strbets)
 }
 
 //下注信息
@@ -311,6 +398,7 @@ func (g *GameDesk) AddScore(player PlayInfo, area, score int) (int64, error) {
 	//第一次增加
 	if !v {
 		g.Players[player.UserID] = &player
+		g.Bets[player.UserID] = make([]int64, 8)
 	}
 	if player.WallMoney < int64(score) {
 		return 0, errors.New("余额不足")

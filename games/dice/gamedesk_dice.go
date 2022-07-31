@@ -40,7 +40,7 @@ func (g *Dice) GetBetInfos() (bets []logic.Bets, err error) {
 }
 
 //获取个人的下注信息
-func (g *Dice) GetBetInfo(userid int64) (string, int) {
+func (g *Dice) GetBetInfo(userid int64) ([]string, int) {
 	return g.GameDesk.GetBetInfo(userid)
 }
 

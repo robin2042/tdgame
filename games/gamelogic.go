@@ -29,6 +29,14 @@ var jetmark = []int{ID_DADAN_MARK, ID_XIAOSHUANG_MARK,
 	ID_DAN_MARK,
 	ID_SHUANG_MARK}
 
+var override = []string{"（赔率3.4倍）", "（赔率4.4倍）",
+	"（赔率4.4倍）",
+	"（赔率4.4倍）",
+	"（赔率1.99倍）",
+	"（赔率1.99倍）",
+	"（赔率1.99倍）",
+	"（赔率1.99倍）"}
+
 func SplitBet(str []string) []logic.DiceBetInfo {
 	// var arbet []logic.DiceBetInfo = make([]logic.DiceBetInfo, 0) //最大同时20格下注
 	// return arbet

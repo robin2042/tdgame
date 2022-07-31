@@ -332,8 +332,11 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 				return
 				// TemplateDice_BetText()
 			}
-			table.GetBetInfo(int64(m.Sender.ID))
-			fmt.Println(totalscore, err)
+			strbets, _ := table.GetBetInfo(int64(m.Sender.ID))
+			// table.GetPeriodInfo()
+			a := table.GetBalance(int64(m.Sender.ID))
+
+			fmt.Println(totalscore, err, strbets, a)
 		}
 
 	}
