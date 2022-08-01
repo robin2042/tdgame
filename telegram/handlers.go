@@ -39,7 +39,7 @@ func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *teleb
 
 func (tb *TgBot) ReplyToMessage(msg string, m *telebot.Message) (*telebot.Message, error) {
 
-	return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyTo: m, ParseMode: telebot.ModeMarkdownV2})
+	return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyTo: m})
 
 }
 
@@ -349,9 +349,10 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 				Balance: balance,
 			}
 			fmt.Println(diceinfo)
-			abc := TemplateDice_BetText(diceinfo)
+			strdice := TemplateDice_BetText(diceinfo)
 
-			fmt.Println(abc)
+			tb.ReplyToMessage(strdice, m)
+
 		}
 
 	}
