@@ -1,13 +1,12 @@
 第{{$.Info.PeriodID}}期 
  
-开奖时间：{{$.Turnontime}}
+开奖时间：{{$.Info.Turnontime}}
  
-封盘时间：{{$.Closetime}}
+封盘时间：{{$.Info.Closetime}}
  
 下注内容 
 ------------ 
 玩家列表:{{range $val := .Bets}}
-{{$val}}
-{{end}}
+{{$val}}{{end}}
 ------------ 
 余额：{{$.Balance}}

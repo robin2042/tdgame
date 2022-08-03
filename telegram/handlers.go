@@ -11,7 +11,6 @@ import (
 	"github.com/aoyako/telegram_2ch_res_bot/games"
 	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/leekchan/accounting"
-
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -34,6 +33,12 @@ func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *teleb
 	} else {
 		return tb.Bot.Send(m.Chat, msg, &telebot.SendOptions{ReplyMarkup: menu, ParseMode: telebot.ModeMarkdownV2})
 	}
+
+}
+
+func (tb *TgBot) DiceToMessage(m *telebot.Message, dice *telebot.Dice) (*telebot.Message, error) {
+
+	return tb.Bot.Send(m.Chat, dice)
 
 }
 
@@ -300,6 +305,18 @@ func LeaveGroups(tb *TgBot) func(m *telebot.Message) {
 }
 
 // /start endpoint
+func KAIJU(tb *TgBot) func(m *telebot.Message) {
+	return func(m *telebot.Message) {
+		err := tb.Controller.Unregister(int64(m.Sender.ID))
+		if err != nil {
+
+		}
+
+		// help(tb)(m)
+	}
+}
+
+// /start endpoint
 func Callback(tb *TgBot) func(c *telebot.Callback) {
 	return func(m *telebot.Callback) {
 		//fmt.Println(m)
@@ -309,6 +326,8 @@ func Callback(tb *TgBot) func(c *telebot.Callback) {
 // 判断文本消息
 func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
+		RandDice_SendBack(tb, 0, m)
+		return
 
 		messageid := fmt.Sprintf("%d%d", m.Unixtime, m.ID)
 
@@ -354,7 +373,6 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			tb.ReplyToMessage(strdice, m)
 
 		}
-
 	}
 }
 
@@ -368,6 +386,30 @@ func Relief(tb *TgBot) func(m *telebot.Message) {
 
 		// help(tb)(m)
 	}
+}
+
+//随机发送骰子
+func RandDice_SendBack(tb *TgBot, serialno int, m *telebot.Message) {
+	dice := &telebot.Dice{
+		Type: telebot.Cube.Type,
+	}
+
+	first, _ := tb.DiceToMessage(m, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+	second, _ := tb.DiceToMessage(m, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+	three, _ := tb.DiceToMessage(m, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+
+	table := tb.Games.GetTable(games.GAME_BACCARAT, int64(m.ID), serialno)
+	table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value)
+
 }
 
 // /百家乐回调下注
@@ -601,12 +643,12 @@ func Baccarat_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 		// playid := fmt.Sprintf("%d%d", c.Message.Chat.ID, c.Message.ID)
 
 		//写分
-		_, err := table.SettleGame(int64(c.Sender.ID))
-		if err != nil {
-			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
-			tb.Bot.Respond(c, &reply)
-			return
-		}
+		// _, err := table.SettleGame(int64(c.Sender.ID))
+		// if err != nil {
+		// 	reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
+		// 	tb.Bot.Respond(c, &reply)
+		// 	return
+		// }
 
 		//回写数据库
 		// fmt.Println(betsinfo)
@@ -628,16 +670,16 @@ func Baccarat_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Niuniu_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
+		// table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
 		// playid := fmt.Sprintf("%d%d", c.Message.Chat.ID, c.Message.ID)
 
 		//写分
-		_, err := table.SettleGame(int64(c.Sender.ID))
-		if err != nil {
-			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
-			tb.Bot.Respond(c, &reply)
-			return
-		}
+		// _, err := table.SettleGame(int64(c.Sender.ID))
+		// if err != nil {
+		// 	reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
+		// 	tb.Bot.Respond(c, &reply)
+		// 	return
+		// }
 
 		//回写数据库
 		// fmt.Println(betsinfo)

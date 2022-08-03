@@ -81,12 +81,12 @@ func (g *Baccarat) EndGame() error {
 	return nil
 }
 
-func (g *Baccarat) SettleGame(userid int64) ([]logic.Scorelogs, error) {
+func (g *Baccarat) SettleGame(int, int, int) ([]logic.Scorelogs, error) {
 
-	_, err := g.GameDesk.SettleGame(userid)
-	if err != nil {
-		return nil, err
-	}
+	// _, err := g.GameDesk.SettleGame(userid)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	//结算
 	g.CalculateScore()

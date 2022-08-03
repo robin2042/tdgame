@@ -111,6 +111,7 @@ func SetupHandlers(tb *TgBot) {
 	tb.Bot.Handle("/qk", GamesWithdraw(tb))
 
 	tb.Bot.Handle("/relief", LeaveGroups(tb))
+	tb.Bot.Handle("/kj", KAIJU(tb))
 
 }
 

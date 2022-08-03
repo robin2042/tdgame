@@ -27,7 +27,7 @@ type GameTable interface {
 	SetMsgID(int)   //获取游戏状态
 	GetStatus() int //获取游戏状态
 	StartGame(int64) (bool, error)
-	SettleGame(int64) ([]logic.Scorelogs, error)
+	SettleGame(int, int, int) ([]logic.Scorelogs, error)
 	EndGame() error
 	AddScore(player PlayInfo, area, score int) (int64, error)
 	Bet(int64, int) (bool, error)           //用户,下注区域

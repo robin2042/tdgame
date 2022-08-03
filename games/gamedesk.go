@@ -381,26 +381,26 @@ func (g *GameDesk) AddScore(player PlayInfo, area, score int) (int64, error) {
 }
 
 //回写数据库
-func (g *GameDesk) SettleGame(userid int64) ([]logic.Scorelogs, error) {
+func (g *GameDesk) SettleGame(int, int, int) ([]logic.Scorelogs, error) {
 
-	var bfind bool
-	for i := range g.Bets {
-		if i == userid {
-			bfind = true
-			break
-		}
-	}
-	if !bfind {
-		return nil, errors.New("您没有参与此游戏，无权更改游戏状态")
-	}
-	if time.Now().Before(g.LastBetTime.Add(time.Second * 6)) {
-		return nil, errors.New("所有用户无操作6s后才能开始游戏")
-	}
+	// var bfind bool
+	// for i := range g.Bets {
+	// 	if i == userid {
+	// 		bfind = true
+	// 		break
+	// 	}
+	// }
+	// if !bfind {
+	// 	return nil, errors.New("您没有参与此游戏，无权更改游戏状态")
+	// }
+	// if time.Now().Before(g.LastBetTime.Add(time.Second * 6)) {
+	// 	return nil, errors.New("所有用户无操作6s后才能开始游戏")
+	// }
 
-	ncountdown := time.Until(g.BetCountDownTime)
-	if int(ncountdown.Seconds()) > 0 {
+	// ncountdown := time.Until(g.BetCountDownTime)
+	// if int(ncountdown.Seconds()) > 0 {
 
-	}
+	// }
 
 	return nil, nil
 }
