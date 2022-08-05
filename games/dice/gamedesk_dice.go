@@ -15,6 +15,8 @@ import (
 //骰子
 type Dice struct {
 	games.GameDesk
+	WinPoint int //点数
+	WinArea  int //赢点	牌值大小单双
 }
 
 func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
@@ -55,4 +57,71 @@ func (g *Dice) GetPeriodID() string {
 	fmt.Println(isexist, err)
 
 	return ""
+}
+
+//根据牌值类型 单双,返回大小单双
+func RetTypes(value, types int) int {
+	values := value & types
+	return values
+}
+
+//根据牌值类型 单双
+func GetCardTypes(sums int) int {
+	if sums%2 == 0 {
+		return games.ID_SHUANG_MARK
+	} else {
+		return games.ID_DAN_MARK
+	}
+
+}
+
+//根据牌值计算大小值
+func GetCardValue(sums int) int {
+	if sums <= 10 {
+		return games.ID_XIAO_MARK //小
+	}
+	if sums > 10 {
+		return games.ID_DA_MARK //大
+	}
+	return 0
+}
+
+//计算牌点
+func CalcPoint(first, second, three int) int {
+	return first + second + three
+}
+
+//结算用户
+func (g *Dice) CalculateScore() {
+	//推算赢家
+}
+
+//回写数据库
+func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
+
+	g.BetMux.Lock()
+	defer g.BetMux.Unlock()
+	g.WinPoint = CalcPoint(first, second, three)
+	g.WinArea = RetTypes(GetCardValue(g.WinPoint), GetCardTypes(g.WinPoint))
+
+	// var bfind bool
+	// for i := range g.Bets {
+	// 	if i == userid {
+	// 		bfind = true
+	// 		break
+	// 	}
+	// }
+	// if !bfind {
+	// 	return nil, errors.New("您没有参与此游戏，无权更改游戏状态")
+	// }
+	// if time.Now().Before(g.LastBetTime.Add(time.Second * 6)) {
+	// 	return nil, errors.New("所有用户无操作6s后才能开始游戏")
+	// }
+
+	// ncountdown := time.Until(g.BetCountDownTime)
+	// if int(ncountdown.Seconds()) > 0 {
+
+	// }
+
+	return nil, nil
 }

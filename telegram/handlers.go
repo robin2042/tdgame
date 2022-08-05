@@ -407,7 +407,7 @@ func RandDice_SendBack(tb *TgBot, serialno int, m *telebot.Message) {
 		return
 	}
 
-	table := tb.Games.GetTable(games.GAME_BACCARAT, int64(m.ID), serialno)
+	table := tb.Games.GetTable(games.GAME_DICE, int64(m.ID), serialno)
 	table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value)
 
 }

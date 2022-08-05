@@ -112,7 +112,8 @@ func (g *GameMainManage) LoadGames() (bool, error) {
 }
 
 func (g *GameMainManage) GetTable(nameid int, chatid int64, msgid int) games.GameTable {
-	playid := fmt.Sprintf("%d%d", chatid, msgid)
+	// playid := fmt.Sprintf("%d%d", chatid, msgid)
+	playid := "-7306125820"
 	table := g.Tables[playid]
 	if table != nil {
 		return table

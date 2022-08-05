@@ -10,14 +10,14 @@ import (
 )
 
 var (
-	ID_DADAN_MARK      int = 0x10
-	ID_XIAOSHUANG_MARK int = 0x13
-	ID_DASHUANG_MARK   int = 0x11
+	ID_DADAN_MARK      int = 0x18
+	ID_XIAOSHUANG_MARK int = 0x22
+	ID_DASHUANG_MARK   int = 0x28
 	ID_XIAODAN_MARK    int = 0x12
-	ID_XIAO_MARK       int = 0x01
-	ID_DA_MARK         int = 0x02
-	ID_DAN_MARK        int = 0x04
-	ID_SHUANG_MARK     int = 0x08
+	ID_XIAO_MARK       int = 0x02
+	ID_DA_MARK         int = 0x08
+	ID_DAN_MARK        int = 0x10
+	ID_SHUANG_MARK     int = 0x20
 )
 
 var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}

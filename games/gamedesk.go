@@ -381,7 +381,8 @@ func (g *GameDesk) AddScore(player PlayInfo, area, score int) (int64, error) {
 }
 
 //回写数据库
-func (g *GameDesk) SettleGame(int, int, int) ([]logic.Scorelogs, error) {
+func (g *GameDesk) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
+	fmt.Println(first, second, three)
 
 	// var bfind bool
 	// for i := range g.Bets {
