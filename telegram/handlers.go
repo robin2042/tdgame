@@ -326,8 +326,6 @@ func Callback(tb *TgBot) func(c *telebot.Callback) {
 // 判断文本消息
 func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
-		RandDice_SendBack(tb, 0, m)
-		return
 
 		messageid := fmt.Sprintf("%d%d", m.Unixtime, m.ID)
 
@@ -373,6 +371,8 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			tb.ReplyToMessage(strdice, m)
 
 		}
+		RandDice_SendBack(tb, 0, m)
+
 	}
 }
 

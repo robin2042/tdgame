@@ -9,7 +9,6 @@ import (
 )
 
 var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
-var betspeed = []float32{3.4, 3.4, 4.4, 4.4, 1.99, 1.99, 1.99, 1.99}
 
 // const letter_goodness []string {"大","小","单","双","大单","大双","小单","小双"}
 

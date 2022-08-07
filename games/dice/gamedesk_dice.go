@@ -2,6 +2,7 @@ package dice
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/aoyako/telegram_2ch_res_bot/games"
@@ -12,11 +13,26 @@ import (
 
 // "大","小","单","双","大单","大双","小单","小双"
 
+func Change(slice []int64) []int64 {
+	slice = append(slice, 1)
+	return slice
+}
+
 //骰子
 type Dice struct {
 	games.GameDesk
-	WinPoint int //点数
-	WinArea  int //赢点	牌值大小单双
+	WinPoint     int                       //点数
+	WinArea      int                       //赢点	牌值大小单双
+	WinAreaIndex int                       //赢点	牌值大小单双
+	WinAreaBets  map[int64]([]games.Areas) //赢钱区域
+}
+
+func (g *Dice) InitTable(playid string, nameid int, chatid int64) {
+
+	g.WinAreaBets = make(map[int64][]games.Areas)
+
+	g.GameDesk.InitTable(playid, nameid, chatid)
+
 }
 
 func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
@@ -61,7 +77,7 @@ func (g *Dice) GetPeriodID() string {
 
 //根据牌值类型 单双,返回大小单双
 func RetTypes(value, types int) int {
-	values := value & types
+	values := value | types
 	return values
 }
 
@@ -91,19 +107,60 @@ func CalcPoint(first, second, three int) int {
 	return first + second + three
 }
 
+//获取值
+func (g *Dice) GetWinareaIndex(winarea int) int {
+	for key, value := range games.JET_MARK {
+		if value == winarea {
+			return key
+		}
+	}
+	return -1
+}
+
 //结算用户
+//根据结果,比对是否选中.
 func (g *Dice) CalculateScore() {
-	//推算赢家
+	for userid, arrs := range g.Bets {
+		for key, value := range arrs {
+			if value <= 0 {
+				continue
+			} else {
+				_, v := g.WinAreaBets[userid]
+				if !v {
+					g.WinAreaBets[userid] = make([]games.Areas, 0)
+				}
+			}
+			if g.WinArea&games.JET_MARK[key] != 0 { //中奖了
+				fmt.Println(games.Bet_SPEED[key])
+				fmt.Println(float64(value))
+				//地板去整
+				score := int64(math.Floor(games.Bet_SPEED[key] * float64(value)))
+				fmt.Println(score)
+				wins := g.WinAreaBets[userid]
+				area := games.Areas{
+					Area:  key,
+					Score: score,
+				}
+				wins = append(wins, area)
+				g.WinAreaBets[userid] = wins
+
+			}
+
+		}
+	}
 }
 
 //回写数据库
 func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
+	fmt.Println(first, second, three)
 
 	g.BetMux.Lock()
-	defer g.BetMux.Unlock()
+
 	g.WinPoint = CalcPoint(first, second, three)
 	g.WinArea = RetTypes(GetCardValue(g.WinPoint), GetCardTypes(g.WinPoint))
-
+	g.WinAreaIndex = g.GetWinareaIndex(g.WinArea)
+	defer g.BetMux.Unlock()
+	g.CalculateScore()
 	// var bfind bool
 	// for i := range g.Bets {
 	// 	if i == userid {
