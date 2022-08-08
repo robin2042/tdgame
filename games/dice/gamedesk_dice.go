@@ -120,6 +120,7 @@ func (g *Dice) GetWinareaIndex(winarea int) int {
 //结算用户
 //根据结果,比对是否选中.
 func (g *Dice) CalculateScore() {
+	g.BetMux.Lock()
 	for userid, arrs := range g.Bets {
 		for key, value := range arrs {
 			if value <= 0 {
@@ -131,8 +132,7 @@ func (g *Dice) CalculateScore() {
 				}
 			}
 			if g.WinArea&games.JET_MARK[key] != 0 { //中奖了
-				fmt.Println(games.Bet_SPEED[key])
-				fmt.Println(float64(value))
+
 				//地板去整
 				score := int64(math.Floor(games.Bet_SPEED[key] * float64(value)))
 				fmt.Println(score)
@@ -143,11 +143,12 @@ func (g *Dice) CalculateScore() {
 				}
 				wins = append(wins, area)
 				g.WinAreaBets[userid] = wins
-
+				g.M_lUserWinScore[userid] += score //赢钱累加
 			}
 
 		}
 	}
+	defer g.BetMux.Unlock()
 }
 
 //回写数据库
@@ -159,26 +160,11 @@ func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
 	g.WinPoint = CalcPoint(first, second, three)
 	g.WinArea = RetTypes(GetCardValue(g.WinPoint), GetCardTypes(g.WinPoint))
 	g.WinAreaIndex = g.GetWinareaIndex(g.WinArea)
-	defer g.BetMux.Unlock()
+
+	g.BetMux.Unlock()
+
 	g.CalculateScore()
-	// var bfind bool
-	// for i := range g.Bets {
-	// 	if i == userid {
-	// 		bfind = true
-	// 		break
-	// 	}
-	// }
-	// if !bfind {
-	// 	return nil, errors.New("您没有参与此游戏，无权更改游戏状态")
-	// }
-	// if time.Now().Before(g.LastBetTime.Add(time.Second * 6)) {
-	// 	return nil, errors.New("所有用户无操作6s后才能开始游戏")
-	// }
-
-	// ncountdown := time.Until(g.BetCountDownTime)
-	// if int(ncountdown.Seconds()) > 0 {
-
-	// }
+	g.GameDesk.WriteChangeScore(g.PlayID, g.ChatID, g.M_lUserWinScore) //回写数据库
 
 	return nil, nil
 }
