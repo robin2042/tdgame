@@ -3,6 +3,7 @@ package telegram
 import (
 	"fmt"
 	"log"
+	"tdgames/logger"
 	"tdgames/logic"
 
 	"tdgames/games"
@@ -356,7 +357,7 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			fmt.Println(intvar, player)
 			_, err := tb.Games.AddScore(messageid, table, player, area, intvar)
 			if err != nil {
-				return
+				logger.Error(err.Error())
 				// TemplateDice_BetText()
 			}
 			strbets, _ := table.GetBetInfo(int64(m.Sender.ID))
@@ -393,6 +394,30 @@ func Relief(tb *TgBot) func(m *telebot.Message) {
 
 //随机发送骰子
 func RandDice_SendBack(tb *TgBot, serialno int, m *telebot.Message) {
+	dice := &telebot.Dice{
+		Type: telebot.Cube.Type,
+	}
+
+	first, _ := tb.DiceToMessage(m, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+	second, _ := tb.DiceToMessage(m, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+	three, _ := tb.DiceToMessage(m, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+
+	table := tb.Games.GetTable(games.GAME_DICE, int64(m.ID), serialno)
+	table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value)
+
+}
+
+//停盘消息
+func Dice_CloseBet(tb *TgBot, serialno int, m *telebot.Message) {
 	dice := &telebot.Dice{
 		Type: telebot.Cube.Type,
 	}

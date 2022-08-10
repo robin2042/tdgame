@@ -34,11 +34,107 @@ type Lottery struct {
 //骰子
 type Dice struct {
 	games.GameDesk
-	PeriodID     string                    //第几期
+
+	Periodinfo   logic.PeriodInfo
 	WinPoint     int                       //点数
 	WinArea      int                       //赢点	牌值大小单双
 	WinAreaIndex int                       //赢点	牌值大小单双
 	WinAreaBets  map[int64]([]games.Areas) //赢钱区域
+	GameTimer    *time.Timer               //定时器
+}
+
+//获取分钟
+func GetFormatHourMinute(minute, second int) string {
+	t4 := time.Now().Hour() //小时
+
+	t5 := fmt.Sprintf("%02d:%02d:%02d", t4, minute, second)
+
+	return t5
+}
+
+//获取分钟
+func GetMinute() int {
+	t5 := time.Now().Minute() //分钟
+	return t5
+}
+
+//获取秒
+func GetSecond() int {
+	t5 := time.Now().Second() //秒
+	return t5
+}
+
+//设置开局信息
+func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
+
+	g.BetMux.Lock()
+	defer g.BetMux.Unlock()
+
+	t1 := time.Now().Year()
+	t2 := time.Now().Month()
+	t3 := time.Now().Day()
+	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
+	fmt.Println(date)
+	values, err := g.Rdb.GetValue(date)
+	if err == nil {
+		g.Rdb.Incr(date)
+	}
+
+	Period := fmt.Sprintf("%s%03s", date, values)
+
+	durationsec := 1
+	//开盘时间\封盘时间
+	var turnontime, closetime string
+
+	if GetMinute()%2 == 0 {
+		durationsec = 2*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+2, 0)
+		closetime = GetFormatHourMinute(GetMinute()+3, 50)
+	} else {
+		durationsec = 1*60 - GetSecond()
+		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
+		closetime = GetFormatHourMinute(GetMinute()+2, 50)
+	}
+	fmt.Println(turnontime, closetime)
+
+	periondInfo := logic.PeriodInfo{
+		PeriodID:   Period,
+		Turnontime: turnontime,
+		Closetime:  closetime,
+	}
+	g.Periodinfo = periondInfo
+	g.LastOpentime = durationsec
+	g.GameTimer = time.NewTimer(time.Duration(1) * time.Second) //定时器
+	g.CreateCloseBet()
+	return periondInfo, durationsec, nil
+}
+
+//创建停盘消息
+func (g *Dice) CreateCloseBet() {
+	go func() {
+		fmt.Println("当前时间为:", time.Now())
+		for {
+			select {
+			case <-g.GameTimer.C:
+				//获取
+
+				values, err := g.Rdb.GetList(g.Periodinfo.PeriodID)
+				fmt.Println(values, err)
+			}
+		}
+
+	}()
+}
+
+//获取期号
+func (g *Dice) GetPeriodInfo() logic.PeriodInfo {
+	g.BetMux.Lock()
+	defer g.BetMux.Unlock()
+	return g.Periodinfo
+}
+
+func (g *Dice) SetPeriodInfo(info logic.PeriodInfo) {
+	g.Periodinfo = info
 }
 
 func (g *Dice) InitTable(playid string, nameid int, chatid int64) {
@@ -83,10 +179,9 @@ func (g *Dice) GetPeriodID() string {
 	t3 := time.Now().Day()
 	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
 	fmt.Println(date)
-	isexist, _, err := g.Rdb.GetValue(date)
-	fmt.Println(isexist, err)
+	values, _ := g.Rdb.GetValue(date)
 
-	return ""
+	return values
 }
 
 //根据牌值类型 单双,返回大小单双
@@ -181,4 +276,11 @@ func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
 	g.GameDesk.WriteChangeScore(g.PlayID, g.ChatID, g.M_lUserWinScore) //回写数据库
 
 	return nil, nil
+}
+
+//停止下注
+func (g *Dice) CloseGameBet() {
+	values := g.GetPeriodID()
+	fmt.Println(values)
+
 }

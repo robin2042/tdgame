@@ -88,6 +88,7 @@ func InitStart(tb *telegram.TgBot) {
 
 		// }
 	}()
+
 	return
 
 }

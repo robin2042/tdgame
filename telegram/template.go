@@ -750,3 +750,18 @@ func TemplateDice_BetText(score logic.DiceJettonInfo) string {
 
 	return b.String()
 }
+
+//停盘消息
+func TemplateDice_CloseBetText(score logic.DiceJettonInfo) string {
+
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/dice/close.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, score)
+
+	return b.String()
+}

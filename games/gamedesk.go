@@ -30,27 +30,6 @@ const (
 
 )
 
-//获取分钟
-func GetFormatHourMinute(minute, second int) string {
-	t4 := time.Now().Hour() //小时
-
-	t5 := fmt.Sprintf("%02d:%02d:%02d", t4, minute, second)
-
-	return t5
-}
-
-//获取分钟
-func GetMinute() int {
-	t5 := time.Now().Minute() //分钟
-	return t5
-}
-
-//获取秒
-func GetSecond() int {
-	t5 := time.Now().Second() //秒
-	return t5
-}
-
 type GameDesk struct {
 	GameTable
 	Rdb              *storage.CloudStore
@@ -80,8 +59,8 @@ type GameDesk struct {
 
 	M_lUserReturnScore map[int64]int64 //显示的钱
 	m_GameRecordArrary []byte          //路子
-	periodinfo         logic.PeriodInfo
-	BetMux             sync.Mutex //锁
+
+	BetMux sync.Mutex //锁
 }
 
 func (g *GameDesk) SetRdb(r *storage.CloudStore) {
@@ -144,61 +123,6 @@ func (g *GameDesk) GetPlayID() string {
 //GameTable
 func (g *GameDesk) GetNameID() int {
 	return g.NameID
-}
-
-//设置开局信息
-func (g *GameDesk) InitPeriodInfo() (logic.PeriodInfo, int, error) {
-
-	g.BetMux.Lock()
-	defer g.BetMux.Unlock()
-
-	t1 := time.Now().Year()
-	t2 := time.Now().Month()
-	t3 := time.Now().Day()
-	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
-	fmt.Println(date)
-	values, isexist, err := g.Rdb.GetValue(date)
-	if !isexist {
-		g.Rdb.Incr(date)
-	}
-
-	Period := fmt.Sprintf("%s%03s", date, values)
-	fmt.Println(Period, values, isexist, err)
-
-	durationsec := 1
-	//开盘时间\封盘时间
-	var turnontime, closetime string
-
-	if GetMinute()%2 == 0 {
-		durationsec = 2*60 - GetSecond()
-		turnontime = GetFormatHourMinute(GetMinute()+2, 0)
-		closetime = GetFormatHourMinute(GetMinute()+3, 50)
-	} else {
-		durationsec = 1*60 - GetSecond()
-		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
-		closetime = GetFormatHourMinute(GetMinute()+2, 50)
-	}
-	fmt.Println(turnontime, closetime)
-
-	periondInfo := logic.PeriodInfo{
-		PeriodID:   Period,
-		Turnontime: turnontime,
-		Closetime:  closetime,
-	}
-	g.periodinfo = periondInfo
-	g.LastOpentime = durationsec
-	return periondInfo, durationsec, nil
-}
-
-//获取期号
-func (g *GameDesk) GetPeriodInfo() logic.PeriodInfo {
-	g.BetMux.Lock()
-	defer g.BetMux.Unlock()
-	return g.periodinfo
-}
-
-func (g *GameDesk) SetPeriodInfo(info logic.PeriodInfo) {
-	g.periodinfo = info
 }
 
 //获取标题信息

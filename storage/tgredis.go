@@ -53,13 +53,20 @@ func (c *CloudStore) Del(key string) {
 }
 
 //获取值
-func (c *CloudStore) GetValue(key string) (string, bool, error) {
+func (c *CloudStore) GetValue(key string) (string, error) {
 	val, err := c.rds.Get(ctx, key).Result()
 
 	if err == redis.Nil {
-		return "", false, nil
+		return "", nil
 	}
-	return val, true, nil
+	return val, nil
+}
+
+//获取list
+func (c *CloudStore) GetList(key string) ([]string, error) {
+
+	val, err := c.rds.Keys(ctx, key).Result()
+	return val, err
 }
 
 //incr 自增
