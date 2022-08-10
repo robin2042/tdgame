@@ -18,9 +18,23 @@ func Change(slice []int64) []int64 {
 	return slice
 }
 
+//结果
+type History struct {
+	Last    string   `json:"last"`
+	History []string `json:"history"`
+}
+
+//结果
+type Lottery struct {
+	PeriodID string   `json:"periodID"`
+	Last     string   `json:"last"`
+	Users    []string `json:"users"`
+}
+
 //骰子
 type Dice struct {
 	games.GameDesk
+	PeriodID     string                    //第几期
 	WinPoint     int                       //点数
 	WinArea      int                       //赢点	牌值大小单双
 	WinAreaIndex int                       //赢点	牌值大小单双
@@ -133,7 +147,7 @@ func (g *Dice) CalculateScore() {
 			}
 			if g.WinArea&games.JET_MARK[key] != 0 { //中奖了
 
-				//地板去整
+				//地板取整
 				score := int64(math.Floor(games.Bet_SPEED[key] * float64(value)))
 				fmt.Println(score)
 				wins := g.WinAreaBets[userid]
