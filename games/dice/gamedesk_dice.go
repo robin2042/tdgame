@@ -117,8 +117,8 @@ func (g *Dice) CreateCloseBet() {
 			select {
 			case <-g.GameTimer.C:
 				//获取
-
-				values, err := g.Rdb.GetList(g.Periodinfo.PeriodID)
+				bet := fmt.Sprintf("%s_bet", g.Periodinfo.PeriodID)
+				values, err := g.Rdb.GetLrange(bet, 0, -1)
 				fmt.Println(values, err)
 			}
 		}

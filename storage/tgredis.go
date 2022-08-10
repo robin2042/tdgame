@@ -63,9 +63,9 @@ func (c *CloudStore) GetValue(key string) (string, error) {
 }
 
 //获取list
-func (c *CloudStore) GetList(key string) ([]string, error) {
+func (c *CloudStore) GetLrange(key string, start, end int64) ([]string, error) {
 
-	val, err := c.rds.Keys(ctx, key).Result()
+	val, err := c.rds.LRange(ctx, key, start, end).Result()
 	return val, err
 }
 
