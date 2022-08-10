@@ -39,7 +39,7 @@ type TgBot struct {
 }
 
 // NewTelegramBot constructor of TelegramBot
-func NewTelegramBot(token string, d *downloader.Downloader, g games.Games) *TgBot {
+func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader, g games.Games) *TgBot {
 	settings := telebot.Settings{
 		Token:  token,
 		Poller: &telebot.LongPoller{Timeout: 30 * time.Second},
@@ -70,6 +70,7 @@ func NewTelegramBot(token string, d *downloader.Downloader, g games.Games) *TgBo
 	return &TgBot{
 		Me:         bot.Me,
 		Bot:        bot,
+		Controller: cnt,
 		Downloader: d,
 		Games:      g,
 	}

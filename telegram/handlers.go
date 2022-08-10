@@ -328,6 +328,7 @@ func Callback(tb *TgBot) func(c *telebot.Callback) {
 // 判断文本消息
 func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
+		//如果是机器人自己，退出
 
 		messageid := fmt.Sprintf("%d%d", m.Unixtime, m.ID)
 

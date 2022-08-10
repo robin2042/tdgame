@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"tdgames/controller"
 	"tdgames/downloader"
 	"tdgames/gamemanage"
 	"tdgames/storage"
@@ -39,10 +40,10 @@ func App() (*telegram.TgBot, uint64) {
 
 	Storage := storage.NewStorage(db, &admins)
 	Rds := storage.ExampleNewClient()
-
+	controller := controller.NewController(Storage)
 	games := gamemanage.NewGameManager(Storage, Rds)
 
-	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), downloader.NewDownloader(
+	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), controller, downloader.NewDownloader(
 		viper.GetString("disk.path"),
 		viper.GetUint64("disk.size")),
 		games)

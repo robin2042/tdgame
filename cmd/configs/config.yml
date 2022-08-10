@@ -1,5 +1,5 @@
 groups:
-  id:"-729420422"
+  id:"-509660763"
 db:
   username: "games"
   host: "127.0.0.1"
@@ -13,7 +13,7 @@ dapi:
 tg:
   admin_id: ["232469683"]
   #groupid:  -729420422
-  groupid:  -730612582
+  groupid:  -509660763
 
 
 disk:
