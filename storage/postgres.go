@@ -5,7 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
+	"tdgames/logic"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

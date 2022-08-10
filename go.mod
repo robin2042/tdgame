@@ -1,12 +1,10 @@
-module github.com/aoyako/telegram_2ch_res_bot
+module tdgames
 
 go 1.15
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/go-redis/redis/v8 v8.11.0
-	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1 // indirect
-	github.com/golang/mock v1.3.1
 	github.com/leekchan/accounting v1.0.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.1

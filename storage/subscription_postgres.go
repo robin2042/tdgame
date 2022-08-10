@@ -1,7 +1,8 @@
 package storage
 
 import (
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
+	"tdgames/logic"
+
 	"gorm.io/gorm"
 )
 

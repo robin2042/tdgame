@@ -4,8 +4,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/aoyako/telegram_2ch_res_bot/initialize"
+	"tdgames/initialize"
 )
 
 var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
@@ -64,7 +63,7 @@ var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "
 
 func main() {
 
-	bot, _, _ := initialize.App()
+	bot, _ := initialize.App()
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)

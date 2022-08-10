@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
+	"tdgames/logic"
 )
 
 var (

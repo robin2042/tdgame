@@ -5,8 +5,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/aoyako/telegram_2ch_res_bot/games"
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
+	"tdgames/games"
+	"tdgames/logic"
 )
 
 // 大单", "小双", "大双", "小单", "小", "大", "单", "双"

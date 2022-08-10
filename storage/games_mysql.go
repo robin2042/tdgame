@@ -3,11 +3,10 @@ package storage
 import (
 	"errors"
 	"fmt"
+	"tdgames/logger"
+	"tdgames/logic"
 	"time"
 
-	logger "github.com/aoyako/telegram_2ch_res_bot/logger"
-
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"gorm.io/gorm"
 )
 

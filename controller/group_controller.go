@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
-	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"tdgames/logic"
+
+	"tdgames/storage"
 )
 
 // InfoController is an implementation of controller.Info

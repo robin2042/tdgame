@@ -1,8 +1,9 @@
 package games
 
 import (
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
-	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"tdgames/logic"
+
+	"tdgames/storage"
 )
 
 type PlayInfo struct {

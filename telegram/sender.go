@@ -1,6 +1,6 @@
 package telegram
 
-import "github.com/aoyako/telegram_2ch_res_bot/logic"
+import "tdgames/logic"
 
 // Sender can send files to users
 type Sender interface {

@@ -3,7 +3,7 @@ package controller
 import (
 	"sync"
 
-	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"tdgames/storage"
 )
 
 // InfoController is an implementation of controller.Info

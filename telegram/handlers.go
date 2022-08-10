@@ -3,13 +3,15 @@ package telegram
 import (
 	"fmt"
 	"log"
+	"tdgames/logic"
+
+	"tdgames/games"
+
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/aoyako/telegram_2ch_res_bot/games"
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
 	"github.com/leekchan/accounting"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
@@ -530,14 +532,14 @@ func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 // /签到
 func Games_BalanceCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
-		ac := accounting.Accounting{Symbol: "$"}
-		name := c.Sender.FirstName + " " + c.Sender.LastName
+		// ac := accounting.Accounting{Symbol: "$"}
+		// name := c.Sender.FirstName + " " + c.Sender.LastName
 
-		board, _ := tb.Controller.Balance(int64(c.Sender.ID), c.Message.Chat.ID)
-		str := fmt.Sprintf("%s\n\t\t当前余额:%s，本周累计胜场，财富榜：", name, ac.FormatMoney(board.Score))
+		// board, _ := tb.Controller.Balance(int64(c.Sender.ID), c.Message.Chat.ID)
+		// str := fmt.Sprintf("%s\n\t\t当前余额:%s，本周累计胜场，财富榜：", name, ac.FormatMoney(board.Score))
 
-		reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
-		tb.Bot.Respond(c, &reply)
+		// reply := telebot.CallbackResponse{Text: str, ShowAlert: true}
+		// tb.Bot.Respond(c, &reply)
 
 		// score, err := tb.Controller.Sign(int64(c.Sender.ID), sign)
 

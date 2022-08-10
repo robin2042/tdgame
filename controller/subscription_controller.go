@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
-	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"tdgames/logic"
+	"tdgames/storage"
 )
 
 // SubscriptionController is an implementation of controller.Subscription

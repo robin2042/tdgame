@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
+	"tdgames/logic"
+
 	"github.com/spf13/viper"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )

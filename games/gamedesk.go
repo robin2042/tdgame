@@ -6,8 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
-	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"tdgames/logic"
+	"tdgames/storage"
+
 	"github.com/leekchan/accounting"
 )
 

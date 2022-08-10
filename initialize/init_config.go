@@ -5,19 +5,16 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"tdgames/downloader"
+	"tdgames/gamemanage"
+	"tdgames/storage"
+	"tdgames/telegram"
 
-	"github.com/aoyako/telegram_2ch_res_bot/controller"
-	"github.com/aoyako/telegram_2ch_res_bot/downloader"
-	"github.com/aoyako/telegram_2ch_res_bot/dvach"
-	"github.com/aoyako/telegram_2ch_res_bot/gamemanage"
-
-	"github.com/aoyako/telegram_2ch_res_bot/storage"
-	"github.com/aoyako/telegram_2ch_res_bot/telegram"
 	"github.com/spf13/viper"
 )
 
 // App initializes application
-func App() (*telegram.TgBot, *dvach.APIController, uint64) {
+func App() (*telegram.TgBot, uint64) {
 	if err := initConfig(); err != nil {
 		log.Fatalf("Error initializing config file: %s", err.Error())
 	}
@@ -40,31 +37,22 @@ func App() (*telegram.TgBot, *dvach.APIController, uint64) {
 		Admin: stringToInt64Slice(viper.GetStringSlice("tg.admin_id")),
 	}
 
-	requestURL := &dvach.RequestURL{
-		AllThreadsURL: viper.GetString("dapi.all"),
-		ThreadURL:     viper.GetString("dapi.thread"),
-		ResourceURL:   viper.GetString("dapi.resource"),
-	}
-
 	Storage := storage.NewStorage(db, &admins)
 	Rds := storage.ExampleNewClient()
-	controller := controller.NewController(Storage)
+
 	games := gamemanage.NewGameManager(Storage, Rds)
 
-	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), controller, downloader.NewDownloader(
+	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), downloader.NewDownloader(
 		viper.GetString("disk.path"),
 		viper.GetUint64("disk.size")),
 		games)
-
-	requester := dvach.NewRequester(requestURL)
-	apicnt := dvach.NewAPIController(controller, bot, requester)
 
 	telegram.SetupHandlers(bot)
 	gamemanage.InitStart(bot)
 
 	fmt.Println("链接bot成功!")
 
-	return bot, apicnt, viper.GetUint64("polling.time")
+	return bot, viper.GetUint64("polling.time")
 }
 
 func initConfig() error {

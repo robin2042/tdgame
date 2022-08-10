@@ -3,8 +3,8 @@ package controller
 import (
 	"fmt"
 
-	"github.com/aoyako/telegram_2ch_res_bot/logic"
-	"github.com/aoyako/telegram_2ch_res_bot/storage"
+	"tdgames/logic"
+	"tdgames/storage"
 )
 
 // UserController is an implementation of controller.User
