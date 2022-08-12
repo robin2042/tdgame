@@ -84,6 +84,8 @@ func (g *GameDesk) InitTable(playid string, nameid int, chatid int64) {
 	g.M_lUserWinScore = make(map[int64]int64)
 	g.M_lUserReturnScore = make(map[int64]int64)
 	g.GameStation = GS_TK_FREE
+	//初始化redis
+
 }
 
 //清理表

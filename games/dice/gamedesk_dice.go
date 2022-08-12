@@ -150,16 +150,25 @@ func (g *Dice) GetBetPrex() string {
 	return bet
 }
 
+func (g *Dice) GetWinPrex() string {
+	bet := fmt.Sprintf("%s_Win", g.Periodinfo.PeriodID)
+	return bet
+}
+
 //下注
 func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
 
-	betstring := g.GetBetString(player, area, score)
-	// betpre := g.GetBetPrex()
-	betpre := "20220811006_bet"
-	g.Rdb.RPush(betpre, betstring)
+	// betstring := g.GetBetString(player, area, score)
+	// // betpre := g.GetBetPrex()
+	// betpre := "20220811006_bet"
 
+	// go g.InserRedisBetList(betpre, betstring)
 	return g.GameDesk.AddScore(player, area, score)
 
+}
+
+func (g *Dice) InserRedisBetList(betpre, betstring string) {
+	g.Rdb.RPush(betpre, betstring)
 }
 
 func (g *Dice) GetBetString(player games.PlayInfo, area, score int) string {
