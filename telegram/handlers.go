@@ -375,6 +375,7 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			tb.ReplyToMessage(strdice, m)
 
 		}
+
 		RandDice_SendBack(tb, 0, m)
 
 	}

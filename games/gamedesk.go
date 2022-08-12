@@ -152,7 +152,7 @@ func (g *GameDesk) GetBetInfo(userid int64) ([]string, int) {
 		if v <= 0 {
 			continue
 		}
-		jetton := strjetton[k]
+		jetton := JETTON_STR[k]
 		area := override[k]
 		score := v
 		strbet := fmt.Sprintf("%s%d%s", jetton, score, area)

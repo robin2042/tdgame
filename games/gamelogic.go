@@ -20,7 +20,7 @@ var (
 	ID_SHUANG_MARK     int = 0x20
 )
 
-var strjetton = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
+var JETTON_STR = []string{"大单", "小双", "大双", "小单", "小", "大", "单", "双"}
 var JET_MARK = []int{ID_DADAN_MARK, ID_XIAOSHUANG_MARK,
 	ID_DASHUANG_MARK,
 	ID_XIAODAN_MARK,
@@ -46,14 +46,24 @@ type Areas struct {
 	Score int64
 }
 
+// 日子富裕【5516166760】小 50
+func GetAddScoreStr(username string, userid int64, n string, score int) string {
+	return fmt.Sprintf("%s【%d】%s %d", username, userid, n, score)
+}
+
+//获取中将中文
+func GetJettonStr(n int) string {
+	return JETTON_STR[n]
+}
+
 func SplitBet(str []string) []logic.DiceBetInfo {
 	// var arbet []logic.DiceBetInfo = make([]logic.DiceBetInfo, 0) //最大同时20格下注
 	// return arbet
 	// 	fmt.Println(len(str))
 	var arbet []logic.DiceBetInfo = make([]logic.DiceBetInfo, 0) //最大同时20格下注
 	for len(str) > 0 {
-		for x := 0; x < len(strjetton); x++ {
-			find := strings.Index(str[0], strjetton[x])
+		for x := 0; x < len(JETTON_STR); x++ {
+			find := strings.Index(str[0], JETTON_STR[x])
 			if find >= 0 { //找到了
 				re := regexp.MustCompile("[0-9]+")
 				strbet := re.FindString(str[0])

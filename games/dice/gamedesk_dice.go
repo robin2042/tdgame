@@ -105,7 +105,7 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 	g.Periodinfo = periondInfo
 	g.LastOpentime = durationsec
 	g.GameTimer = time.NewTimer(time.Duration(1) * time.Second) //定时器
-	g.CreateCloseBet()
+
 	return periondInfo, durationsec, nil
 }
 
@@ -145,10 +145,30 @@ func (g *Dice) InitTable(playid string, nameid int, chatid int64) {
 
 }
 
+func (g *Dice) GetBetPrex() string {
+	bet := fmt.Sprintf("%s_bet", g.Periodinfo.PeriodID)
+	return bet
+}
+
+//下注
 func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
+
+	betstring := g.GetBetString(player, area, score)
+	// betpre := g.GetBetPrex()
+	betpre := "20220811006_bet"
+	g.Rdb.RPush(betpre, betstring)
+
 	return g.GameDesk.AddScore(player, area, score)
 
 }
+
+func (g *Dice) GetBetString(player games.PlayInfo, area, score int) string {
+	bet := games.GetJettonStr(area)
+	userbet := games.GetAddScoreStr(player.Name, player.UserID, bet, score)
+	return userbet
+}
+
+//
 func (g *Dice) Bet(userid int64, area int) (bool, error) {
 	return g.GameDesk.Bet(userid, area)
 }
@@ -258,6 +278,7 @@ func (g *Dice) CalculateScore() {
 		}
 	}
 	defer g.BetMux.Unlock()
+	g.CreateCloseBet()
 }
 
 //回写数据库
