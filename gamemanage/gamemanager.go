@@ -29,6 +29,29 @@ type GameMainManage struct {
 
 }
 
+//创建停盘消息
+func CloseBetTimer(tb *telegram.TgBot, ntimer int) {
+
+	groupid := viper.GetInt64("tg.groupid")
+	c := &telebot.Chat{
+		ID: int64(groupid),
+	}
+
+	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
+	fmt.Println(table)
+	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
+	fmt.Println(timer)
+	go func() {
+		<-timer.C //等等定时器
+		CountDown_SendBack(tb, 0, c)
+		RandDiceTimer(tb, 10) //封盘后10秒发送骰子
+
+	}()
+
+	fmt.Println("停盘消息")
+
+}
+
 //倒计时
 func CountDownTimer(tb *telegram.TgBot, ntimer int) {
 	groupid := viper.GetInt64("tg.groupid")
@@ -43,7 +66,8 @@ func CountDownTimer(tb *telegram.TgBot, ntimer int) {
 	go func() {
 		<-timer.C //等等定时器
 		CountDown_SendBack(tb, 0, c)
-		RandDiceTimer(tb, 10) //封盘后10秒发送骰子
+		CloseBetTimer(tb, 10) //停盘消息
+
 	}()
 }
 
@@ -62,6 +86,17 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 		RandDice_SendBack(tb, 0, c)
 		//开启下一轮游戏
 	}()
+}
+
+//停盘消息
+func CloseBet_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), 0)
+	str := telegram.TemplateDice_CountDownText()
+	if table != nil {
+		fmt.Println(table)
+	}
+	m, err := tb.SendChatMessage(str, nil, c)
+	fmt.Println(m, err)
 }
 
 //封盘

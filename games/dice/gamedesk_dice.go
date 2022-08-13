@@ -74,7 +74,7 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 	t2 := time.Now().Month()
 	t3 := time.Now().Day()
 	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
-	fmt.Println(date)
+
 	values, err := g.Rdb.GetValue(date)
 	if err == nil {
 		g.Rdb.Incr(date)
@@ -95,7 +95,6 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
 		closetime = GetFormatHourMinute(GetMinute()+2, 50)
 	}
-	fmt.Println(turnontime, closetime)
 
 	periondInfo := logic.PeriodInfo{
 		PeriodID:   Period,
@@ -107,24 +106,6 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 	g.GameTimer = time.NewTimer(time.Duration(1) * time.Second) //定时器
 
 	return periondInfo, durationsec, nil
-}
-
-//创建停盘消息
-func (g *Dice) CreateCloseBet() {
-
-	go func() {
-		fmt.Println("当前时间为:", time.Now())
-		for {
-			select {
-			case <-g.GameTimer.C:
-				//获取
-				bet := fmt.Sprintf("%s_bet", g.Periodinfo.PeriodID)
-				values, err := g.Rdb.GetLrange(bet, 0, -1)
-				fmt.Println(values, err)
-			}
-		}
-
-	}()
 }
 
 //获取期号
@@ -203,7 +184,7 @@ func (g *Dice) GetPeriodID() string {
 	t2 := time.Now().Month()
 	t3 := time.Now().Day()
 	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
-	fmt.Println(date)
+
 	values, _ := g.Rdb.GetValue(date)
 
 	return values
@@ -269,7 +250,7 @@ func (g *Dice) CalculateScore() {
 
 				//地板取整
 				score := int64(math.Floor(games.Bet_SPEED[key] * float64(value)))
-				fmt.Println(score)
+
 				wins := g.WinAreaBets[userid]
 				area := games.Areas{
 					Area:  key,
@@ -283,12 +264,11 @@ func (g *Dice) CalculateScore() {
 		}
 	}
 	defer g.BetMux.Unlock()
-	g.CreateCloseBet()
+
 }
 
 //回写数据库
 func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
-	fmt.Println(first, second, three)
 
 	g.BetMux.Lock()
 
