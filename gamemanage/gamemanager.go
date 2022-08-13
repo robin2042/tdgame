@@ -29,6 +29,76 @@ type GameMainManage struct {
 
 }
 
+//倒计时
+func CountDownTimer(tb *telegram.TgBot, ntimer int) {
+	groupid := viper.GetInt64("tg.groupid")
+	c := &telebot.Chat{
+		ID: int64(groupid),
+	}
+
+	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
+	fmt.Println(table)
+	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
+	fmt.Println(timer)
+	go func() {
+		<-timer.C //等等定时器
+		CountDown_SendBack(tb, 0, c)
+		RandDiceTimer(tb, 10) //封盘后10秒发送骰子
+	}()
+}
+
+func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
+	groupid := viper.GetInt64("tg.groupid")
+	c := &telebot.Chat{
+		ID: int64(groupid),
+	}
+
+	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
+	fmt.Println(table)
+	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
+	fmt.Println(timer)
+	go func() {
+		<-timer.C //等等定时器
+		RandDice_SendBack(tb, 0, c)
+		//开启下一轮游戏
+	}()
+}
+
+//封盘
+func CountDown_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), 0)
+	str := telegram.TemplateDice_CountDownText()
+	if table != nil {
+		fmt.Println(table)
+	}
+	m, err := tb.SendChatMessage(str, nil, c)
+	fmt.Println(m, err)
+}
+
+//随机发送骰子
+func RandDice_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
+	dice := &telebot.Dice{
+		Type: telebot.Cube.Type,
+	}
+
+	first, _ := tb.DiceToMessage(c, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+	second, _ := tb.DiceToMessage(c, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+	three, _ := tb.DiceToMessage(c, dice)
+	if first.Dice.Type != telebot.Cube.Type {
+		return
+	}
+
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), 0)
+	table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value) //结算游戏
+
+}
+
 //启动游戏
 func InitStart(tb *telegram.TgBot) {
 
@@ -74,22 +144,8 @@ func InitStart(tb *telegram.TgBot) {
 		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, message.ID)
 		// table.SetPeriodInfo(periond)
 		fmt.Println(table)
-
-		//
-		// if !start {
-		// 	msg := TemplateNiuniu_limit()
-		// 	tb.SendHtmlMessage(msg, nil, m)
-		// } else { //可以开启新局
-		// 	msg := TemplateNiuniu_Text()
-		// 	reply := TemplateNiuniu_Bet(tb)
-		// 	message, _ := tb.SendHtmlMessage(msg, reply, m)
-
-		// 	tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
-
-		// }
+		CountDownTimer(tb, 10) //30 倒计时
 	}()
-
-	return
 
 }
 

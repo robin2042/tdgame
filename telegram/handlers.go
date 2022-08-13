@@ -39,9 +39,9 @@ func (tb *TgBot) SendHtmlMessage(msg string, menu *telebot.ReplyMarkup, m *teleb
 
 }
 
-func (tb *TgBot) DiceToMessage(m *telebot.Message, dice *telebot.Dice) (*telebot.Message, error) {
+func (tb *TgBot) DiceToMessage(c *telebot.Chat, dice *telebot.Dice) (*telebot.Message, error) {
 
-	return tb.Bot.Send(m.Chat, dice)
+	return tb.Bot.Send(c, dice)
 
 }
 
@@ -376,8 +376,6 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 
 		}
 
-		RandDice_SendBack(tb, 0, m)
-
 	}
 }
 
@@ -393,51 +391,27 @@ func Relief(tb *TgBot) func(m *telebot.Message) {
 	}
 }
 
-//随机发送骰子
-func RandDice_SendBack(tb *TgBot, serialno int, m *telebot.Message) {
-	dice := &telebot.Dice{
-		Type: telebot.Cube.Type,
-	}
-
-	first, _ := tb.DiceToMessage(m, dice)
-	if first.Dice.Type != telebot.Cube.Type {
-		return
-	}
-	second, _ := tb.DiceToMessage(m, dice)
-	if first.Dice.Type != telebot.Cube.Type {
-		return
-	}
-	three, _ := tb.DiceToMessage(m, dice)
-	if first.Dice.Type != telebot.Cube.Type {
-		return
-	}
-
-	table := tb.Games.GetTable(games.GAME_DICE, int64(m.ID), serialno)
-	table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value)
-
-}
-
 //停盘消息
-func Dice_CloseBet(tb *TgBot, serialno int, m *telebot.Message) {
-	dice := &telebot.Dice{
-		Type: telebot.Cube.Type,
-	}
+func Dice_CloseBet(tb *TgBot, serialno int, c *telebot.Chat) {
+	// dice := &telebot.Dice{
+	// 	Type: telebot.Cube.Type,
+	// }
 
-	first, _ := tb.DiceToMessage(m, dice)
-	if first.Dice.Type != telebot.Cube.Type {
-		return
-	}
-	second, _ := tb.DiceToMessage(m, dice)
-	if first.Dice.Type != telebot.Cube.Type {
-		return
-	}
-	three, _ := tb.DiceToMessage(m, dice)
-	if first.Dice.Type != telebot.Cube.Type {
-		return
-	}
+	// first, _ := tb.DiceToMessage(c, dice)
+	// if first.Dice.Type != telebot.Cube.Type {
+	// 	return
+	// }
+	// second, _ := tb.DiceToMessage(c, dice)
+	// if first.Dice.Type != telebot.Cube.Type {
+	// 	return
+	// }
+	// three, _ := tb.DiceToMessage(c, dice)
+	// if first.Dice.Type != telebot.Cube.Type {
+	// 	return
+	// }
 
-	table := tb.Games.GetTable(games.GAME_DICE, int64(m.ID), serialno)
-	table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value)
+	// table := tb.Games.GetTable(games.GAME_DICE, int64(m.ID), serialno)
+	// table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value)
 
 }
 

@@ -111,6 +111,7 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 
 //创建停盘消息
 func (g *Dice) CreateCloseBet() {
+
 	go func() {
 		fmt.Println("当前时间为:", time.Now())
 		for {
@@ -158,11 +159,6 @@ func (g *Dice) GetWinPrex() string {
 //下注
 func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
 
-	// betstring := g.GetBetString(player, area, score)
-	// // betpre := g.GetBetPrex()
-	// betpre := "20220811006_bet"
-
-	// go g.InserRedisBetList(betpre, betstring)
 	return g.GameDesk.AddScore(player, area, score)
 
 }

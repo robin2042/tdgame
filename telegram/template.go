@@ -689,6 +689,19 @@ func TemplateDice_Jetton(tb *TgBot, viper *viper.Viper) [][]telebot.InlineButton
 	return btnarray
 }
 
+//倒计时文本
+func TemplateDice_CountDownText() string {
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/dice/countdown.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, nil)
+	return b.String()
+}
+
 func TemplateDice_Text(period logic.PeriodInfo) string {
 	var b bytes.Buffer
 	tmpl, err := template.ParseFiles("./templates/dice/start.tmpl")
