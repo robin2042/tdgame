@@ -168,8 +168,28 @@ func (g *Dice) EndGame() error {
 }
 
 //下注信息
-func (g *Dice) GetBetInfos() (bets []logic.Bets, err error) {
-	return g.GameDesk.GetBetInfos()
+//江湖人【5344882004】小单 500
+// GetAddScoreStr
+func (g *Dice) GetBetInfos() (bets []string, err error) {
+
+	s := make([]string, 0)
+	for userid, arrs := range g.Bets {
+		player := g.Players[userid]
+		if player == nil {
+			continue
+		}
+		for key, value := range arrs {
+			if value <= 0 {
+				continue
+			}
+			jet := games.GetJettonStr(key)
+			bet := games.GetAddScoreStr(player.Name, player.UserID, jet, int(value))
+
+			s = append(s, bet)
+		}
+	}
+
+	return s, nil
 
 }
 

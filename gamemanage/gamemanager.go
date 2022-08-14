@@ -37,13 +37,12 @@ func CloseBetTimer(tb *telegram.TgBot, ntimer int) {
 		ID: int64(groupid),
 	}
 
-	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
-	fmt.Println(table)
 	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
-	fmt.Println(timer)
 	go func() {
-		<-timer.C //等等定时器
-		CountDown_SendBack(tb, 0, c)
+		<-timer.C //等等定时器、
+		table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
+		fmt.Println(table)
+		CloseBet_SendBack(tb, 0, c)
 		RandDiceTimer(tb, 10) //封盘后10秒发送骰子
 
 	}()
@@ -91,7 +90,14 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 //停盘消息
 func CloseBet_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), 0)
-	str := telegram.TemplateDice_CountDownText()
+	period := table.GetPeriodInfo()
+	bets, err := table.GetBetInfos()
+	fmt.Println(bets, err)
+	jettoninfo := logic.DiceJettonInfo{
+		Info: period,
+	}
+
+	str := telegram.TemplateDice_CloseBetText(jettoninfo)
 	if table != nil {
 		fmt.Println(table)
 	}
@@ -270,7 +276,7 @@ func (g *GameMainManage) Bet(table games.GameTable, userid int64, area int) (boo
 
 }
 
-func (g *GameMainManage) BetInfos(chatid int64, msgid int) ([]logic.Bets, error) {
+func (g *GameMainManage) BetInfos(chatid int64, msgid int) ([]string, error) {
 	playid := fmt.Sprintf("%d%d", chatid, msgid)
 	table := g.Tables[playid]
 	return table.GetBetInfos()

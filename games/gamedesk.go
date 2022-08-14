@@ -8,8 +8,6 @@ import (
 
 	"tdgames/logic"
 	"tdgames/storage"
-
-	"github.com/leekchan/accounting"
 )
 
 var (
@@ -165,19 +163,9 @@ func (g *GameDesk) GetBetInfo(userid int64) ([]string, int) {
 }
 
 //下注信息
-func (g *GameDesk) GetBetInfos() ([]logic.Bets, error) {
-	s := make([]logic.Bets, 0)
-	ac := accounting.Accounting{Symbol: "$"}
+func (g *GameDesk) GetBetInfos() ([]string, error) {
+	s := make([]string, 0)
 
-	for k, v := range g.Bets {
-		var bet logic.Bets
-		bet.Userid = k
-		bet.UserName = g.Players[k].Name
-		bet.Title = g.Players[k].Title
-
-		bet.FmtBet = ac.FormatMoney(v)
-		s = append(s, bet)
-	}
 	return s, nil
 }
 
