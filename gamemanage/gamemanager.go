@@ -79,12 +79,33 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
 	fmt.Println(table)
 	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
-	fmt.Println(timer)
+
 	go func() {
 		<-timer.C //等等定时器
 		RandDice_SendBack(tb, 0, c)
+		//发送消息
 		//开启下一轮游戏
+		//开奖结果
+		//最近10期
+
 	}()
+}
+
+//开奖结果
+func LotteryGame_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), 0)
+	period := table.GetPeriodInfo()
+	bets, err := table.GetSettleInfos()
+	fmt.Println(period, bets, err)
+	// jettoninfo := logic.DiceJettonInfo{
+	// 	Info: period,
+	// 	Bets: bets,
+	// }
+
+	// str := telegram.TemplateDice_CloseBetText(jettoninfo)
+
+	// m, err := tb.SendChatMessage(str, nil, c)
+	// fmt.Println(m, err)
 }
 
 //停盘消息

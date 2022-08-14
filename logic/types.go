@@ -132,7 +132,8 @@ type Leaderboard struct {
 	Win    int64
 	Grades int //名次
 }
-type Records interface {
+type Records struct {
+	Record []string
 }
 
 // User stores info about user

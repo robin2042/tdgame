@@ -171,44 +171,9 @@ func (g *GameDesk) GetBetInfos() ([]string, error) {
 
 //结算信息
 func (g *GameDesk) GetSettleInfos() (logic.Records, error) {
-	// betinfo := &logic.Records{}
-	// ac := accounting.Accounting{Symbol: "$"}
+	winsinfo := logic.Records{}
+	fmt.Println(winsinfo)
 
-	// for i := 0; i < MAX_COUNT; i++ {
-	// 	var str string
-	// 	if i == INDEX_BANKER {
-	// 		str += "🎴庄家 "
-	// 		str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-	// 		str += " "
-	// 		str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-
-	// 	} else if i == INDEX_PLAYER1 {
-	// 		str += "🐲青龙 "
-	// 		str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-	// 		str += " "
-	// 		str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-
-	// 	} else if i == INDEX_PLAYER2 {
-	// 		str += "🐯白虎 "
-	// 		str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-	// 		str += " "
-	// 		str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-
-	// 	} else if i == INDEX_PLAYER3 {
-	// 		str += "🦚朱雀 "
-	// 		str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-	// 		str += " "
-	// 		str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-
-	// 	} else if i == INDEX_PLAYER4 {
-	// 		str += "🐢玄武 "
-	// 		str += GetCardTimesEmoj(g.m_cbTableCardArray[i])
-	// 		str += " "
-	// 		str += GetCardValueEmoj(g.m_cbTableCardArray[i])
-
-	// 	}
-	// 	betinfo.Detail = append(betinfo.Detail, str)
-	// }
 	// for k := range g.Players {
 	// 	change := logic.ChangeScore{}
 	// 	change.UserName = g.Players[k].Name
@@ -232,7 +197,7 @@ func (g *GameDesk) GetSettleInfos() (logic.Records, error) {
 	// 	betinfo.Change = append(betinfo.Change, change)
 	// }
 
-	return nil, nil
+	return winsinfo, nil
 }
 
 //开始
