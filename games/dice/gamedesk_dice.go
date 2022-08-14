@@ -148,7 +148,16 @@ func (g *Dice) InserRedisBetList(betpre, betstring string) {
 	g.Rdb.RPush(betpre, betstring)
 }
 
-func (g *Dice) GetBetString(player games.PlayInfo, area, score int) string {
+//获取赢钱字符串
+// 赢点吧【5586650684】双 46(1.99倍率)
+func (g *Dice) GetWinString(player *games.PlayInfo, area, score int) string {
+	bet := games.GetJettonStr(area)
+	odds := games.GetOddsStr(area)
+	return fmt.Sprintf("%s【%d】%s %d%s", player.Name, player.UserID, bet, score, odds)
+
+}
+
+func (g *Dice) GetBetString(player *games.PlayInfo, area, score int) string {
 	bet := games.GetJettonStr(area)
 	userbet := games.GetAddScoreStr(player.Name, player.UserID, bet, score)
 	return userbet
@@ -250,6 +259,29 @@ func (g *Dice) GetWinareaIndex(winarea int) int {
 		}
 	}
 	return -1
+}
+
+//结算信息
+// 20220814601期开奖结果
+// 2+5+5=12 大双
+// 赢点吧【5586650684】双 46(1.99倍率)
+func (g *Dice) GetSettleInfos() (logic.Records, error) {
+	winsinfo := logic.Records{}
+	for userid, arrs := range g.WinAreaBets {
+		if len(arrs) == 0 {
+			continue
+		}
+		player := g.Players[userid]
+		if player == nil {
+			continue
+		}
+		for _, value := range arrs {
+			winstr := g.GetWinString(player, value.Area, int(value.Score))
+			fmt.Println(winstr)
+		}
+
+	}
+	return winsinfo, nil
 }
 
 //结算用户

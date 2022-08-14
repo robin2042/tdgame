@@ -43,7 +43,7 @@ func CloseBetTimer(tb *telegram.TgBot, ntimer int) {
 		table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
 		fmt.Println(table)
 		CloseBet_SendBack(tb, 0, c)
-		RandDiceTimer(tb, 10) //封盘后10秒发送骰子
+		RandDiceTimer(tb, 2) //封盘后10秒发送骰子
 
 	}()
 
@@ -84,6 +84,7 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 		<-timer.C //等等定时器
 		RandDice_SendBack(tb, 0, c)
 		//发送消息
+		LotteryGame_SendBack(tb, 0, c)
 		//开启下一轮游戏
 		//开奖结果
 		//最近10期

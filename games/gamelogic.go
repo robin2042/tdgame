@@ -37,6 +37,14 @@ var override = []string{"（赔率3.4倍）", "（赔率4.4倍）",
 	"（赔率1.99倍）",
 	"（赔率1.99倍）"}
 
+var DICE_ODDS = []string{"（3.4赔率）", "（4.4赔率）",
+	"（4.4赔率）",
+	"（4.4赔率）",
+	"（1.99赔率）",
+	"（1.99赔率）",
+	"（1.99赔率）",
+	"（1.99赔率）"}
+
 //中奖倍率
 var Bet_SPEED = []float64{3.4, 3.4, 4.4, 4.4, 1.99, 1.99, 1.99, 1.99}
 
@@ -54,6 +62,11 @@ func GetAddScoreStr(username string, userid int64, n string, score int) string {
 //获取中将中文
 func GetJettonStr(n int) string {
 	return JETTON_STR[n]
+}
+
+//获取倍率中文
+func GetOddsStr(n int) string {
+	return DICE_ODDS[n]
 }
 
 func SplitBet(str []string) []logic.DiceBetInfo {

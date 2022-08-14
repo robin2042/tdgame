@@ -642,29 +642,29 @@ func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Baccarat_EndGameCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, c.Message.ID)
-		// playid := fmt.Sprintf("%d%d", c.Message.Chat.ID, c.Message.ID)
+		// table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, c.Message.ID)
+		// // playid := fmt.Sprintf("%d%d", c.Message.Chat.ID, c.Message.ID)
 
-		//写分
-		// _, err := table.SettleGame(int64(c.Sender.ID))
-		// if err != nil {
-		// 	reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
-		// 	tb.Bot.Respond(c, &reply)
-		// 	return
-		// }
+		// //写分
+		// // _, err := table.SettleGame(int64(c.Sender.ID))
+		// // if err != nil {
+		// // 	reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
+		// // 	tb.Bot.Respond(c, &reply)
+		// // 	return
+		// // }
 
-		//回写数据库
-		// fmt.Println(betsinfo)
-		//获取游戏记录
-		records, _ := table.GetSettleInfos()
+		// //回写数据库
+		// // fmt.Println(betsinfo)
+		// //获取游戏记录
+		// records, _ := table.GetSettleInfos()
 
-		tb.Games.GameEnd(games.GAME_BACCARAT, c.Message.Chat.ID, c.Message.ID) //结算游戏
+		// tb.Games.GameEnd(games.GAME_BACCARAT, c.Message.Chat.ID, c.Message.ID) //结算游戏
 
-		msg := TemplateBaccarat_EndGameText(records.(*logic.BaccaratRecords))
-		// // fmt.Println(msg)
-		reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
+		// msg := TemplateBaccarat_EndGameText(records.(*logic.BaccaratRecords))
+		// // // fmt.Println(msg)
+		// reply := TemplateNiuniu_EndGameReplyMarkUp(tb)
 
-		tb.EditHtmlMessage(c.Message, msg, reply)
+		// tb.EditHtmlMessage(c.Message, msg, reply)
 
 	}
 }
