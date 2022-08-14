@@ -95,12 +95,11 @@ func CloseBet_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 	fmt.Println(bets, err)
 	jettoninfo := logic.DiceJettonInfo{
 		Info: period,
+		Bets: bets,
 	}
 
 	str := telegram.TemplateDice_CloseBetText(jettoninfo)
-	if table != nil {
-		fmt.Println(table)
-	}
+
 	m, err := tb.SendChatMessage(str, nil, c)
 	fmt.Println(m, err)
 }
