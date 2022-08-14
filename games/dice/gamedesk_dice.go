@@ -35,12 +35,13 @@ type Lottery struct {
 type Dice struct {
 	games.GameDesk
 
-	Periodinfo   logic.PeriodInfo
-	WinPoint     int                       //点数
-	WinArea      int                       //赢点	牌值大小单双
-	WinAreaIndex int                       //赢点	牌值大小单双
-	WinAreaBets  map[int64]([]games.Areas) //赢钱区域
-	GameTimer    *time.Timer               //定时器
+	Periodinfo           logic.PeriodInfo
+	First, Second, Three int
+	WinPoint             int                       //点数
+	WinArea              int                       //赢点	牌值大小单双
+	WinAreaIndex         int                       //赢点	牌值大小单双
+	WinAreaBets          map[int64]([]games.Areas) //赢钱区域
+	GameTimer            *time.Timer               //定时器
 }
 
 //获取分钟
@@ -251,6 +252,15 @@ func CalcPoint(first, second, three int) int {
 	return first + second + three
 }
 
+//4+1+1=6 小双
+func (g *Dice) GetLotteryStr() string {
+	index := g.GetWinareaIndex(g.WinArea)
+	winArea := games.GetJettonStr(index)
+
+	str := fmt.Sprintf("%d\\+%d\\+%d\\=%d %s", g.First, g.Second, g.Three, g.WinPoint, winArea)
+	return str
+}
+
 //获取值
 func (g *Dice) GetWinareaIndex(winarea int) int {
 	for key, value := range games.JET_MARK {
@@ -261,12 +271,25 @@ func (g *Dice) GetWinareaIndex(winarea int) int {
 	return -1
 }
 
+func (g *Dice) GetLotteryInfo() logic.LotteryInfo {
+
+	win := g.GetLotteryStr()
+	bets, _ := g.GetSettleInfos()
+	Lottery := logic.LotteryInfo{
+		Info: g.Periodinfo,
+		Wins: win,
+		Bets: bets,
+	}
+
+	return Lottery
+}
+
 //结算信息
 // 20220814601期开奖结果
 // 2+5+5=12 大双
 // 赢点吧【5586650684】双 46(1.99倍率)
-func (g *Dice) GetSettleInfos() (logic.Records, error) {
-	winsinfo := logic.Records{}
+func (g *Dice) GetSettleInfos() ([]string, error) {
+	winsinfo := make([]string, 0)
 	for userid, arrs := range g.WinAreaBets {
 		if len(arrs) == 0 {
 			continue
@@ -323,6 +346,10 @@ func (g *Dice) CalculateScore() {
 func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
 
 	g.BetMux.Lock()
+	//保存骰子
+	g.First = first
+	g.Second = second
+	g.Three = three
 
 	g.WinPoint = CalcPoint(first, second, three)
 	g.WinArea = RetTypes(GetCardValue(g.WinPoint), GetCardTypes(g.WinPoint))

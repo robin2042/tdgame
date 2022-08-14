@@ -778,3 +778,18 @@ func TemplateDice_CloseBetText(score logic.DiceJettonInfo) string {
 
 	return b.String()
 }
+
+//中奖信息
+func TemplateDice_LotteryText(score logic.LotteryInfo) string {
+
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/dice/lottery.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, score)
+
+	return b.String()
+}

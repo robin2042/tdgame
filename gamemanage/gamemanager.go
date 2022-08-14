@@ -94,22 +94,14 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 
 //开奖结果
 func LotteryGame_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
-	// table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), 0)
-	// period := table.GetPeriodInfo()
-	// bets, err := table.GetSettleInfos()
-	// fmt.Println(period, bets, err)
-	// str := telegram.TemplateDice_LotteryText(jettoninfo)
-	// fmt.Println(m, err)
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), 0)
 
-	// jettoninfo := logic.DiceJettonInfo{
-	// 	Info: period,
-	// 	Bets: bets,
-	// }
+	lottery := table.GetLotteryInfo()
 
-	// str := telegram.TemplateDice_CloseBetText(jettoninfo)
+	str := telegram.TemplateDice_LotteryText(lottery)
 
-	// m, err := tb.SendChatMessage(str, nil, c)
-	// fmt.Println(m, err)
+	m, err := tb.SendChatMessage(str, nil, c)
+	fmt.Println(m, err)
 }
 
 //停盘消息
