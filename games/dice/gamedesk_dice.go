@@ -14,6 +14,7 @@ import (
 // "大","小","单","双","大单","大双","小单","小双"
 
 const MAX_LEN = 100
+const TEN_HISTORY = 10
 
 func Change(slice []int64) []int64 {
 	slice = append(slice, 1)
