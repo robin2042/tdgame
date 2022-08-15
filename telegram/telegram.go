@@ -8,6 +8,7 @@ import (
 	"tdgames/controller"
 	"tdgames/downloader"
 	"tdgames/games"
+	"tdgames/storage"
 	"time"
 	"unsafe"
 
@@ -36,10 +37,11 @@ type TgBot struct {
 	Controller *controller.Controller
 	Downloader *downloader.Downloader
 	Games      games.Games
+	Rds        *storage.CloudStore
 }
 
 // NewTelegramBot constructor of TelegramBot
-func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader, g games.Games) *TgBot {
+func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader, g games.Games, rds *storage.CloudStore) *TgBot {
 	settings := telebot.Settings{
 		Token:  token,
 		Poller: &telebot.LongPoller{Timeout: 30 * time.Second},
@@ -73,6 +75,7 @@ func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Down
 		Controller: cnt,
 		Downloader: d,
 		Games:      g,
+		Rds:        rds,
 	}
 }
 

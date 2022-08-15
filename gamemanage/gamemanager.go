@@ -101,6 +101,12 @@ func LotteryGame_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 	str := telegram.TemplateDice_LotteryText(lottery)
 
 	m, err := tb.SendChatMessage(str, nil, c)
+
+	//发送最后10个
+	// rlasthistory := "last_history" //最后一条
+	// rhistory := "history"
+	// last := tb.Games.Rdb.GetValue
+	// last_history := telegram.TemplateDice_HistoryText()
 	fmt.Println(m, err)
 }
 

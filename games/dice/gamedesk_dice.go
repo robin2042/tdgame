@@ -13,6 +13,8 @@ import (
 
 // "大","小","单","双","大单","大双","小单","小双"
 
+const MAX_LEN = 100
+
 func Change(slice []int64) []int64 {
 	slice = append(slice, 1)
 	return slice
@@ -363,7 +365,27 @@ func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
 	g.CalculateScore()
 	g.GameDesk.WriteChangeScore(g.PlayID, g.ChatID, g.M_lUserWinScore) //回写数据库
 
+	//更新历史记录
+	go g.UpdateHistory(g.Periodinfo.PeriodID, first, second, three, g.WinPoint, g.WinArea)
+
 	return nil, nil
+}
+
+//更新历史记录
+
+func (g *Dice) UpdateHistory(periodinfo string, first, second, three, WinPoint, WinArea int) {
+	// 20220815673期 2,1,2 =5小单,Periodinfo
+
+	rlasthistory := "last_history" //最后一条
+	rhistory := "history"
+	last := g.GetLotteryStr()
+	index := g.GetWinareaIndex(g.WinArea)
+	winArea := games.GetJettonStr(index)
+
+	g.Rdb.SetValue(rlasthistory, last)
+	hvalue := fmt.Sprintf("%s期 %d\\,%d\\,%d\\,\\=%d%s", g.Periodinfo.PeriodID, first, second, three, WinPoint, winArea)
+	g.Rdb.MaxRPush(rhistory, hvalue, MAX_LEN)
+
 }
 
 //停止下注

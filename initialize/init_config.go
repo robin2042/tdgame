@@ -46,7 +46,7 @@ func App() (*telegram.TgBot, uint64) {
 	bot := telegram.NewTelegramBot(os.Getenv("BOT_TOKEN"), controller, downloader.NewDownloader(
 		viper.GetString("disk.path"),
 		viper.GetUint64("disk.size")),
-		games)
+		games, Rds)
 
 	telegram.SetupHandlers(bot)
 	gamemanage.InitStart(bot)

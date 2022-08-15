@@ -266,3 +266,10 @@ type LotteryInfo struct {
 	Bets []string   //中奖人员信息
 
 }
+
+//lottery信息
+type DiceHistory struct {
+	Last    string
+	Records []string //中奖人员信息
+
+}

@@ -39,6 +39,26 @@ func ExampleNewClient() *CloudStore {
 	// Output: PONG <nil>
 }
 
+//设置键值
+func (c *CloudStore) SetValue(key string, value string) error {
+	err := c.rds.Set(ctx, key, value, 0).Err()
+
+	return err
+}
+
+//最大插入
+func (c *CloudStore) MaxRPush(key string, argv interface{}, max int64) error {
+
+	err := c.rds.RPush(ctx, key, argv).Err()
+	len, _ := c.rds.LLen(ctx, key).Result()
+	if len > max {
+		c.rds.LTrim(ctx, key, max, -1)
+	}
+
+	return err
+
+}
+
 func (c *CloudStore) RPush(key string, argv ...interface{}) error {
 	return c.rds.RPush(ctx, key, argv...).Err()
 

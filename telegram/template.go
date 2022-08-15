@@ -793,3 +793,19 @@ func TemplateDice_LotteryText(score logic.LotteryInfo) string {
 
 	return b.String()
 }
+
+//最后10期中奖信息
+// /cmd\templates\dice\history.tmpl
+func TemplateDice_HistoryText(history logic.DiceHistory) string {
+
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/dice/history.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, history)
+
+	return b.String()
+}
