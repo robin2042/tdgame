@@ -300,7 +300,7 @@ func (g *Dice) GetSettleInfos() ([]string, error) {
 		}
 		for _, value := range arrs {
 			winstr := g.GetWinString(player, value.Area, int(value.Score))
-			fmt.Println(winstr)
+			winsinfo = append(winsinfo, winstr)
 		}
 
 	}
@@ -345,6 +345,9 @@ func (g *Dice) CalculateScore() {
 //回写数据库
 func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
 
+	first = 5
+	second = 5
+	three = 5
 	g.BetMux.Lock()
 	//保存骰子
 	g.First = first
