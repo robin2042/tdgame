@@ -46,6 +46,19 @@ func (c *CloudStore) SetValue(key string, value string) error {
 	return err
 }
 
+//最大左插入
+func (c *CloudStore) MaxLPush(key string, argv interface{}, max int64) error {
+
+	err := c.rds.LPush(ctx, key, argv).Err()
+	len, _ := c.rds.LLen(ctx, key).Result()
+	if len > max {
+		c.rds.LTrim(ctx, key, max, -1)
+	}
+
+	return err
+
+}
+
 //最大插入
 func (c *CloudStore) MaxRPush(key string, argv interface{}, max int64) error {
 
@@ -59,6 +72,13 @@ func (c *CloudStore) MaxRPush(key string, argv interface{}, max int64) error {
 
 }
 
+//左插入
+func (c *CloudStore) LPush(key string, argv ...interface{}) error {
+	return c.rds.RPush(ctx, key, argv...).Err()
+
+}
+
+//右插入
 func (c *CloudStore) RPush(key string, argv ...interface{}) error {
 	return c.rds.RPush(ctx, key, argv...).Err()
 

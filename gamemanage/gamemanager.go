@@ -105,15 +105,14 @@ func LotteryGame_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 	//发送最后10个
 	rhistory := "history"
 
-	lasthistory, _ := tb.Rds.GetLrange(rhistory, 0, dice.MAX_LEN)
+	lasthistory, _ := tb.Rds.GetLrange(rhistory, 0, dice.TEN_HISTORY)
 	dicehistory := logic.DiceHistory{
 		Last:    lottery.Wins,
 		Records: lasthistory,
 	}
 	historystr := telegram.TemplateDice_HistoryText(dicehistory)
-	m, err := tb.SendChatMessage(historystr, nil, c)
+	tb.SendChatMessage(historystr, nil, c)
 
-	fmt.Println(m, err)
 }
 
 //停盘消息
@@ -193,7 +192,7 @@ func InitStart(tb *telegram.TgBot) {
 	go func() {
 		fmt.Println("当前时间为:", time.Now())
 		fmt.Println(timer)
-		// t := <-timer.C
+		<-timer.C
 
 		// fmt.Println("当前时间为:", t)
 
@@ -202,13 +201,15 @@ func InitStart(tb *telegram.TgBot) {
 		// reply := telegram.TemplateDice_Bet(tb)
 		message := telebot.Message{Chat: m}
 
-		ok, err := tb.SendHtmlMessage(msg, nil, &message)
-
-		// message, err := tb.SendChatMessage(msg, nil, m)
-		fmt.Println(ok, err)
-
+		_, err := tb.SendHtmlMessage(msg, nil, &message)
+		if err != nil {
+			logger.Error(err.Error())
+		}
 		start := tb.Games.NewGames(games.GAME_DICE, m.ID)
-		fmt.Println(start)
+		if !start {
+			logger.Error(err.Error())
+		}
+
 		tb.Games.GameBegin(games.GAME_DICE, message.Chat.ID, message.ID)
 		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, message.ID)
 		// table.SetPeriodInfo(periond)

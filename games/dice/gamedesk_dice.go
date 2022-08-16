@@ -149,7 +149,7 @@ func (g *Dice) AddScore(player games.PlayInfo, area, score int) (int64, error) {
 }
 
 func (g *Dice) InserRedisBetList(betpre, betstring string) {
-	g.Rdb.RPush(betpre, betstring)
+	g.Rdb.LPush(betpre, betstring)
 }
 
 //获取赢钱字符串
