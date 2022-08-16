@@ -44,20 +44,40 @@ type Dice struct {
 	WinArea              int                       //赢点	牌值大小单双
 	WinAreaIndex         int                       //赢点	牌值大小单双
 	WinAreaBets          map[int64]([]games.Areas) //赢钱区域
-	GameTimer            *time.Timer               //定时器
+	GameTimer            time.Timer                //定时器
 }
 
 //获取分钟
 func GetFormatHourMinute(minute, second int) string {
-	t4 := time.Now().Hour() //小时
 
-	t5 := fmt.Sprintf("%02d:%02d:%02d", t4, minute, second)
+	t := time.Now()
+	t1 := t.Add(time.Minute * time.Duration(minute))
+	t2 := t1.Add(time.Second * time.Duration(second))
+	t6 := fmt.Sprintf("%02d:%02d:%02d", t2.Hour(), t2.Minute(), second)
 
-	return t5
+	return t6
+}
+
+//格式化获取分钟
+func GetTimeMinute(m int) int {
+	t := time.Date(2022, 8, 17, 0, 59, 0, 0, time.Local)
+
+	// t := time.Now()
+	t5 := t.Add(time.Minute * time.Duration(m))
+
+	t1 := t5.Year()
+	t2 := t5.Month()
+	t3 := t5.Day()
+	t4 := t5.Hour()
+	t6 := t5.Minute()
+	date := fmt.Sprintf("%d%02d%02d%2d%2d", t1, t2, t3, t4, t6)
+	fmt.Println(date)
+	return t5.Minute()
 }
 
 //获取分钟
 func GetMinute() int {
+
 	t5 := time.Now().Minute() //分钟
 	return t5
 }
@@ -92,12 +112,12 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 
 	if GetMinute()%2 == 0 {
 		durationsec = 2*60 - GetSecond()
-		turnontime = GetFormatHourMinute(GetMinute()+2, 0)
-		closetime = GetFormatHourMinute(GetMinute()+3, 50)
+		turnontime = GetFormatHourMinute(2, 0) //开始时间
+		closetime = GetFormatHourMinute(3, 50)
 	} else {
 		durationsec = 1*60 - GetSecond()
-		turnontime = GetFormatHourMinute(GetMinute()+1, 0)
-		closetime = GetFormatHourMinute(GetMinute()+2, 50)
+		turnontime = GetFormatHourMinute(1, 0) //开始时间
+		closetime = GetFormatHourMinute(2, 50)
 	}
 
 	periondInfo := logic.PeriodInfo{
@@ -106,10 +126,16 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 		Closetime:  closetime,
 	}
 	g.Periodinfo = periondInfo
-	g.LastOpentime = durationsec
-	g.GameTimer = time.NewTimer(time.Duration(1) * time.Second) //定时器
-
+	fmt.Println("开局倒计时:", durationsec)
 	return periondInfo, durationsec, nil
+}
+
+func (g *Dice) SetOpenTime(time time.Timer) {
+	g.GameTimer = time
+}
+
+func (g *Dice) GetLastOpenTime() int {
+	return g.LastOpentime
 }
 
 //获取期号

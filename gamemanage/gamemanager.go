@@ -177,8 +177,7 @@ func InitStart(tb *telegram.TgBot) {
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
 	fmt.Println(table)
 	periond, lasttime, _ := table.InitPeriodInfo()
-	fmt.Println(periond)
-
+	logger.Info("当前%s期,开局时间:%d!", periond, lasttime)
 	timer := time.NewTimer(time.Duration(lasttime) * time.Second)
 
 	if table.GetStatus() > games.GS_TK_BET {
@@ -187,14 +186,14 @@ func InitStart(tb *telegram.TgBot) {
 		tb.SendChatMessage("已经开局，请等待结束\\!", nil, m)
 	}
 	start := tb.Games.NewGames(games.GAME_DICE, m.ID)
-	fmt.Println(start)
+	if start {
+		logger.Info("新游戏开局:%s", m.ID)
+	}
 
 	go func() {
-		fmt.Println("当前时间为:", time.Now())
-		fmt.Println(timer)
+		logger.Info("当前时间为:", time.Now())
+		fmt.Println("准备开局，当前时间为:", time.Now())
 		<-timer.C
-
-		// fmt.Println("当前时间为:", t)
 
 		msg := telegram.TemplateDice_Text(periond)
 
@@ -214,7 +213,8 @@ func InitStart(tb *telegram.TgBot) {
 		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, message.ID)
 		// table.SetPeriodInfo(periond)
 		fmt.Println(table)
-		CountDownTimer(tb, 10) //30 倒计时
+		lasttime := table.GetLastOpenTime()
+		CountDownTimer(tb, lasttime) //30 倒计时
 	}()
 
 }

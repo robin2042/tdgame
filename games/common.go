@@ -42,7 +42,7 @@ type GameTable interface {
 	InitPeriodInfo() (logic.PeriodInfo, int, error) //设置开局信息
 	GetTitlesInfo() (string, error)                 //获取标题信息
 	GetBalance(uid int64) int64                     //获取用户余额
-
+	GetLastOpenTime() int
 }
 
 type Games interface {
