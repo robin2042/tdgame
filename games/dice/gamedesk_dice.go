@@ -137,7 +137,7 @@ func (g *Dice) SetCloseTime(time time.Time) {
 	g.GameTime = time
 }
 
-func (g *Dice) GetLastCloseTime() int {
+func (g *Dice) GetLastOpenTime() int {
 	m1 := time.Since(g.GameTime)
 
 	return int(m1.Minutes())
