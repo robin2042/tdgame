@@ -58,6 +58,23 @@ func GetFormatHourMinute(minute, second int) (string, time.Time) {
 	return t6, t2
 }
 
+//获取分钟
+func GetGameDefTime(t time.Time, m, s int32) time.Time {
+	t1 := t.Add(time.Duration(m) * time.Minute)
+	t1 = t1.Add(time.Duration(s) * time.Second)
+	return t1
+}
+
+//获取分钟
+func GetCurrGameTime() time.Time {
+	t1 := time.Now()
+	timestr := fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(), t1.Hour(), t1.Minute(), 0)
+
+	t2, _ := time.ParseInLocation("2006-01-02 15:04:05", timestr, time.Local) //这里按照当前时区转
+
+	return t2
+}
+
 //格式化获取分钟
 func GetTimeMinute(m int) int {
 	t := time.Date(2022, 8, 17, 0, 59, 0, 0, time.Local)
