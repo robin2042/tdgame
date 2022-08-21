@@ -48,6 +48,7 @@ type Dice struct {
 }
 
 //获取分钟
+//获取分钟
 func GetFormatHourMinute(minute, second int) (string, time.Time) {
 
 	t := time.Now()
