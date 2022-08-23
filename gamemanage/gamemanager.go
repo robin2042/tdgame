@@ -36,11 +36,11 @@ func CloseBetTimer(tb *telegram.TgBot, ntimer int) {
 	c := &telebot.Chat{
 		ID: int64(groupid),
 	}
-
+	currentid := GetRedisNameValues(tb, games.GAME_DICE)
 	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
 	go func() {
 		<-timer.C //等等定时器、
-		table := tb.Games.GetTable(games.GAME_DICE, groupid, "0")
+		table := tb.Games.GetTable(games.GAME_DICE, groupid, currentid)
 		fmt.Println(table)
 		CloseBet_SendBack(tb, 0, c)
 		RandDiceTimer(tb, 2) //封盘后10秒发送骰子
@@ -57,8 +57,9 @@ func CountDownTimer(tb *telegram.TgBot, ntimer time.Duration) {
 	c := &telebot.Chat{
 		ID: int64(groupid),
 	}
+	currentid := GetRedisNameValues(tb, games.GAME_DICE)
 
-	table := tb.Games.GetTable(games.GAME_DICE, groupid, "0")
+	table := tb.Games.GetTable(games.GAME_DICE, groupid, currentid)
 	fmt.Println(table)
 	timer := time.NewTimer(ntimer)
 	fmt.Println(timer)
@@ -75,8 +76,8 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 	c := &telebot.Chat{
 		ID: int64(groupid),
 	}
-
-	table := tb.Games.GetTable(games.GAME_DICE, groupid, "0")
+	currentid := GetRedisNameValues(tb, games.GAME_DICE)
+	table := tb.Games.GetTable(games.GAME_DICE, groupid, currentid)
 	fmt.Println(table)
 	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
 
@@ -94,7 +95,8 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 
 //开奖结果
 func LotteryGame_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
-	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), "0")
+	currentid := GetRedisNameValues(tb, games.GAME_DICE)
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), currentid)
 
 	lottery := table.GetLotteryInfo()
 
@@ -117,7 +119,8 @@ func LotteryGame_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 
 //停盘消息
 func CloseBet_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
-	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), "0")
+	currentid := GetRedisNameValues(tb, games.GAME_DICE)
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), currentid)
 	period := table.GetPeriodInfo()
 	bets, err := table.GetBetInfos()
 	fmt.Println(bets, err)
@@ -134,7 +137,8 @@ func CloseBet_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 
 //封盘
 func CountDown_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
-	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), "0")
+	currentid := GetRedisNameValues(tb, games.GAME_DICE)
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), currentid)
 	str := telegram.TemplateDice_CountDownText()
 	if table != nil {
 		fmt.Println(table)
@@ -161,8 +165,9 @@ func RandDice_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 	if first.Dice.Type != telebot.Cube.Type {
 		return
 	}
+	currentid := GetRedisNameValues(tb, games.GAME_DICE)
+	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), currentid)
 
-	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), "0")
 	table.SettleGame(first.Dice.Value, second.Dice.Value, three.Dice.Value) //结算游戏
 
 }
@@ -193,7 +198,7 @@ func InitStart(tb *telegram.TgBot) {
 	}
 	currentid := GetRedisNameValues(tb, games.GAME_DICE)
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, currentid)
-	fmt.Println(table)
+
 	periond, lasttime, _ := table.InitPeriodInfo()
 	logger.Info("当前%s期,开局时间:%d!", periond, lasttime)
 	newgametimer := time.NewTimer(time.Duration(lasttime) * time.Second)
