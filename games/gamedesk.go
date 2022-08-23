@@ -32,7 +32,7 @@ type GameDesk struct {
 	GameTable
 	Rdb              *storage.CloudStore
 	db               *storage.Storage
-	MsgID            int    //消息ID
+	MsgID            string //消息ID
 	PlayID           string //局号
 	ChatID           int64  //桌台号
 	NameID           int
@@ -318,12 +318,12 @@ func (g *GameDesk) DispatchTableCard() {
 }
 
 //开始
-func (g *GameDesk) GetMsgID() int {
+func (g *GameDesk) GetMsgID() string {
 	return g.MsgID
 }
 
 //开始
-func (g *GameDesk) SetMsgID(m int) {
+func (g *GameDesk) SetMsgID(m string) {
 	g.MsgID = m
 }
 

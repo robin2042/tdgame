@@ -26,8 +26,8 @@ type GameTable interface {
 	GetChatID() int64
 	GetPlayID() string
 	GetNameID() int
-	SetMsgID(int)   //获取游戏状态
-	GetStatus() int //获取游戏状态
+	SetMsgID(string) //获取游戏状态
+	GetStatus() int  //获取游戏状态
 	StartGame(int64) (bool, error)
 	SettleGame(int, int, int) ([]logic.Scorelogs, error)
 	EndGame() error
@@ -48,9 +48,9 @@ type GameTable interface {
 
 type Games interface {
 	NewGames(nameid, chatid int64) bool //判断上一句时间
-	GameBegin(nameid int, chatid int64, msgid int) int
-	GameEnd(nameid, chatid int64, msgid int) error
-	GetTable(nameid int, chatid int64, msgid int) GameTable //桌台
+	GameBegin(nameid int, chatid int64, msgid string) int
+	GameEnd(nameid, chatid int64, msgid string) error
+	GetTable(nameid int, chatid int64, msgid string) GameTable //桌台
 	Bet(table GameTable, userid int64, area int) (bool, error)
 	AddScore(string, GameTable, PlayInfo, int, int) (int64, error) //下注额 下注总额 错误
 	BetInfos(chatid int64, msgid int) ([]string, error)
