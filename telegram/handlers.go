@@ -198,7 +198,7 @@ func NiuniuBet(tb *TgBot) func(m *telebot.Message) {
 			reply := TemplateNiuniu_Bet(tb)
 			message, _ := tb.SendHtmlMessage(msg, reply, m)
 
-			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, string(message.ID))
 
 		}
 
@@ -220,7 +220,7 @@ func RouletteBet(tb *TgBot) func(m *telebot.Message) {
 			reply := TemplateNiuniu_Bet(tb)
 			message, _ := tb.SendHtmlMessage(msg, reply, m)
 
-			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, string(message.ID))
 
 		}
 
@@ -242,7 +242,7 @@ func BaccaratBet(tb *TgBot) func(m *telebot.Message) {
 			reply := TemplateBaccarat_Bet(tb)
 			message, _ := tb.SendHtmlMessage(msg, reply, m)
 
-			tb.Games.GameBegin(games.GAME_BACCARAT, message.Chat.ID, message.ID)
+			tb.Games.GameBegin(games.GAME_BACCARAT, message.Chat.ID, string(message.ID))
 
 		}
 
@@ -264,7 +264,7 @@ func FruitBet(tb *TgBot) func(m *telebot.Message) {
 			reply := TemplateNiuniu_Bet(tb)
 			message, _ := tb.SendHtmlMessage(msg, reply, m)
 
-			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, message.ID)
+			tb.Games.GameBegin(games.GAME_NIUNIU, message.Chat.ID, string(message.ID))
 
 		}
 
@@ -339,7 +339,7 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 		if len(arrbet) <= 0 {
 			return
 		}
-		table := tb.Games.GetTable(games.GAME_DICE, m.Chat.ID, 0)
+		table := tb.Games.GetTable(games.GAME_DICE, m.Chat.ID, "")
 		if table.GetStatus() > games.GS_TK_BET {
 			return
 			// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
@@ -419,7 +419,7 @@ func Dice_CloseBet(tb *TgBot, serialno int, c *telebot.Chat) {
 func Baccarat_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, c.Message.ID)
+		table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, string(c.Message.ID))
 		if table.GetStatus() > games.GS_TK_BET {
 			reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
 			tb.Bot.Respond(c, &reply)
@@ -455,7 +455,7 @@ func Baccarat_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, string(c.Message.ID))
 		if table.GetStatus() > games.GS_TK_BET {
 			reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
 			tb.Bot.Respond(c, &reply)
@@ -490,7 +490,7 @@ func Niuniu_BetCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Baccarat_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, c.Message.ID)
+		table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, string(c.Message.ID))
 		start, err := table.StartGame(int64(c.Sender.ID))
 		if !start {
 			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
@@ -512,7 +512,7 @@ func Baccarat_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Niuniu_StartCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, string(c.Message.ID))
 		start, err := table.StartGame(int64(c.Sender.ID))
 		if !start {
 			reply := telebot.CallbackResponse{Text: err.Error(), ShowAlert: true}
@@ -590,7 +590,7 @@ func Games_SignCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Baccarat_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, c.Message.ID)
+		table := tb.Games.GetTable(games.GAME_BACCARAT, c.Message.Chat.ID, string(c.Message.ID))
 		data, _ := strconv.Atoi(c.Data)
 
 		_, err := tb.Games.Bet(table, int64(c.Sender.ID), data)
@@ -616,7 +616,7 @@ func Baccarat_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 func Niuniu_SelectCallBack(tb *TgBot) func(c *telebot.Callback) {
 	return func(c *telebot.Callback) {
 
-		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, c.Message.ID)
+		table := tb.Games.GetTable(games.GAME_NIUNIU, c.Message.Chat.ID, string(c.Message.ID))
 		data, _ := strconv.Atoi(c.Data)
 
 		_, err := tb.Games.Bet(table, int64(c.Sender.ID), data)
