@@ -12,6 +12,10 @@ import (
 // 大单", "小双", "大双", "小单", "小", "大", "单", "双"
 
 // "大","小","单","双","大单","大双","小单","小双"
+const TIME_LAYOUT = "2006-01-02 15:04:05"
+const CLOSE_MINTURE = 1
+const CLOSE_MINTURE_SECOND = 50
+const TURNNO_MINTURE = 2
 
 const MAX_LEN = 100
 const TEN_HISTORY = 10
@@ -51,7 +55,6 @@ type Dice struct {
 //获取分钟
 func GetFormatHourMinute(t time.Time, minute, second int) (string, time.Time) {
 
-	// t := time.Now()
 	t1 := t.Add(time.Minute * time.Duration(minute))
 	t2 := t1.Add(time.Second * time.Duration(second))
 	t6 := fmt.Sprintf("%02d:%02d:%02d", t2.Hour(), t2.Minute(), second)
@@ -71,8 +74,7 @@ func GetCurrGameTime() time.Time {
 	t1 := time.Now()
 	timestr := fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(), t1.Hour(), t1.Minute(), 0)
 
-	t2, _ := time.ParseInLocation("2006-01-02 15:04:05", timestr, time.Local) //这里按照当前时区转
-
+	t2, _ := time.ParseInLocation(TIME_LAYOUT, timestr, time.Local) //这里按照当前时区转
 	return t2
 }
 
@@ -147,14 +149,20 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 
 //设置时间
 func (g *Dice) SetGameTime(close, turnon time.Time) {
+	// t1 := time.Now()
+	// fmt.Println(t1.Sub(close))
+
 	g.CloseTime = close
 	g.TurnnoTime = turnon
+
 }
 
-func (g *Dice) GetLastOpenTime() int {
-	m1 := time.Since(g.CloseTime)
+func (g *Dice) GetGameTimeSecond() (time.Duration, time.Duration) {
+	t1 := time.Now()
+	m1 := g.CloseTime.Sub(t1)
+	m2 := g.TurnnoTime.Sub(t1)
 
-	return int(m1.Minutes())
+	return m1, m2
 }
 
 //获取期号

@@ -52,7 +52,7 @@ func CloseBetTimer(tb *telegram.TgBot, ntimer int) {
 }
 
 //倒计时
-func CountDownTimer(tb *telegram.TgBot, ntimer int) {
+func CountDownTimer(tb *telegram.TgBot, ntimer time.Duration) {
 	groupid := viper.GetInt64("tg.groupid")
 	c := &telebot.Chat{
 		ID: int64(groupid),
@@ -60,7 +60,7 @@ func CountDownTimer(tb *telegram.TgBot, ntimer int) {
 
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
 	fmt.Println(table)
-	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
+	timer := time.NewTimer(ntimer)
 	fmt.Println(timer)
 	go func() {
 		<-timer.C //等等定时器
@@ -178,7 +178,7 @@ func InitStart(tb *telegram.TgBot) {
 	fmt.Println(table)
 	periond, lasttime, _ := table.InitPeriodInfo()
 	logger.Info("当前%s期,开局时间:%d!", periond, lasttime)
-	timer := time.NewTimer(time.Duration(lasttime) * time.Second)
+	newgametimer := time.NewTimer(time.Duration(lasttime) * time.Second)
 
 	if table.GetStatus() > games.GS_TK_BET {
 		// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
@@ -193,7 +193,7 @@ func InitStart(tb *telegram.TgBot) {
 	go func() {
 		logger.Info("当前时间为:", time.Now())
 		fmt.Println("准备开局，当前时间为:", time.Now())
-		<-timer.C
+		<-newgametimer.C
 
 		msg := telegram.TemplateDice_Text(periond)
 
@@ -212,8 +212,9 @@ func InitStart(tb *telegram.TgBot) {
 		tb.Games.GameBegin(games.GAME_DICE, message.Chat.ID, message.ID)
 		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, message.ID)
 		// table.SetPeriodInfo(periond)
-		fmt.Println(table)
-		lasttime := table.GetLastOpenTime()
+		// fmt.Println(table)
+		lasttime, _ := table.GetGameTimeSecond()
+		// fmt.Println(lasttime)
 		CountDownTimer(tb, lasttime) //30 倒计时
 	}()
 
