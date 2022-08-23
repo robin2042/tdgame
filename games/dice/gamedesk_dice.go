@@ -108,24 +108,29 @@ func GetSecond() int {
 	return t5
 }
 
+//获取RedisID
+func (g *Dice) GetRedisPeriodID() string {
+	t1 := time.Now().Year()
+	t2 := time.Now().Month()
+	t3 := time.Now().Day()
+	date := fmt.Sprintf("%d%d%02d%02d", g.GetNameID(), t1, t2, t3)
+
+	values, err := g.Rdb.GetValue(date)
+	if err == nil {
+		g.Rdb.Incr(date)
+	}
+	Period := fmt.Sprintf("%s%03s", date, values)
+	return Period
+
+}
+
 //设置开局信息
 func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 
 	g.BetMux.Lock()
 	defer g.BetMux.Unlock()
 
-	t1 := time.Now().Year()
-	t2 := time.Now().Month()
-	t3 := time.Now().Day()
-	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
-
-	values, err := g.Rdb.GetValue(date)
-	if err == nil {
-		g.Rdb.Incr(date)
-	}
-
-	Period := fmt.Sprintf("%s%03s", date, values)
-
+	Period := g.GetRedisPeriodID()
 	durationsec := 1
 	//开盘时间\封盘时间
 	var turnontime, closetime string
@@ -133,8 +138,8 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 	bettime := GetCurrGameTime()
 	// fmt.Println(bettime)
 
-	closetime, close := GetFormatHourMinute(bettime, 1, 50)  //封盘时间
-	turnontime, turnon := GetFormatHourMinute(bettime, 2, 0) //开奖时间
+	closetime, close := GetFormatHourMinute(bettime, CLOSE_MINTURE, CLOSE_MINTURE_SECOND) //封盘时间
+	turnontime, turnon := GetFormatHourMinute(bettime, TURNNO_MINTURE, 0)                 //开奖时间
 
 	periondInfo := logic.PeriodInfo{
 		PeriodID:   Period,

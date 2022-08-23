@@ -174,6 +174,7 @@ func InitStart(tb *telegram.TgBot) {
 	m := &telebot.Chat{
 		ID: int64(groupid),
 	}
+
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, 0)
 	fmt.Println(table)
 	periond, lasttime, _ := table.InitPeriodInfo()
@@ -181,8 +182,7 @@ func InitStart(tb *telegram.TgBot) {
 	newgametimer := time.NewTimer(time.Duration(lasttime) * time.Second)
 
 	if table.GetStatus() > games.GS_TK_BET {
-		// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
-		// tb.Bot.Respond(c, &reply)
+
 		tb.SendChatMessage("已经开局，请等待结束\\!", nil, m)
 	}
 	start := tb.Games.NewGames(games.GAME_DICE, m.ID)
@@ -240,8 +240,8 @@ func (g *GameMainManage) LoadGames() (bool, error) {
 }
 
 func (g *GameMainManage) GetTable(nameid int, chatid int64, msgid int) games.GameTable {
-	// playid := fmt.Sprintf("%d%d", chatid, msgid)
-	playid := "-7306125820"
+	playid := fmt.Sprintf("%d%d", chatid, msgid)
+	// playid := "-7306125820"
 	table := g.Tables[playid]
 	if table != nil {
 		return table
