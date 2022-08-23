@@ -269,18 +269,6 @@ func (g *Dice) GetBetInfo(userid int64) ([]string, int) {
 	return g.GameDesk.GetBetInfo(userid)
 }
 
-//获取ID
-func (g *Dice) GetPeriodID() string {
-	t1 := time.Now().Year()
-	t2 := time.Now().Month()
-	t3 := time.Now().Day()
-	date := fmt.Sprintf("%d%02d%02d", t1, t2, t3)
-
-	values, _ := g.Rdb.GetValue(date)
-
-	return values
-}
-
 //根据牌值类型 单双,返回大小单双
 func RetTypes(value, types int) int {
 	values := value | types
@@ -444,12 +432,5 @@ func (g *Dice) UpdateHistory(periodinfo string, first, second, three, WinPoint, 
 	g.Rdb.SetValue(rlasthistory, last)
 	hvalue := fmt.Sprintf("%s期 %d\\,%d\\,%d\\,\\=%d%s", g.Periodinfo.PeriodID, first, second, three, WinPoint, winArea)
 	g.Rdb.MaxRPush(rhistory, hvalue, MAX_LEN)
-
-}
-
-//停止下注
-func (g *Dice) CloseGameBet() {
-	values := g.GetPeriodID()
-	fmt.Println(values)
 
 }
