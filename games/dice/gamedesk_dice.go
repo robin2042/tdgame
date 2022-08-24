@@ -147,6 +147,8 @@ func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
 		Closetime:  closetime,
 	}
 	g.SetGameTime(close, turnon)
+	fmt.Println(g)
+
 	g.Periodinfo = periondInfo
 	fmt.Println("开局倒计时:", durationsec)
 	return periondInfo, durationsec, nil
@@ -163,6 +165,7 @@ func (g *Dice) SetGameTime(close, turnon time.Time) {
 }
 
 func (g *Dice) GetGameTimeSecond() (time.Duration, time.Duration) {
+	fmt.Println(g)
 	t1 := time.Now()
 	m1 := g.CloseTime.Sub(t1)
 	m2 := g.TurnnoTime.Sub(t1)

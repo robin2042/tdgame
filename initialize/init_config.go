@@ -49,7 +49,7 @@ func App() (*telegram.TgBot, uint64) {
 		games, Rds)
 
 	telegram.SetupHandlers(bot)
-	gamemanage.InitStart(bot)
+	gamemanage.InitStart(bot) //初始化
 
 	fmt.Println("链接bot成功!")
 
