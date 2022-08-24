@@ -40,10 +40,10 @@ type GameTable interface {
 	GetSettleInfos() ([]string, error)
 	GetPeriodInfo() logic.PeriodInfo //开局信息
 	GetLotteryInfo() logic.LotteryInfo
-	InitPeriodInfo() (logic.PeriodInfo, int, error)    //设置开局信息
-	GetTitlesInfo() (string, error)                    //获取标题信息
-	GetBalance(uid int64) int64                        //获取用户余额
-	GetGameTimeSecond() (time.Duration, time.Duration) //倒计时时间,停盘,停止时间
+	InitPeriodInfo(period string) (logic.PeriodInfo, int, error) //设置开局信息
+	GetTitlesInfo() (string, error)                              //获取标题信息
+	GetBalance(uid int64) int64                                  //获取用户余额
+	GetGameTimeSecond() (time.Duration, time.Duration)           //倒计时时间,停盘,停止时间
 }
 
 type Games interface {

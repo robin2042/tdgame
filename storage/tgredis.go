@@ -110,6 +110,7 @@ func (c *CloudStore) GetLrange(key string, start, end int64) ([]string, error) {
 }
 
 //incr 自增
-func (c *CloudStore) Incr(key string) {
-	c.rds.Incr(ctx, key)
+func (c *CloudStore) Incr(key string) int64 {
+	r, _ := c.rds.Incr(ctx, key).Result()
+	return r
 }

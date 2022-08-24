@@ -29,6 +29,13 @@ type GameMainManage struct {
 
 }
 
+//开启下一局新游戏
+func EndGame(tb *telegram.TgBot, nameid, chatid int64, msgid string) {
+	tb.Games.GameEnd(nameid, chatid, msgid) //结算游戏
+	SetRedisNextID(tb, games.GAME_DICE)     //初始化ID
+	InitStart(tb)
+}
+
 //创建停盘消息
 func CloseBetTimer(tb *telegram.TgBot, ntimer int) {
 
@@ -36,7 +43,7 @@ func CloseBetTimer(tb *telegram.TgBot, ntimer int) {
 	c := &telebot.Chat{
 		ID: int64(groupid),
 	}
-	currentid := GetRedisInitID(tb, games.GAME_DICE)
+	currentid := GetRedisCurrentID(tb, games.GAME_DICE)
 	timer := time.NewTimer(time.Duration(ntimer) * time.Second)
 	go func() {
 		<-timer.C //等等定时器、
@@ -65,7 +72,6 @@ func CountDownTimer(tb *telegram.TgBot, ntimer time.Duration) {
 	fmt.Println(du)
 	timer := time.NewTimer(ntimer)
 
-	fmt.Println(timer)
 	go func() {
 		<-timer.C //等等定时器
 		CountDown_SendBack(tb, 0, c)
@@ -92,13 +98,13 @@ func RandDiceTimer(tb *telegram.TgBot, ntimer int) {
 		//开启下一轮游戏
 		//开奖结果
 		//最近10期
-
+		EndGame(tb, games.GAME_DICE, groupid, currentid)
 	}()
 }
 
 //开奖结果
 func LotteryGame_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
-	currentid := GetRedisInitID(tb, games.GAME_DICE)
+	currentid := GetRedisCurrentID(tb, games.GAME_DICE)
 	table := tb.Games.GetTable(games.GAME_DICE, int64(groupid), currentid)
 
 	lottery := table.GetLotteryInfo()
@@ -176,7 +182,7 @@ func RandDice_SendBack(tb *telegram.TgBot, groupid int, c *telebot.Chat) {
 }
 
 //获取RedisID
-func GetRedisInitID(tb *telegram.TgBot, nameid int) string {
+func SetRedisNextID(tb *telegram.TgBot, nameid int) string {
 	t1 := time.Now().Year()
 	t2 := time.Now().Month()
 	t3 := time.Now().Day()
@@ -213,10 +219,10 @@ func InitStart(tb *telegram.TgBot) {
 	m := &telebot.Chat{
 		ID: int64(groupid),
 	}
-	currentid := GetRedisInitID(tb, games.GAME_DICE) //初始化ID
+	currentid := GetRedisCurrentID(tb, games.GAME_DICE) //初始化ID
 	table := tb.Games.GetTable(games.GAME_DICE, groupid, currentid)
 
-	periond, lasttime, _ := table.InitPeriodInfo()
+	periond, lasttime, _ := table.InitPeriodInfo(currentid)
 	logger.Info("当前%s期,开局时间:%d!", periond, lasttime)
 	newgametimer := time.NewTimer(time.Duration(lasttime) * time.Second)
 
@@ -248,13 +254,14 @@ func InitStart(tb *telegram.TgBot) {
 			logger.Error(err.Error())
 		}
 
-		tb.Games.GameBegin(games.GAME_DICE, message.Chat.ID, string(message.ID))
-		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, string(message.ID))
+		tb.Games.GameBegin(games.GAME_DICE, message.Chat.ID, currentid)
+		table := tb.Games.GetTable(games.GAME_DICE, message.Chat.ID, currentid)
 		// table.SetPeriodInfo(periond)
 		// fmt.Println(table)
 		lasttime, _ := table.GetGameTimeSecond()
+		countdown := lasttime - time.Duration(30)*time.Second
 		// fmt.Println(lasttime)
-		CountDownTimer(tb, lasttime) //30 倒计时
+		CountDownTimer(tb, countdown) //30 倒计时
 	}()
 
 }
@@ -279,7 +286,7 @@ func (g *GameMainManage) LoadGames() (bool, error) {
 }
 
 func (g *GameMainManage) GetTable(nameid int, chatid int64, msgid string) games.GameTable {
-	playid := fmt.Sprintf("%d%d", chatid, msgid)
+	playid := fmt.Sprintf("%d%s", chatid, msgid)
 	// playid := "-7306125820"
 	table := g.Tables[playid]
 	if table != nil {
@@ -295,7 +302,7 @@ func (g *GameMainManage) GetTable(nameid int, chatid int64, msgid string) games.
 }
 
 func (g *GameMainManage) GameBegin(nameid int, chatid int64, msgid string) int {
-	playid := fmt.Sprintf("%d%d", chatid, msgid)
+	playid := fmt.Sprintf("%d%s", chatid, msgid)
 
 	table := g.GetTable(nameid, chatid, msgid)
 	if table.GetStatus() != games.GS_TK_FREE { //存在就返回
@@ -395,7 +402,7 @@ func (g *GameMainManage) AddScore(messageid string, table games.GameTable, playe
 }
 
 func CreateTable(nameid int, chatid int64, msgid string) games.GameTable {
-	playid := fmt.Sprintf("%d%d", chatid, msgid)
+	playid := fmt.Sprintf("%d%s", chatid, msgid)
 	var table games.GameTable
 	// if nameid == games.GAME_NIUNIU {
 	// 	table = new(niuniu.Niuniu)

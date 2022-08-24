@@ -108,29 +108,15 @@ func GetSecond() int {
 	return t5
 }
 
-//获取RedisID
-func (g *Dice) GetRedisPeriodID() string {
-	t1 := time.Now().Year()
-	t2 := time.Now().Month()
-	t3 := time.Now().Day()
-	date := fmt.Sprintf("%d%d%02d%02d", g.GetNameID(), t1, t2, t3)
-
-	values, err := g.Rdb.GetValue(date)
-	if err == nil {
-		g.Rdb.Incr(date)
-	}
-	Period := fmt.Sprintf("%s%03s", date, values)
-	return Period
-
-}
-
 //设置开局信息
-func (g *Dice) InitPeriodInfo() (logic.PeriodInfo, int, error) {
+func (g *Dice) InitPeriodInfo(period string) (logic.PeriodInfo, int, error) {
 
 	g.BetMux.Lock()
 	defer g.BetMux.Unlock()
 
-	Period := g.GetRedisPeriodID()
+	Period := fmt.Sprintf("%d%s", g.NameID, period)
+	// Period1 := g.GetRedisPeriodID()
+	// fmt.Println(Period, Period1)
 	durationsec := 1
 	//开盘时间\封盘时间
 	var turnontime, closetime string
