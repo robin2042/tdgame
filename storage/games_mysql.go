@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"tdgames/logger"
 	"tdgames/logic"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -133,14 +132,14 @@ func (groupStorage *GamesMysql) NewGames(nameid int, chatid int64) error {
 
 	result := groupStorage.db.Model(&logic.Gamerounds{}).Where("nameid = ? and chatid =? ", nameid, chatid).Order("createtime desc").Limit(1).Find(&game)
 
-	timer, _ := time.ParseInLocation("2006-01-02 15:04:05", game.Createtime, time.Local)
+	// timer, _ := time.ParseInLocation("2006-01-02 15:04:05", game.Createtime, time.Local)
 
 	if game.Status == GAME_END {
 		return nil
 	}
-	if time.Since(timer).Seconds() <= 90 {
-		return errors.New("上局90s后才能开始游戏")
-	}
+	// if time.Since(timer).Seconds() <= 90 {
+	// 	return errors.New("上局90s后才能开始游戏")
+	// }
 
 	if result.Error != nil {
 		return errors.New("上局90s后才能开始游戏")

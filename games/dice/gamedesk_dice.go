@@ -114,9 +114,6 @@ func (g *Dice) InitPeriodInfo(period string) (logic.PeriodInfo, int, error) {
 	g.BetMux.Lock()
 	defer g.BetMux.Unlock()
 
-	Period := fmt.Sprintf("%d%s", g.NameID, period)
-	// Period1 := g.GetRedisPeriodID()
-	// fmt.Println(Period, Period1)
 	durationsec := 1
 	//开盘时间\封盘时间
 	var turnontime, closetime string
@@ -128,7 +125,7 @@ func (g *Dice) InitPeriodInfo(period string) (logic.PeriodInfo, int, error) {
 	turnontime, turnon := GetFormatHourMinute(bettime, TURNNO_MINTURE, 0)                 //开奖时间
 
 	periondInfo := logic.PeriodInfo{
-		PeriodID:   Period,
+		PeriodID:   period,
 		Turnontime: turnontime,
 		Closetime:  closetime,
 	}
@@ -383,9 +380,9 @@ func (g *Dice) CalculateScore() {
 //回写数据库
 func (g *Dice) SettleGame(first, second, three int) ([]logic.Scorelogs, error) {
 
-	first = 5
-	second = 5
-	three = 5
+	// first = 5
+	// second = 5
+	// three = 5
 	g.BetMux.Lock()
 	//保存骰子
 	g.First = first

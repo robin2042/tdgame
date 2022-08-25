@@ -61,8 +61,13 @@ func (c *CloudStore) MaxLPush(key string, argv interface{}, max int64) error {
 
 //最大插入
 func (c *CloudStore) MaxRPush(key string, argv interface{}, max int64) error {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(r)
+		}
+	}()
 
-	err := c.rds.RPush(ctx, key, argv).Err()
+	err := c.rds.LPush(ctx, key, argv).Err()
 	len, _ := c.rds.LLen(ctx, key).Result()
 	if len > max {
 		c.rds.LTrim(ctx, key, max, -1)
