@@ -19,11 +19,13 @@ func App() (*telegram.TgBot, uint64) {
 	if err := initConfig(); err != nil {
 		log.Fatalf("Error initializing config file: %s", err.Error())
 	}
-	fmt.Print(viper.Get("niuniu_start"))
+	fmt.Println(viper.Get("niuniu_start"))
+
+	fmt.Println(os.Getenv("DB_PASSWORD"))
 
 	db, err := storage.NewMysqlDB(storage.Config{
 		Host:     viper.GetString("db.host"),
-		Port:     os.Getenv("DB_PORT"),
+		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		DBName:   viper.GetString("db.dbname"),
 		SSLMode:  viper.GetString("db.sslmode"),
