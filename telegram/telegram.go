@@ -40,6 +40,18 @@ type TgBot struct {
 	Rds        *storage.CloudStore
 }
 
+func (tb *TgBot) GetRedisCurrentID(nameid int) string {
+	t1 := time.Now().Year()
+	t2 := time.Now().Month()
+	t3 := time.Now().Day()
+	date := fmt.Sprintf("%d%d%02d%02d", nameid, t1, t2, t3)
+
+	values, _ := tb.Rds.GetValue(date)
+
+	currentid := fmt.Sprintf("%d%02d%02d%s", t1, t2, t3, values)
+	return currentid
+}
+
 // NewTelegramBot constructor of TelegramBot
 func NewTelegramBot(token string, cnt *controller.Controller, d *downloader.Downloader, g games.Games, rds *storage.CloudStore) *TgBot {
 	settings := telebot.Settings{

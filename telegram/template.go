@@ -750,6 +750,20 @@ func TemplateDice_Bet(tb *TgBot) *telebot.ReplyMarkup {
 }
 
 //骰子下注信息
+func TemplateDice_ErrText(str string) string {
+	var b bytes.Buffer
+	tmpl, err := template.ParseFiles("./templates/dice/err.tmpl")
+	if err != nil {
+		fmt.Println("create template failed,err:", err)
+		return "无效"
+	}
+
+	tmpl.Execute(&b, str)
+
+	return b.String()
+}
+
+//骰子下注信息
 func TemplateDice_BetText(score logic.DiceJettonInfo) string {
 
 	var b bytes.Buffer

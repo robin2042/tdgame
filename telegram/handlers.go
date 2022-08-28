@@ -331,6 +331,8 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
 		//如果是机器人自己，退出
 
+		currentid := tb.GetRedisCurrentID(games.GAME_DICE)
+
 		messageid := fmt.Sprintf("%d%d", m.Unixtime, m.ID)
 
 		str := strings.Split(m.Text, " ")
@@ -339,7 +341,7 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 		if len(arrbet) <= 0 {
 			return
 		}
-		table := tb.Games.GetTable(games.GAME_DICE, m.Chat.ID, "")
+		table := tb.Games.GetTable(games.GAME_DICE, m.Chat.ID, currentid)
 		if table.GetStatus() > games.GS_TK_BET {
 			return
 			// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
@@ -348,7 +350,9 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 		for i := 0; i < len(arrbet); i++ {
 			intvar := arrbet[i].Score
 			area := arrbet[i].Bet
-			//fmt.Println(floatvar)
+			if intvar < 1 {
+				return
+			}
 
 			player := games.PlayInfo{
 				Name:   fmt.Sprintf("%s %s", m.Sender.FirstName, m.Sender.LastName),
@@ -358,7 +362,10 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			_, err := tb.Games.AddScore(messageid, table, player, area, intvar)
 			if err != nil {
 				logger.Error(err.Error())
-				// TemplateDice_BetText()
+				str := "余额不足"
+				errstr := TemplateDice_ErrText(str)
+				tb.ReplyToMessage(errstr, m)
+				return
 			}
 			strbets, _ := table.GetBetInfo(int64(m.Sender.ID))
 			period := table.GetPeriodInfo()
