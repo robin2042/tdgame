@@ -346,7 +346,7 @@ func Ontext(tb *TgBot) func(m *telebot.Message) {
 			return
 		}
 		table := tb.Games.GetTable(games.GAME_DICE, m.Chat.ID, currentid)
-		if table.GetStatus() > games.GS_TK_BET {
+		if table.GetStatus() != games.GS_TK_BET {
 			return
 			// reply := telebot.CallbackResponse{Text: "已经开局，请等待结束！", ShowAlert: true}
 			// tb.Bot.Respond(c, &reply)
