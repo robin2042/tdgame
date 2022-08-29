@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/leekchan/accounting"
+	"github.com/spf13/viper"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -330,7 +331,10 @@ func Callback(tb *TgBot) func(c *telebot.Callback) {
 func Ontext(tb *TgBot) func(m *telebot.Message) {
 	return func(m *telebot.Message) {
 		//如果是机器人自己，退出
-
+		groupid := viper.GetInt64("tg.groupid")
+		if m.Chat.ID != groupid {
+			return
+		}
 		currentid := tb.GetRedisCurrentID(games.GAME_DICE)
 
 		messageid := fmt.Sprintf("%d%d", m.Unixtime, m.ID)
